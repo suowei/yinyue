@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>数字专辑销售数据</title>
+
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
+    <script
+            src="https://code.jquery.com/jquery-3.1.1.min.js"
+            integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
+</head>
+<body>
+<div class="ui container">
+    <p>*大约30分钟更新一次。<br>
+    *暂缺虾米音乐数据。咪咕音乐销量前端仅显示一张专辑，其余无法获得。酷我音乐部分专辑销售金额与计算数据有差异，本表以销售金额为准。</p>
+    <table class="ui blue table">
+        <thead>
+        <tr><th>专辑</th>
+            <th>总销量（元）</th>
+            <th>QQ音乐</th>
+            <th>网易云音乐</th>
+            <th>酷狗音乐</th>
+            <th>酷我音乐</th>
+            <th>咪咕音乐</th>
+        </tr></thead>
+        <tbody>
+        {% for album in album_list %}
+        <tr>
+            <td>
+                <h4 class="ui header">
+                    《{{ album.title }}》{{ album.singer }} <div class="sub header">{{ album.release_date }}&nbsp;&nbsp;{{ album.price }}元</div>
+                </h4>
+            </td>
+            <td>{{ album.money }}</td>
+            <td>
+                {% if album.qq_id %}
+                    <a href="https://y.qq.com/m/digitalbum/gold/index.html?id={{ album.qq_id }}" target="_blank">
+                    {% if album.qq_count > 0 %}
+                        {% if album.album_only %}{{ album.qq_count }}张{% else %}{{ album.qq_song_count }}首{% endif %}<br>{{ album.qq_money }}元
+                    {% else %}
+                        暂缺
+                    {% endif %}
+                    </a>
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td>
+                {% if album.wyy_id %}
+                    <a href="https://music.163.com/store/newalbum/detail?id={{ album.wyy_id }}" target="_blank">
+                    {% if album.wyy_count > 0 %}
+                        {% if album.album_only %}{{ album.wyy_count }}张{% else %}{{ album.wyy_song_count }}首{% endif %}<br>{{ album.wyy_money }}元
+                    {% else %}
+                        暂缺
+                    {% endif %}
+                    </a>
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td>
+                {% if album.kugou_id %}
+                    <a href="http://zhuanjistatic.kugou.com/html/pc_commonchargeV3/index_{{ album.kugou_id }}.html" target="_blank">
+                    {% if album.kugou_count > 0 %}
+                        {% if album.album_only %}{{ album.kugou_count }}张{% else %}{{ album.kugou_song_ccount }}首{% endif %}<br>{{ album.kugou_money }}元
+                    {% else %}
+                        暂缺
+                    {% endif %}
+                    </a>
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td>
+                {% if album.kuwo_id %}
+                    <a href="http://vip1.kuwo.cn/fans/fans/template/index.html?key={{ album.kuwo_id }}" target="_blank">
+                    {% if album.kuwo_count > 0 %}
+                        {% if album.album_only %}{{ album.kuwo_count }}张{% else %}{{ album.kuwo_song_ccount }}首{% endif %}<br>{{ album.kuwo_money }}元
+                    {% else %}
+                        暂缺
+                    {% endif %}
+                    </a>
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td>
+                {% if album.migu_id %}
+                    <a href="http://h5.nf.migu.cn/app/v3/p/digital-album/detail/index.html?id={{ album.migu_id }}" target="_blank">
+                    {% if album.migu_count > 0 %}
+                        {% if album.album_only %}{{ album.migu_count }}张{% else %}{{ album.migu_song_ccount }}首{% endif %}<br>{{ album.migu_money }}元
+                    {% else %}
+                        暂缺
+                    {% endif %}
+                    </a>
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
