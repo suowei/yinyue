@@ -20,7 +20,7 @@ class Album(models.Model):
     wyy_params = models.TextField(null=True, blank=True)
     wyy_encSecKey = models.TextField(null=True, blank=True)
     xiami_id = models.IntegerField(null=True, blank=True)
-    migu_id = models.CharField(max_length=20, null=True, blank=True)
+    migu_id = models.IntegerField(null=True, blank=True)
     qq_count = models.IntegerField(default=0)
     qq_song_count = models.IntegerField(default=0)
     qq_money = models.DecimalField(max_digits=11, decimal_places=2, default=0.00)
@@ -122,7 +122,7 @@ class Album(models.Model):
         return
 
     def get_migu_sale_info(self):
-        if self.migu_id is None or self.migu_id != '24388243':
+        if self.migu_id is None or self.migu_id != 24388243:
             return
         url = 'https://app.act.nf.migu.cn/MAC/activity3/ninepercent/getAlbumInfo?activityId=NINEPERCENT'
         req = request.Request(url)
