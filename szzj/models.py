@@ -73,7 +73,7 @@ class Album(models.Model):
             if self.album_only:
                 self.kugou_money = self.price * self.kugou_count
             else:
-                url2 = 'https://zhuanjidata.kugou.com/v3/Commoncharge/getSongsInfo?topic_id=' + self.kugou_id + '&hashs=' + self.kugou_hashs
+                url2 = 'https://zhuanjidata.kugou.com/v3/Commoncharge/getSongsInfo?topic_id=' + self.kugou_id.__str__() + '&hashs=' + self.kugou_hashs
                 with request.urlopen(url2) as f2:
                     data2 = f2.read().decode('utf-8')
                     json_data2 = json.loads(data2)
