@@ -86,20 +86,22 @@ class Album(models.Model):
     def get_kuwo_sale_info(self):
         if self.kuwo_id is None:
             return
+        data = {'type': self.kuwo_id}
+        req = request.Request('http://vip1.kuwo.cn/fans/promotion/gettotalcnt', data=parse.urlencode(data).encode('utf-8'))
+        with request.urlopen(req) as f:
+            response = f.read().decode('utf-8')
+            json_data = json.loads(response)
+            self.kuwo_count = json_data['data']['total']
+            self.kuwo_money = Decimal(json_data['data']['totalMoney'])
+        if self.album_only:
+            return
         data = {'key': self.kuwo_id, 'op': 'gfc'}
         req = request.Request('http://vip1.kuwo.cn/fans/admin/sysInfo', data=parse.urlencode(data).encode('utf-8'))
         with request.urlopen(req) as f:
             response = f.read().decode('utf-8')
             json_data = json.loads(response)
             docs = json_data['fans']['docs']
-            self.kuwo_count = int(docs['total_cnt'])
             self.kuwo_song_count = int(docs['song_total_cnt'])
-        data2 = {'type': self.kuwo_id}
-        req2 = request.Request('http://vip1.kuwo.cn/fans/promotion/gettotalcnt', data=parse.urlencode(data2).encode('utf-8'))
-        with request.urlopen(req2) as f:
-            response2 = f.read().decode('utf-8')
-            json_data2 = json.loads(response2)
-            self.kuwo_money = Decimal(json_data2['data']['totalMoney'])
 
     def get_wyy_sale_info(self):
         if self.wyy_id is None:
