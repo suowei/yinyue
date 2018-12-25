@@ -14,6 +14,7 @@ class Album(models.Model):
     song_price = models.DecimalField(max_digits=3, decimal_places=2, default=0.00)
     qq_id = models.IntegerField(null=True, blank=True)
     kugou_id = models.IntegerField(null=True, blank=True)
+    kugou_album_id = models.IntegerField(null=True, blank=True)
     kugou_hashs = models.TextField(null=True, blank=True)
     kuwo_id = models.CharField(max_length=20, null=True, blank=True)
     wyy_id = models.IntegerField(null=True, blank=True)
@@ -73,15 +74,18 @@ class Album(models.Model):
             if self.album_only:
                 self.kugou_money = self.price * self.kugou_count
             else:
-                url2 = 'https://zhuanjidata.kugou.com/v3/Commoncharge/getSongsInfo?topic_id=' + self.kugou_id.__str__() + '&hashs=' + self.kugou_hashs
+                url2 = 'https://zhuanjidata.kugou.com/v3/Commoncharge/getSongsInfo?album_id=' + self.kugou_album_id.__str__() + '&hashs=' + self.kugou_hashs
                 with request.urlopen(url2) as f2:
                     data2 = f2.read().decode('utf-8')
                     json_data2 = json.loads(data2)
                     song_sales = json_data2['data']
                     self.kugou_song_count = 0
+                    actual_song_num = 0
                     for song_sale in song_sales:
-                        self.kugou_song_count += song_sale['buy_count']
-                    self.kugou_money = self.price * self.kugou_count + (self.kugou_song_count - self.kugou_count * self.song_num) * self.song_price
+                        if song_sale['pay_type'] == 2:
+                            self.kugou_song_count += song_sale['buy_count']
+                            actual_song_num += 1
+                    self.kugou_money = self.price * self.kugou_count + (self.kugou_song_count - self.kugou_count * actual_song_num) * self.song_price
 
     def get_kuwo_sale_info(self):
         if self.kuwo_id is None:
