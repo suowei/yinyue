@@ -34,9 +34,6 @@ class Album(models.Model):
     wyy_count = models.IntegerField(default=0)
     wyy_song_count = models.IntegerField(default=0)
     wyy_money = models.DecimalField(max_digits=11, decimal_places=2, default=0.00)
-    xiami_count = models.IntegerField(default=0)
-    xiami_song_count = models.IntegerField(default=0)
-    xiami_money = models.DecimalField(max_digits=11, decimal_places=2, default=0.00)
     migu_count = models.IntegerField(default=0)
     migu_song_count = models.IntegerField(default=0)
     migu_money = models.DecimalField(max_digits=11, decimal_places=2, default=0.00)
@@ -47,9 +44,8 @@ class Album(models.Model):
         self.get_kugou_sale_info()
         self.get_kuwo_sale_info()
         self.get_wyy_sale_info()
-        self.get_xiami_sale_info()
         self.get_migu_sale_info()
-        self.money = self.qq_money + self.kugou_money + self.kuwo_money + self.wyy_money + self.xiami_money + self.migu_money
+        self.money = self.qq_money + self.kugou_money + self.kuwo_money + self.wyy_money + self.migu_money
 
     def get_qq_sale_info(self):
         if self.qq_id is None:
@@ -123,9 +119,6 @@ class Album(models.Model):
             self.wyy_money = self.price * self.wyy_count
             if not self.album_only:
                 self.wyy_money += (self.wyy_song_count - self.wyy_count * self.song_num) * self.song_price
-
-    def get_xiami_sale_info(self):
-        return
 
     def get_migu_sale_info(self):
         if self.migu_id is None or self.migu_id != 24388243:
