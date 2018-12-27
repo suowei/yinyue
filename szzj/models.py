@@ -67,21 +67,22 @@ class Album(models.Model):
             data = f.read().decode('utf-8')
             json_data = json.loads(data)
             self.kugou_count = json_data['buy_num']
-            if self.album_only:
-                self.kugou_money = self.price * self.kugou_count
-            else:
-                url2 = 'https://zhuanjidata.kugou.com/v3/Commoncharge/getSongsInfo?album_id=' + self.kugou_album_id.__str__() + '&hashs=' + self.kugou_hashs
-                with request.urlopen(url2) as f2:
-                    data2 = f2.read().decode('utf-8')
-                    json_data2 = json.loads(data2)
-                    song_sales = json_data2['data']
-                    self.kugou_song_count = 0
-                    actual_song_num = 0
-                    for song_sale in song_sales:
-                        if song_sale['pay_type'] == 2:
-                            self.kugou_song_count += song_sale['buy_count']
-                            actual_song_num += 1
-                    self.kugou_money = self.price * self.kugou_count + (self.kugou_song_count - self.kugou_count * actual_song_num) * self.song_price
+
+        self.kugou_money = self.price * self.kugou_count
+        if self.album_only:
+            return
+        url = 'https://zhuanjidata.kugou.com/v3/Commoncharge/getSongsInfo?album_id=' + self.kugou_album_id.__str__() + '&hashs=' + self.kugou_hashs
+        with request.urlopen(url) as f:
+            data = f.read().decode('utf-8')
+            json_data = json.loads(data)
+            song_sales = json_data['data']
+            self.kugou_song_count = 0
+            actual_song_num = 0
+            for song_sale in song_sales:
+                if song_sale['pay_type'] == 2:
+                    self.kugou_song_count += song_sale['buy_count']
+                    actual_song_num += 1
+            self.kugou_money += (self.kugou_song_count - self.kugou_count * actual_song_num) * self.song_price
 
     def get_kuwo_sale_info(self):
         if self.kuwo_id is None:

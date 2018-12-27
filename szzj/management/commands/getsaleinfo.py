@@ -6,8 +6,10 @@ class Command(BaseCommand):
     help = 'Get sale data.'
 
     def handle(self, *args, **options):
-        album_list = Album.objects.all()
-        for album in album_list:
+        i = Album.objects.count()
+        while i > 0:
+            album = Album.objects.get(id=i)
             album.get_sale_info()
             album.save()
+            i -= 1
 
