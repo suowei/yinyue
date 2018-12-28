@@ -68,7 +68,11 @@
             </td>
             <td>
                 {% if album.kugou_id %}
+                    {% if album.kugou_id > 100000 %}
                     <a href="http://zhuanjistatic.kugou.com/html/pc_commonchargeV3/index_{{ album.kugou_id }}.html" target="_blank">
+                    {% else %}
+                    <a href="http://huodong.kugou.com/2014/html/pc_commonchargeV2/index_{{ album.kugou_id }}.html" target="_blank">
+                    {% endif %}
                     {% if album.kugou_count > 0 %}
                         {% if album.album_only %}{{ album.kugou_count }}张{% else %}{{ album.kugou_song_count }}首{% endif %}<br>{{ album.kugou_money }}元
                     {% else %}
