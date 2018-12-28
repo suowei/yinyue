@@ -107,6 +107,17 @@ class Album(models.Model):
     def get_wyy_sale_info(self):
         if self.wyy_id is None:
             return
+
+        if not self.wyy_params:
+            req = request.Request('https://music.163.com/store/api/product/detail?id=' + self.wyy_id.__str__())
+            req.add_header('Referer', 'https://music.163.com/store/product/detail?id=' + self.wyy_id.__str__())
+            with request.urlopen(req) as f:
+                response = f.read().decode('utf-8')
+                json_data = json.loads(response)
+                self.wyy_count = json_data['sales']
+                self.wyy_money = self.price * self.wyy_count
+            return
+
         data = {'params': self.wyy_params, 'encSecKey': self.wyy_encSecKey}
         req = request.Request('https://music.163.com/weapi/vipmall/albumproduct/detail', data=parse.urlencode(data).encode('utf-8'))
         req.add_header('User-Agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36 OPR/56.0.3051.116')
