@@ -63,6 +63,8 @@ class Album(models.Model):
         if self.kugou_id is None:
             return
         url = 'https://zhuanjidata.kugou.com/v3/Commoncharge/getBuyNum?topic_id=' + self.kugou_id.__str__()
+        if self.kugou_id == 60748:
+            url = 'http://zhuanji.kugou.com/index.php?r=commonchargeV2/getBuyNum&topic_id=' + self.kugou_id.__str__()
         with request.urlopen(url) as f:
             data = f.read().decode('utf-8')
             json_data = json.loads(data)

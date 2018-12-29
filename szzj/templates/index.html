@@ -55,7 +55,7 @@
             </td>
             <td>
                 {% if album.wyy_id %}
-                    {% if album.wyy_id > 5856052 %}
+                    {% if album.wyy_id != 5856052 %}
                     <a href="https://music.163.com/store/newalbum/detail?id={{ album.wyy_id }}" target="_blank">
                     {% else %}
                     <a href="https://music.163.com/store/product/detail?id={{ album.wyy_id }}" target="_blank">
@@ -72,10 +72,12 @@
             </td>
             <td>
                 {% if album.kugou_id %}
-                    {% if album.kugou_id > 38901 %}
-                    <a href="http://zhuanjistatic.kugou.com/html/pc_commonchargeV3/index_{{ album.kugou_id }}.html" target="_blank">
-                    {% else %}
+                    {% if album.kugou_id == 38901 %}
                     <a href="http://huodong.kugou.com/2014/html/pc_commonchargeV2/index_{{ album.kugou_id }}.html" target="_blank">
+                    {% elif album.kugou_id == 60748 %}
+                    <a href="http://zhuanji.kugou.com/html/mobile_commonchargeV2/index_{{ album.kugou_id }}.html" target="_blank">
+                    {% else %}
+                    <a href="http://zhuanjistatic.kugou.com/html/pc_commonchargeV3/index_{{ album.kugou_id }}.html" target="_blank">
                     {% endif %}
                     {% if album.kugou_count > 0 %}
                         {% if album.album_only %}{{ album.kugou_count }}张{% else %}{{ album.kugou_song_count }}首{% endif %}<br>{{ album.kugou_money }}元
