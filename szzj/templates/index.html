@@ -42,7 +42,11 @@
             <td>{{ album.money }}</td>
             <td>
                 {% if album.qq_id %}
+                    {% if album.qq_id != 656743 %}
                     <a href="https://y.qq.com/m/digitalbum/gold/index.html?id={{ album.qq_id }}" target="_blank">
+                    {% else %}
+                    <a href="https://y.qq.com/m/digitalbum/silver/index.html?id={{ album.qq_id }}" target="_blank">
+                    {% endif %}
                     {% if album.qq_count > 0 %}
                         {% if album.album_only %}{{ album.qq_count }}张{% else %}{{ album.qq_song_count }}首{% endif %}<br>{{ album.qq_money }}元
                     {% else %}
@@ -72,9 +76,9 @@
             </td>
             <td>
                 {% if album.kugou_id %}
-                    {% if album.kugou_id == 38901 %}
+                    {% if album.kugou_id <= 38901 %}
                     <a href="http://huodong.kugou.com/2014/html/pc_commonchargeV2/index_{{ album.kugou_id }}.html" target="_blank">
-                    {% elif album.kugou_id == 60748 %}
+                    {% elif album.kugou_id <= 60748 %}
                     <a href="http://zhuanji.kugou.com/html/mobile_commonchargeV2/index_{{ album.kugou_id }}.html" target="_blank">
                     {% else %}
                     <a href="http://zhuanjistatic.kugou.com/html/pc_commonchargeV3/index_{{ album.kugou_id }}.html" target="_blank">
