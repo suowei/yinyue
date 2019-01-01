@@ -20,7 +20,7 @@
 </head>
 <body>
     <p>*大约30分钟更新一次。当前时间：{% now "SHORT_DATETIME_FORMAT" %}<br>
-    *暂缺虾米音乐数据。咪咕音乐销量前端仅显示一张专辑，其余无法获得。</p>
+    *暂缺虾米音乐和咪咕音乐数据。咪咕音乐此前仅可获得《TO THE NINES》一张专辑的销售数据，目前也已无法获取，今后仅保留最后获得的销售数据200629张4012580.00元参与计算，但不再显示链接。</p>
     <table class="ui blue table">
         <thead>
         <tr><th>专辑</th>
@@ -29,7 +29,6 @@
             <th>网易云音乐</th>
             <th>酷狗音乐</th>
             <th>酷我音乐</th>
-            <th>咪咕音乐</th>
         </tr></thead>
         <tbody>
         {% for album in album_list %}
@@ -98,19 +97,6 @@
                     <a href="http://vip1.kuwo.cn/fans/fans/template/index.html?key={{ album.kuwo_id }}" target="_blank">
                     {% if album.kuwo_count > 0 %}
                         {% if album.album_only %}{{ album.kuwo_count }}张{% else %}{{ album.kuwo_song_count }}首{% endif %}<br>{{ album.kuwo_money }}元
-                    {% else %}
-                        暂缺
-                    {% endif %}
-                    </a>
-                {% else %}
-                    -
-                {% endif %}
-            </td>
-            <td>
-                {% if album.migu_id %}
-                    <a href="http://h5.nf.migu.cn/app/v3/p/digital-album/detail/index.html?id={{ album.migu_id }}" target="_blank">
-                    {% if album.migu_count > 0 %}
-                        {% if album.album_only %}{{ album.migu_count }}张{% else %}{{ album.migu_song_ccount }}首{% endif %}<br>{{ album.migu_money }}元
                     {% else %}
                         暂缺
                     {% endif %}
