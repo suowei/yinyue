@@ -8,6 +8,9 @@ class Singer(models.Model):
     name = models.CharField(max_length=200, unique=True)
     money = models.DecimalField(max_digits=11, decimal_places=2, default=0.00)
 
+    def __str__(self):
+        return self.name
+
 
 class Album(models.Model):
     title = models.CharField(max_length=200)
@@ -42,6 +45,9 @@ class Album(models.Model):
     migu_song_count = models.IntegerField(default=0)
     migu_money = models.DecimalField(max_digits=11, decimal_places=2, default=0.00)
     money = models.DecimalField(max_digits=11, decimal_places=2, default=0.00, db_index=True)
+
+    def __str__(self):
+        return self.title
 
     def get_sale_info(self):
         self.get_qq_sale_info()
