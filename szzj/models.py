@@ -11,7 +11,7 @@ class Singer(models.Model):
 
 class Album(models.Model):
     title = models.CharField(max_length=200)
-    singer = models.CharField(max_length=200)
+    singer_temp = models.CharField(max_length=200)
     release_date = models.DateField()
     song_num = models.SmallIntegerField()
     price = models.DecimalField(max_digits=4, decimal_places=2)
