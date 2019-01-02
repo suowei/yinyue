@@ -1,6 +1,7 @@
 from django.shortcuts import render
+from django.views import generic
 
-from .models import Album
+from .models import Artist, Album
 
 
 def index(request):
@@ -12,3 +13,7 @@ def index(request):
                                                        'wyy_count', 'wyy_song_count', 'wyy_money', 'money')
     context = {'album_list': album_list}
     return render(request, 'index.html', context)
+
+
+class ArtistDetailView(generic.DetailView):
+    model = Artist
