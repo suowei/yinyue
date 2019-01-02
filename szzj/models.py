@@ -4,6 +4,11 @@ import json
 from decimal import Decimal
 
 
+class Singer(models.Model):
+    name = models.CharField(max_length=200)
+    money = models.DecimalField(max_digits=11, decimal_places=2, default=0.00)
+
+
 class Album(models.Model):
     title = models.CharField(max_length=200)
     singer = models.CharField(max_length=200)
