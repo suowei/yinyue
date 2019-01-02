@@ -4,7 +4,7 @@ from .models import Album
 
 
 def index(request):
-    album_list = Album.objects.order_by('-money').only('title', 'singer_name', 'singer_id', 'release_date', 'price', 'album_only',
+    album_list = Album.objects.order_by('-money').only('title', 'artist_name', 'artist_id', 'release_date', 'price', 'album_only',
                                                        'qq_id', 'kugou_id', 'kuwo_id', 'wyy_id',
                                                        'qq_count', 'qq_song_count', 'qq_money',
                                                        'kugou_count', 'kugou_song_count', 'kugou_money',
