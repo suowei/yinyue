@@ -17,3 +17,12 @@ def index(request):
 
 class ArtistDetailView(generic.DetailView):
     model = Artist
+
+
+def artist_index(request):
+    album_list = Album.objects.order_by('-artist__money', 'release_date').select_related('artist').only('title', 'artist', 'release_date', 'money')
+    for i in range(0, len(album_list)):
+        if i == 0 or album_list[i].artist_id != album_list[i-1].artist_id:
+            album_list[i].first = True
+    context = {'album_list': album_list}
+    return render(request, 'szzj/artist_index.html', context)

@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
-from szzj.models import Album
+from django.db.models import Sum
+from szzj.models import Artist, Album
 
 
 class Command(BaseCommand):
@@ -15,3 +16,9 @@ class Command(BaseCommand):
         for album in album_list:
             album.get_sale_info()
             album.save()
+
+        artist_list = Artist.objects.annotate(album_sum=Sum('album__money'))
+        for artist in artist_list:
+            if artist.album_sum:
+                artist.money = artist.album_sum
+                artist.save()
