@@ -83,7 +83,7 @@
                     <a href="http://zhuanjistatic.kugou.com/html/pc_commonchargeV3/index_{{ album.kugou_id }}.html" target="_blank">
                     {% endif %}
                     {% if album.kugou_count > 0 %}
-                        {% if album.album_only %}{{ album.kugou_count }}张{% else %}{{ album.kugou_song_count }}首{% endif %}<br>{{ album.kugou_money }}元
+                        {% if album.kugou_song_count == 0 %}{{ album.kugou_count }}张{% else %}{{ album.kugou_song_count }}首{% endif %}<br>{{ album.kugou_money }}元
                     {% else %}
                         暂缺
                     {% endif %}
