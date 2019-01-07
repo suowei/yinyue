@@ -2,7 +2,12 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="renderer" content="webkit">
     <title>{% if year %}{{ year }}年{% endif %}数字专辑销售数据</title>
+    <meta name="description" content="本站是一个数字专辑销售数据记录网站，在这里你可以查看数字专辑全平台销量。">
+    <meta name="keywords" content="专辑,数字专辑,专辑销量">
 
     <link rel="stylesheet" type="text/css" href="https://lib.baomitu.com/semantic-ui/2.4.1/semantic.min.css">
     <script crossorigin="anonymous" integrity="sha384-tsQFqpEReu7ZLhBV2VZlAu7zcOV+rXbYlF2cqB8txI/8aZajjp4Bqd+V6D5IgvKT" src="https://lib.baomitu.com/jquery/3.3.1/jquery.min.js"></script>
@@ -29,10 +34,9 @@
             </div>
         </div>
     </div>
-
     <p>*大约30分钟更新一次。当前时间：{% now "SHORT_DATETIME_FORMAT" %}<br>
     *暂缺虾米音乐和咪咕音乐数据。咪咕音乐此前仅可获得《TO THE NINES》一张专辑的销售数据，目前也已无法获取，今后仅保留最后获得的销售数据200629张4012580.00元参与计算，不再显示链接。</p>
-    <table class="ui blue table">
+    <table class="ui blue unstackable table">
         <thead>
         <tr><th>专辑</th>
             <th>总销量（元）</th>
