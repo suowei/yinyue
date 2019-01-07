@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>数字专辑销售数据</title>
+    <title>{% if year %}{{ year }}年{% endif %}数字专辑销售数据</title>
 
     <link rel="stylesheet" type="text/css" href="https://lib.baomitu.com/semantic-ui/2.4.1/semantic.min.css">
     <script crossorigin="anonymous" integrity="sha384-tsQFqpEReu7ZLhBV2VZlAu7zcOV+rXbYlF2cqB8txI/8aZajjp4Bqd+V6D5IgvKT" src="https://lib.baomitu.com/jquery/3.3.1/jquery.min.js"></script>
@@ -19,8 +19,19 @@
     </script>
 </head>
 <body>
+    <div class="ui one item menu">
+        <div class="ui dropdown item">
+            {% if year %}{{ year }}年{% else %}全部专辑{% endif %}<i class="dropdown icon"></i>
+            <div class="menu">
+                <a href="/szzj" class="item">全部专辑</a>
+                <a href="/szzj/2019" class="item">2019年</a>
+                <a href="/szzj/2018" class="item">2018年</a>
+            </div>
+        </div>
+    </div>
+
     <p>*大约30分钟更新一次。当前时间：{% now "SHORT_DATETIME_FORMAT" %}<br>
-    *暂缺虾米音乐和咪咕音乐数据。咪咕音乐此前仅可获得《TO THE NINES》一张专辑的销售数据，目前也已无法获取，今后仅保留最后获得的销售数据200629张4012580.00元参与计算，但不再显示链接。</p>
+    *暂缺虾米音乐和咪咕音乐数据。咪咕音乐此前仅可获得《TO THE NINES》一张专辑的销售数据，目前也已无法获取，今后仅保留最后获得的销售数据200629张4012580.00元参与计算，不再显示链接。</p>
     <table class="ui blue table">
         <thead>
         <tr><th>专辑</th>
@@ -109,5 +120,10 @@
         {% endfor %}
         </tbody>
     </table>
+    <script>
+        $('.dropdown')
+            .dropdown()
+        ;
+    </script>
 </body>
 </html>
