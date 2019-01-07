@@ -90,9 +90,7 @@
             </td>
             <td>
                 {% if album.kugou_id %}
-                    {% if album.kugou_id <= 38901 %}
-                    <a href="http://huodong.kugou.com/2014/html/pc_commonchargeV2/index_{{ album.kugou_id }}.html" target="_blank">
-                    {% elif album.kugou_id <= 68917 %}
+                    {% if album.kugou_id <= 68917 %}
                     <a href="http://zhuanji.kugou.com/html/mobile_commonchargeV2/index_{{ album.kugou_id }}.html" target="_blank">
                     {% else %}
                     <a href="http://zhuanjistatic.kugou.com/html/pc_commonchargeV3/index_{{ album.kugou_id }}.html" target="_blank">
