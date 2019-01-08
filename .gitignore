@@ -8,3 +8,4 @@ szzj/migrations/*
 db.sqlite3
 
 manage.py
+yinyue/settings.py
