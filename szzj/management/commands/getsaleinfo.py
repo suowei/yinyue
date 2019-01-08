@@ -8,7 +8,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         album_list = Album.objects.only('song_num', 'price', 'album_only', 'song_price',
-                                        'qq_id', 'kugou_id', 'kuwo_id', 'wyy_id', 'wyy_params', 'wyy_encSecKey',
+                                        'qq_id', 'kugou_id', 'kugou_album_id', 'kugou_hashs', 'kuwo_id', 'wyy_id', 'wyy_params', 'wyy_encSecKey',
                                         'qq_count', 'qq_song_count', 'qq_money',
                                         'kugou_count', 'kugou_song_count', 'kugou_money',
                                         'kuwo_count', 'kuwo_song_count', 'kuwo_money',
