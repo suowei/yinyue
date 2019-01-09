@@ -109,7 +109,7 @@
                 {% if album.kuwo_id %}
                     <a href="http://vip1.kuwo.cn/fans/fans/template/index.html?key={{ album.kuwo_id }}" target="_blank">
                     {% if album.kuwo_count > 0 %}
-                        {% if album.album_only %}{{ album.kuwo_count }}张{% else %}{{ album.kuwo_song_count }}首{% endif %}<br>{{ album.kuwo_money }}元
+                        {% if album.album_only or album.kuwo_song_count == 0 %}{{ album.kuwo_count }}张{% else %}{{ album.kuwo_song_count }}首{% endif %}<br>{{ album.kuwo_money }}元
                     {% else %}
                         暂缺
                     {% endif %}

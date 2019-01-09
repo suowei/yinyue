@@ -51,15 +51,17 @@ class Album(models.Model):
         return self.title
 
     def get_sale_info(self):
-        self.get_qq_sale_info()
-        self.get_kugou_sale_info()
-        self.get_kuwo_sale_info()
-        self.get_wyy_sale_info()
+        if self.qq_id:
+            self.get_qq_sale_info()
+        if self.kugou_id:
+            self.get_kugou_sale_info()
+        if self.kuwo_id:
+            self.get_kuwo_sale_info()
+        if self.wyy_id:
+            self.get_wyy_sale_info()
         self.money = self.qq_money + self.kugou_money + self.kuwo_money + self.wyy_money + self.migu_money
 
     def get_qq_sale_info(self):
-        if self.qq_id is None:
-            return
         url = 'https://c.y.qq.com/v8/fcg-bin/musicmall.fcg?cmd=get_album_buy_page&albumid=' + self.qq_id.__str__()
         with request.urlopen(url) as f:
             data = f.read().decode('gbk')
@@ -70,8 +72,6 @@ class Album(models.Model):
             self.qq_money = Decimal(info['sale_money'])
 
     def get_kugou_sale_info(self):
-        if self.kugou_id is None:
-            return
         if self.kugou_id > 68917:
             url = 'https://zhuanjidata.kugou.com/v3/Commoncharge/getBuyNum?topic_id=' + self.kugou_id.__str__()
         else:
@@ -98,8 +98,6 @@ class Album(models.Model):
             self.kugou_money += (self.kugou_song_count - self.kugou_count * actual_song_num) * self.song_price
 
     def get_kuwo_sale_info(self):
-        if self.kuwo_id is None:
-            return
         data = {'key': self.kuwo_id, 'op': 'gfc'}
         req = request.Request('http://vip1.kuwo.cn/fans/admin/sysInfo', data=parse.urlencode(data).encode('utf-8'))
         with request.urlopen(req) as f:
@@ -109,13 +107,10 @@ class Album(models.Model):
             self.kuwo_count = int(docs['total_cnt'])
             self.kuwo_song_count = int(docs['song_total_cnt'])
             self.kuwo_money = self.price * self.kuwo_count
-            if not self.album_only:
+            if not self.album_only and self.kuwo_song_count > 0:
                 self.kuwo_money += (self.kuwo_song_count - self.kuwo_count * self.song_num) * self.song_price
 
     def get_wyy_sale_info(self):
-        if self.wyy_id is None:
-            return
-
         if not self.wyy_params:
             req = request.Request('https://music.163.com/store/api/product/detail?id=' + self.wyy_id.__str__())
             req.add_header('Referer', 'https://music.163.com/store/product/detail?id=' + self.wyy_id.__str__())
