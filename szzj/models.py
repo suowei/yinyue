@@ -72,7 +72,7 @@ class Album(models.Model):
             self.qq_money = Decimal(info['sale_money'])
 
     def get_kugou_sale_info(self):
-        if self.kugou_id > 68917:
+        if self.kugou_id > 69486 and self.kugou_id != 90201:
             url = 'https://zhuanjidata.kugou.com/v3/Commoncharge/getBuyNum?topic_id=' + self.kugou_id.__str__()
         else:
             url = 'http://zhuanji.kugou.com/index.php?r=commonchargeV2/getBuyNum&topic_id=' + self.kugou_id.__str__()
