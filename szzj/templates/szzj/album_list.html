@@ -7,7 +7,7 @@
     <meta name="renderer" content="webkit">
     <title>{% if year %}{{ year }}年{% endif %}数字专辑销售数据</title>
     <meta name="description" content="本站是一个数字专辑销售数据记录网站，在这里你可以查看数字专辑全平台销量。">
-    <meta name="keywords" content="专辑,数字专辑,专辑销量">
+    <meta name="keywords" content="专辑,数字专辑,专辑销量,歌手销量">
 
     <link rel="stylesheet" type="text/css" href="https://lib.baomitu.com/semantic-ui/2.4.1/semantic.min.css">
     <script crossorigin="anonymous" integrity="sha384-tsQFqpEReu7ZLhBV2VZlAu7zcOV+rXbYlF2cqB8txI/8aZajjp4Bqd+V6D5IgvKT" src="https://lib.baomitu.com/jquery/3.3.1/jquery.min.js"></script>
@@ -24,11 +24,12 @@
     </script>
 </head>
 <body>
-    <div class="ui blue one item inverted menu">
+    <div class="ui blue three item inverted menu">
+        {% if year %}<a href="/szzj" class="item">全部专辑</a>{% else %}<a href="/szzj" class="active item">全部专辑</a>{% endif %}
+        <a href="/szzj/artist" class="item">歌手列表</a>
         <div class="ui dropdown item">
-            {% if year %}{{ year }}年{% else %}全部专辑{% endif %}<i class="dropdown icon"></i>
+            {% if year %}{{ year }}年{% else %}选择年份{% endif %}<i class="dropdown icon"></i>
             <div class="menu">
-                <a href="/szzj" class="item">全部专辑</a>
                 <a href="/szzj/2019" class="item">2019年</a>
                 <a href="/szzj/2018" class="item">2018年</a>
                 <a href="/szzj/2017" class="item">2017年</a>
