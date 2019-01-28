@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="renderer" content="webkit">
-    <title>场馆列表</title>
+    <title>{{ year }}年演唱会信息</title>
     <meta name="description" content="本站是一个演唱会信息记录网站。">
     <meta name="keywords" content="演唱会">
 
@@ -27,24 +27,33 @@
     <div class="ui blue three item inverted menu">
         <a href="/yanchanghui" class="item">最新演唱会</a>
         <div class="ui dropdown item">
-            选择年份<i class="dropdown icon"></i>
+            {{ year }}年<i class="dropdown icon"></i>
             <div class="menu">
                 <a href="/yanchanghui/2019" class="item">2019年</a>
                 <a href="/yanchanghui/2018" class="item">2018年</a>
             </div>
         </div>
-        <a href="/yanchanghui/site" class="active item">场馆列表</a>
+        <a href="/yanchanghui/site" class="item">场馆列表</a>
     </div>
     <table class="ui blue unstackable table">
         <thead>
-            <th>场馆</th>
-            <th>座位数</th>
+            <th>歌手</th>
+            <th>场次</th>
+            <th>演唱会</th>
         </tr></thead>
         <tbody>
-        {% for site in site_list %}
-        <tr>
-            <td><h4 class="ui header">{{ site.name }}</h4></td>
-            <td>{{ site.seats }}</td>
+        {% for artist in artist_list %}
+        <tr class="top aligned">
+            <td><h4 class="ui header">{{ artist.name }}</h4></td>
+            <td>{{ artist.num_concert }}</td>
+            <td><div class="ui relaxed list">
+                {% for concert in artist.concert_list %}
+                <div class="item">
+                    <div class="header">{{ concert.title }}</div>
+                    <div class="description">{{ concert.date }}&nbsp;{{ concert.site.name }}</div>
+                </div>
+                {% endfor %}
+            </div></td>
         </tr>
         {% endfor %}
         </tbody>

@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.views import generic
 from django.http import HttpResponse
 from django.utils import timezone
+from django.db.models import Count
 
 from .models import Artist, Album, Concert, Site
 
@@ -53,10 +54,24 @@ class ConcertIndexView(generic.ListView):
 
 
 def concert_year_index(request, year):
-    concert_list = Concert.objects.select_related('artist', 'site').filter(
-        date__year=year).order_by('date').only('artist__name', 'title', 'date', 'site__name')
-    context = {'year': year, 'concert_list': concert_list}
-    return render(request, 'szzj/concert_list.html', context)
+    now = timezone.now()
+    if year == now.year:
+        artist_list = Artist.objects.filter(concert__date__year=year, concert__date__lte=now).annotate(
+            num_concert=Count('concert')).only('name').order_by('-num_concert')
+        concert_list = Concert.objects.select_related('site').filter(
+            date__year=year, date__lte=now).order_by('date').only('artist_id', 'title', 'date', 'site__name')
+    else:
+        artist_list = Artist.objects.filter(concert__date__year=year).annotate(
+            num_concert=Count('concert')).only('name').order_by('-num_concert')
+        concert_list = Concert.objects.select_related('site').filter(
+            date__year=year).order_by('date').only('artist_id', 'title', 'date', 'site__name')
+    for artist in artist_list:
+        artist.concert_list = []
+        for concert in concert_list:
+            if concert.artist_id == artist.id:
+                artist.concert_list.append(concert)
+    context = {'year': year, 'artist_list': artist_list}
+    return render(request, 'szzj/concert_year_list.html', context)
 
 
 class SiteIndexView(generic.ListView):

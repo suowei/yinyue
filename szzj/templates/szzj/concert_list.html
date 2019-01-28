@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="renderer" content="webkit">
-    <title>{% if year %}{{ year }}年{% endif %}演唱会信息</title>
+    <title>演唱会信息</title>
     <meta name="description" content="本站是一个演唱会信息记录网站。">
     <meta name="keywords" content="演唱会">
 
@@ -25,15 +25,15 @@
 </head>
 <body>
     <div class="ui blue three item inverted menu">
-        {% if year %}<a href="/yanchanghui" class="item">最新演唱会</a>{% else %}<a href="/yanchanghui" class="active item">最新演唱会</a>{% endif %}
-        <a href="/yanchanghui/site" class="item">场馆列表</a>
+        <a href="/yanchanghui" class="active item">最新演唱会</a>
         <div class="ui dropdown item">
-            {% if year %}{{ year }}年{% else %}选择年份{% endif %}<i class="dropdown icon"></i>
+            选择年份<i class="dropdown icon"></i>
             <div class="menu">
                 <a href="/yanchanghui/2019" class="item">2019年</a>
                 <a href="/yanchanghui/2018" class="item">2018年</a>
             </div>
         </div>
+        <a href="/yanchanghui/site" class="item">场馆列表</a>
     </div>
     <table class="ui blue unstackable table">
         <thead>
