@@ -49,26 +49,29 @@ def artist_index(request):
 
 class ConcertIndexView(generic.ListView):
     def get_queryset(self):
-        return Concert.objects.select_related('artist', 'site').filter(
-            date__gte=timezone.now()).order_by('date').only('artist__name', 'title', 'date', 'site__name')
+        return Concert.objects.select_related('tour', 'tour__artist', 'site', 'site__city').filter(
+            date__gte=timezone.now()).order_by('date').only('tour__artist__name', 'tour__title', 'date',
+                                                            'site__city__name', 'site__name')
 
 
 def concert_year_index(request, year):
     now = timezone.now()
     if year == now.year:
-        artist_list = Artist.objects.filter(concert__date__year=year, concert__date__lte=now).annotate(
-            num_concert=Count('concert')).only('name').order_by('-num_concert')
-        concert_list = Concert.objects.select_related('site').filter(
-            date__year=year, date__lte=now).order_by('date').only('artist_id', 'title', 'date', 'site__name')
+        artist_list = Artist.objects.filter(tour__concert__date__year=year, tour__concert__date__lte=now).annotate(
+            num_concert=Count('tour__concert')).only('name').order_by('-num_concert')
+        concert_list = Concert.objects.select_related('tour', 'site', 'site__city').filter(
+            date__year=year, date__lte=now).order_by('date').only('tour__artist_id', 'tour__title', 'date',
+                                                                  'site__city__name', 'site__name')
     else:
-        artist_list = Artist.objects.filter(concert__date__year=year).annotate(
-            num_concert=Count('concert')).only('name').order_by('-num_concert')
-        concert_list = Concert.objects.select_related('site').filter(
-            date__year=year).order_by('date').only('artist_id', 'title', 'date', 'site__name')
+        artist_list = Artist.objects.filter(tour__concert__date__year=year).annotate(
+            num_concert=Count('tour__concert')).only('name').order_by('-num_concert')
+        concert_list = Concert.objects.select_related('tour', 'site', 'site__city').filter(
+            date__year=year).order_by('date').only('tour__artist_id', 'tour__title', 'date',
+                                                   'site__city__name', 'site__name')
     for artist in artist_list:
         artist.concert_list = []
         for concert in concert_list:
-            if concert.artist_id == artist.id:
+            if concert.tour.artist_id == artist.id:
                 artist.concert_list.append(concert)
     context = {'year': year, 'artist_list': artist_list}
     return render(request, 'szzj/concert_year_list.html', context)
@@ -76,4 +79,4 @@ def concert_year_index(request, year):
 
 class SiteIndexView(generic.ListView):
     def get_queryset(self):
-        return Site.objects.order_by('-seats')
+        return Site.objects.select_related('city').order_by('city', '-seats')

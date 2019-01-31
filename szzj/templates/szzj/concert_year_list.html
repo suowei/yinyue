@@ -49,7 +49,7 @@
             <td><div class="ui relaxed list">
                 {% for concert in artist.concert_list %}
                 <div class="item">
-                    <div class="header">{{ concert.title }}</div>
+                    <div class="header">{{ concert.tour.title }}-{{ concert.site.city.name }}站</div>
                     <div class="description">{{ concert.date }}&nbsp;{{ concert.site.name }}</div>
                 </div>
                 {% endfor %}

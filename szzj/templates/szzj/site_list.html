@@ -37,12 +37,14 @@
     </div>
     <table class="ui blue unstackable table">
         <thead>
+            <th>城市</th>
             <th>场馆</th>
             <th>座位数</th>
         </tr></thead>
         <tbody>
         {% for site in site_list %}
         <tr>
+            <td><h4 class="ui header">{{ site.city.name }}</h4></td>
             <td><h4 class="ui header">{{ site.name }}</h4></td>
             <td>{{ site.seats }}</td>
         </tr>

@@ -48,19 +48,34 @@ class Album(models.Model):
         return self.title
 
 
-class Site(models.Model):
+class Tour(models.Model):
+    artist = models.ForeignKey(Artist, on_delete=models.CASCADE)
+    title = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.artist.name + self.title
+
+
+class City(models.Model):
     name = models.CharField(max_length=200, unique=True)
-    seats = models.IntegerField(default=0)
 
     def __str__(self):
         return self.name
 
 
+class Site(models.Model):
+    city = models.ForeignKey(City, on_delete=models.CASCADE)
+    name = models.CharField(max_length=200, unique=True)
+    seats = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.city.name + self.name
+
+
 class Concert(models.Model):
-    artist = models.ForeignKey(Artist, on_delete=models.CASCADE)
-    title = models.CharField(max_length=200)
+    tour = models.ForeignKey(Tour, on_delete=models.CASCADE)
     date = models.DateTimeField()
     site = models.ForeignKey(Site, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.artist.__str__() + self.title + self.date.__str__() + self.site.__str__()
+        return self.tour.__str__() + self.date.__str__() + self.site.__str__()
