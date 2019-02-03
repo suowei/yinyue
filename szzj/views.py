@@ -1,6 +1,5 @@
 from django.shortcuts import render
 from django.views import generic
-from django.http import HttpResponse
 from django.utils import timezone
 from django.db.models import Count
 
@@ -8,7 +7,7 @@ from .models import Artist, Album, Concert, Site
 
 
 def index(request):
-    return HttpResponse("查看数字专辑销售数据请访问http://y.saoju.net/szzj/")
+    return render(request, 'szzj/index.html')
 
 
 class AlbumIndexView(generic.ListView):
