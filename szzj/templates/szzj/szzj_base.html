@@ -1,0 +1,27 @@
+{% extends "szzj/base.html" %}
+
+{% block header %}
+<div class="ui blue three item inverted menu">
+    <a href="/szzj" class="item">全部专辑</a>
+    <a href="/szzj/artist" class="item">歌手列表</a>
+    <div class="ui dropdown item">
+        <div class="text">选择年份</div><i class="dropdown icon"></i>
+        <div class="menu">
+            <a href="/szzj/2019" class="item">2019年</a>
+            <a href="/szzj/2018" class="item">2018年</a>
+            <a href="/szzj/2017" class="item">2017年</a>
+            <a href="/szzj/2016" class="item">2016年</a>
+            <a href="/szzj/2015" class="item">2015年</a>
+            <a href="/szzj/2014" class="item">2014年</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+<script>
+    $('.dropdown')
+        .dropdown()
+    ;
+</script>
+{% endblock %}

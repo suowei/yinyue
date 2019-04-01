@@ -1,10 +1,7 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ artist.name }}</title>
-</head>
-<body>
+{% extends "szzj/base.html" %}
+
+{% block title %}{{ artist.name }}{% endblock %}
+
+{% block content %}
 {{ artist.name }}
-</body>
-</html>
+{% endblock %}

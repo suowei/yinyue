@@ -1,64 +1,31 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="renderer" content="webkit">
-    <title>演唱会信息</title>
-    <meta name="description" content="本站是一个演唱会信息记录网站。">
-    <meta name="keywords" content="演唱会">
+{% extends "szzj/yanchanghui_base.html" %}
 
-    <link rel="stylesheet" type="text/css" href="https://lib.baomitu.com/semantic-ui/2.4.1/semantic.min.css">
-    <script crossorigin="anonymous" integrity="sha384-tsQFqpEReu7ZLhBV2VZlAu7zcOV+rXbYlF2cqB8txI/8aZajjp4Bqd+V6D5IgvKT" src="https://lib.baomitu.com/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://lib.baomitu.com/semantic-ui/2.4.1/semantic.min.js"></script>
+{% block title %}演唱会信息{% endblock %}
 
-    <script>
-    var _hmt = _hmt || [];
-    (function() {
-      var hm = document.createElement("script");
-      hm.src = "https://hm.baidu.com/hm.js?5a23a22a8b0592235a20280da39e127b";
-      var s = document.getElementsByTagName("script")[0];
-      s.parentNode.insertBefore(hm, s);
-    })();
-    </script>
-</head>
-<body>
-    <div class="ui blue three item inverted menu">
-        <a href="/yanchanghui" class="active item">最新演唱会</a>
-        <div class="ui dropdown item">
-            选择年份<i class="dropdown icon"></i>
-            <div class="menu">
-                <a href="/yanchanghui/2019" class="item">2019年</a>
-                <a href="/yanchanghui/2018" class="item">2018年</a>
-            </div>
-        </div>
-        <a href="/yanchanghui/site" class="item">场馆列表</a>
-    </div>
-    <table class="ui blue unstackable table">
-        <thead>
-            <th>演唱会</th>
-            <th>时间</th>
-            <th>场馆</th>
-        </tr></thead>
-        <tbody>
-        {% for concert in concert_list %}
-        <tr>
-            <td>
-                <h4 class="ui header">
-                    {{ concert.tour.artist.name }}-{{ concert.tour.title }}-{{ concert.site.city.name }}站
-                </h4>
-            </td>
-            <td>{{ concert.date }}</td>
-            <td>{{ concert.site.name }}</td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    <script>
-        $('.dropdown')
-            .dropdown()
-        ;
-    </script>
-</body>
-</html>
+{% block content %}
+<table class="ui blue unstackable table">
+    <thead>
+    <tr>
+        <th>演唱会</th>
+        <th>时间</th>
+        <th>场馆</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for concert in concert_list %}
+    <tr>
+        <td>
+            <h4 class="ui header">
+                {{ concert.tour.artist.name }}-{{ concert.tour.title }}-{{ concert.site.city.name }}站
+            </h4>
+        </td>
+        <td>{{ concert.date }}</td>
+        <td>{{ concert.site.name }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<script>
+$(".menu:first a:eq(0)").attr("class","active item");
+</script>
+{% endblock %}
