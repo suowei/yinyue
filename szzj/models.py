@@ -55,6 +55,9 @@ class AlbumInfo(models.Model):
     sale_time = models.DateTimeField()
     info = models.CharField(max_length=200)
 
+    def __str__(self):
+        return self.title
+
 
 class Tour(models.Model):
     artist = models.ForeignKey(Artist, on_delete=models.CASCADE)
