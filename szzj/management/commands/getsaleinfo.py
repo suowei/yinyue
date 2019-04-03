@@ -90,7 +90,8 @@ class Command(BaseCommand):
                         if not album.album_only:
                             album.wyy_money += (album.wyy_song_count - album.wyy_count * album.song_num) * album.song_price
 
-            album.money = album.qq_money + album.kugou_money + album.kuwo_money + album.wyy_money + album.migu_money
+            album.count = album.qq_count + album.kugou_count + album.kuwo_count + album.wyy_count
+            album.money = album.qq_money + album.kugou_money + album.kuwo_money + album.wyy_money
             album.save()
 
         artist_list = Artist.objects.annotate(album_sum=Sum('album__money'))

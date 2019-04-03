@@ -42,10 +42,18 @@ class Album(models.Model):
     migu_count = models.IntegerField(default=0)
     migu_song_count = models.IntegerField(default=0)
     migu_money = models.DecimalField(max_digits=11, decimal_places=2, default=0.00)
+    count = models.IntegerField(default=0)
     money = models.DecimalField(max_digits=11, decimal_places=2, default=0.00, db_index=True)
 
     def __str__(self):
         return self.title
+
+
+class AlbumInfo(models.Model):
+    title = models.CharField(max_length=200)
+    artist = models.ForeignKey(Artist, on_delete=models.CASCADE)
+    sale_time = models.DateTimeField()
+    info = models.CharField(max_length=200)
 
 
 class Tour(models.Model):
