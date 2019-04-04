@@ -19,6 +19,19 @@ def index(request):
     return render(request, 'szzj/index.html', context)
 
 
+def new_album_index(request):
+    album_info_list = AlbumInfo.objects.select_related('artist').order_by('sale_time').only(
+        'title', 'artist_id', 'artist__name', 'sale_time', 'info')
+    date = timezone.now().date() + timezone.timedelta(days=-30)
+    album_list = Album.objects.filter(release_date__gte=date).select_related('artist').order_by('-release_date').only(
+        'title', 'artist_id', 'artist__name', 'release_date', 'price', 'album_only',
+        'qq_id', 'kugou_id', 'kuwo_id', 'wyy_id', 'qq_count', 'qq_song_count', 'qq_money',
+        'kugou_count', 'kugou_song_count', 'kugou_money', 'kuwo_count', 'kuwo_song_count', 'kuwo_money',
+        'wyy_count', 'wyy_song_count', 'wyy_money', 'count', 'money')
+    context = {'album_list': album_list, 'album_info_list': album_info_list}
+    return render(request, 'szzj/new_album_list.html', context)
+
+
 class AlbumIndexView(generic.ListView):
     def get_queryset(self):
         return Album.objects.select_related('artist').order_by('-money').only('title', 'artist_id', 'artist__name',
