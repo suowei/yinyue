@@ -95,9 +95,9 @@
 </table>
 <script>
 {% if year %}
-    $(".menu:first .dropdown:first .text:first").text("{{ year }}年");
+    $("[data-label='year']").text("{{ year }}年");
 {% else %}
-    $(".menu:first a:eq(0)").attr("class","active item");
+    $("[data-label='all']").attr("class","active item");
 {% endif %}
 </script>
 {% endblock %}

@@ -2,15 +2,15 @@
 
 {% block header %}
 <div class="ui blue three item inverted menu">
-    <a href="/yanchanghui" class="item">最新演唱会</a>
+    <a href="/yanchanghui" class="item" data-label="new">最新演唱会</a>
     <div class="ui dropdown item">
-        <div class="text">选择年份</div><i class="dropdown icon"></i>
+        <div  data-label="year">选择年份</div><i class="dropdown icon"></i>
         <div class="menu">
             <a href="/yanchanghui/2019" class="item">2019年</a>
             <a href="/yanchanghui/2018" class="item">2018年</a>
         </div>
     </div>
-    <a href="/yanchanghui/site" class="item">场馆列表</a>
+    <a href="/yanchanghui/site" class="item" data-label="site">场馆列表</a>
 </div>
 {% endblock %}
 

@@ -2,10 +2,9 @@
 
 {% block header %}
 <div class="ui blue four item inverted menu">
-    <a href="/szzj" class="item">全部专辑</a>
-    <a href="/szzj/artist" class="item">歌手列表</a>
+    <a href="/szzj/new" class="item" data-label="new">最新</a>
     <div class="ui dropdown item">
-        <div class="text">选择年份</div><i class="dropdown icon"></i>
+        <div data-label="year">选择年份</div><i class="dropdown icon"></i>
         <div class="menu">
             <a href="/szzj/2019" class="item">2019年</a>
             <a href="/szzj/2018" class="item">2018年</a>
@@ -15,7 +14,8 @@
             <a href="/szzj/2014" class="item">2014年</a>
         </div>
     </div>
-    <a href="/szzj/new" class="item">最新</a>
+    <a href="/szzj" class="item" data-label="all">全部专辑</a>
+    <a href="/szzj/artist" class="item" data-label="artist">歌手列表</a>
 </div>
 {% endblock %}
 
