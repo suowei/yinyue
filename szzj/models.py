@@ -13,6 +13,7 @@ class Album(models.Model):
     title = models.CharField(max_length=200)
     artist = models.ForeignKey(Artist, on_delete=models.CASCADE)
     release_date = models.DateField()
+    is_album = models.BooleanField(default=True)
     song_num = models.SmallIntegerField()
     price = models.DecimalField(max_digits=4, decimal_places=2)
     album_only = models.BooleanField(default=True)
