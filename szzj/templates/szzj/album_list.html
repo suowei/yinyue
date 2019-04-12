@@ -4,7 +4,7 @@
 
 {% block content %}
 <p>*大约30分钟更新一次。当前时间：{% now "SHORT_DATETIME_FORMAT" %}<br>
-*不含虾米音乐和咪咕音乐数据。</p>
+*不含虾米音乐和咪咕音乐数据。网易云音乐页面显示数据已统一改为张数，本表中该平台的销量也相应改为按张数计算。</p>
 <table class="ui blue unstackable table">
     <thead>
     <tr>
@@ -50,7 +50,7 @@
                 <a href="https://music.163.com/store/product/detail?id={{ album.wyy_id }}" target="_blank">
                 {% endif %}
                 {% if album.wyy_count > 0 %}
-                    {% if album.album_only %}{{ album.wyy_count }}张{% else %}{{ album.wyy_song_count }}首{% endif %}<br>{{ album.wyy_money }}元
+                    {{ album.wyy_count }}张<br>{{ album.wyy_money }}元
                 {% else %}
                     暂缺
                 {% endif %}
