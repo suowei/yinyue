@@ -43,7 +43,7 @@ class Album(models.Model):
     migu_count = models.IntegerField(default=0)
     migu_song_count = models.IntegerField(default=0)
     migu_money = models.DecimalField(max_digits=11, decimal_places=2, default=0.00)
-    count = models.IntegerField(default=0)
+    count = models.IntegerField(default=0, db_index=True)
     money = models.DecimalField(max_digits=11, decimal_places=2, default=0.00, db_index=True)
 
     def __str__(self):

@@ -43,6 +43,15 @@ class AlbumIndexView(generic.ListView):
                                                                               'wyy_count', 'wyy_song_count', 'wyy_money', 'money')
 
 
+def album_sales_index(request):
+    album_list = Album.objects.select_related('artist').order_by('-count').only(
+        'title', 'artist_id', 'artist__name', 'release_date', 'is_album', 'price',
+        'qq_id', 'kugou_id', 'kuwo_id', 'wyy_id',
+        'qq_count', 'kugou_count', 'kuwo_count', 'wyy_count', 'count')
+    context = {'album_list': album_list}
+    return render(request, 'szzj/album_sales_list.html', context)
+
+
 def album_year_index(request, year):
     album_list = Album.objects.filter(release_date__year=year).select_related('artist').order_by('-money').only('title', 'artist_id', 'artist__name',
                                                                               'release_date', 'price', 'album_only',
@@ -53,6 +62,15 @@ def album_year_index(request, year):
                                                                               'wyy_count', 'wyy_song_count', 'wyy_money', 'money')
     context = {'year': year, 'album_list': album_list}
     return render(request, 'szzj/album_list.html', context)
+
+
+def album_sales_year_index(request, year):
+    album_list = Album.objects.filter(release_date__year=year).select_related('artist').order_by('-count').only(
+        'title', 'artist_id', 'artist__name', 'release_date', 'is_album', 'price',
+        'qq_id', 'kugou_id', 'kuwo_id', 'wyy_id',
+        'qq_count', 'kugou_count', 'kuwo_count', 'wyy_count', 'count')
+    context = {'album_list': album_list, 'year': year}
+    return render(request, 'szzj/album_sales_list.html', context)
 
 
 class ArtistDetailView(generic.DetailView):
