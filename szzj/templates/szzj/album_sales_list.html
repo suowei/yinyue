@@ -1,0 +1,217 @@
+{% extends "szzj/szzj_base.html" %}
+
+{% block title %}{% if year %}{{ year }}年{% endif %}数字专辑销售数据{% endblock %}
+
+{% block content %}
+<p>*大约30分钟更新一次。当前时间：{% now "SHORT_DATETIME_FORMAT" %}
+    <button class="ui right floated primary basic button">
+        &nbsp;&nbsp;&nbsp;<a href="/szzj{% if year %}/{{ year }}{% endif %}">按销售额查询 <i class="long arrow alternate right icon"></i></a>
+    </button>
+<br>*不含虾米音乐和咪咕音乐数据。数字专辑包含5首及以上歌曲的完整专辑和迷你专辑，数字单曲包含单曲和不到5首曲目的EP。
+</p>
+<div class="ui large blue pointing secondary menu">
+  <a class="active item" data-tab="album">数字专辑</a>
+  <a class="item" data-tab="single">数字单曲</a>
+</div>
+<table class="ui blue compact unstackable table" data-tab="album">
+    <thead>
+    <tr>
+        <th>专辑</th>
+        <th class="right aligned">总销量（张）</th>
+        <th class="right aligned">QQ音乐</th>
+        <th class="right aligned">网易云音乐</th>
+        <th class="right aligned">酷狗音乐</th>
+        <th class="right aligned">酷我音乐</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for album in album_list %}{% if album.is_album %}
+    <tr>
+        <td>
+            <h5 class="ui header">
+                {{ album.title }}-{{ album.artist.name }}
+                <div class="sub header">{{ album.release_date|date:"Y.n.j" }}&nbsp;&nbsp;¥{{ album.price }}</div>
+            </h5>
+        </td>
+        <td class="right aligned">{{ album.count }}</td>
+        <td class="right aligned">
+            {% if album.qq_id %}
+                {% if album.qq_id != 656743 %}
+                <a href="https://y.qq.com/m/digitalbum/gold/index.html?id={{ album.qq_id }}" target="_blank">
+                {% else %}
+                <a href="https://y.qq.com/m/digitalbum/silver/index.html?id={{ album.qq_id }}" target="_blank">
+                {% endif %}
+                {% if album.qq_count > 0 %}
+                    {{ album.qq_count }}<br>{% widthratio album.qq_count album.count 100 %}%
+                {% else %}
+                    暂缺
+                {% endif %}
+                </a>
+            {% else %}
+                -
+            {% endif %}
+        </td>
+        <td class="right aligned">
+            {% if album.wyy_id %}
+                {% if album.wyy_id != 5856052 %}
+                <a href="https://music.163.com/store/newalbum/detail?id={{ album.wyy_id }}" target="_blank">
+                {% else %}
+                <a href="https://music.163.com/store/product/detail?id={{ album.wyy_id }}" target="_blank">
+                {% endif %}
+                {% if album.wyy_count > 0 %}
+                    {{ album.wyy_count }}<br>{% widthratio album.wyy_count album.count 100 %}%
+                {% else %}
+                    暂缺
+                {% endif %}
+                </a>
+            {% else %}
+                -
+            {% endif %}
+        </td>
+        <td class="right aligned">
+            {% if album.kugou_id %}
+                {% if album.kugou_id <= 69486 %}
+                <a href="http://zhuanji.kugou.com/html/mobile_commonchargeV2/index_{{ album.kugou_id }}.html" target="_blank">
+                {% else %}
+                <a href="http://zhuanjistatic.kugou.com/html/pc_commonchargeV3/index_{{ album.kugou_id }}.html" target="_blank">
+                {% endif %}
+                {% if album.kugou_count > 0 %}
+                    {{ album.kugou_count }}<br>{% widthratio album.kugou_count album.count 100 %}%
+                {% else %}
+                    暂缺
+                {% endif %}
+                </a>
+            {% else %}
+                -
+            {% endif %}
+        </td>
+        <td class="right aligned">
+            {% if album.kuwo_id %}
+                <a href="http://vip1.kuwo.cn/fans/fans/template/index.html?key={{ album.kuwo_id }}" target="_blank">
+                {% if album.kuwo_count > 0 %}
+                    {{ album.kuwo_count }}<br>{% widthratio album.kuwo_count album.count 100 %}%
+                {% else %}
+                    暂缺
+                {% endif %}
+                </a>
+            {% else %}
+                -
+            {% endif %}
+        </td>
+    </tr>{% endif %}
+    {% endfor %}
+    </tbody>
+</table>
+<table class="ui blue compact unstackable table" data-tab="single">
+    <thead>
+    <tr>
+        <th>专辑</th>
+        <th class="right aligned">总销量（张）</th>
+        <th class="right aligned">QQ音乐</th>
+        <th class="right aligned">网易云音乐</th>
+        <th class="right aligned">酷狗音乐</th>
+        <th class="right aligned">酷我音乐</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for album in album_list %}{% if not album.is_album %}
+    <tr>
+        <td>
+            <h5 class="ui header">
+                {{ album.title }}-{{ album.artist.name }}
+                <div class="sub header">{{ album.release_date|date:"Y.n.j" }}&nbsp;&nbsp;¥{{ album.price }}</div>
+            </h5>
+        </td>
+        <td class="right aligned">{{ album.count }}</td>
+        <td class="right aligned">
+            {% if album.qq_id %}
+                {% if album.qq_id != 656743 %}
+                <a href="https://y.qq.com/m/digitalbum/gold/index.html?id={{ album.qq_id }}" target="_blank">
+                {% else %}
+                <a href="https://y.qq.com/m/digitalbum/silver/index.html?id={{ album.qq_id }}" target="_blank">
+                {% endif %}
+                {% if album.qq_count > 0 %}
+                    {{ album.qq_count }}<br>{% widthratio album.qq_count album.count 100 %}%
+                {% else %}
+                    暂缺
+                {% endif %}
+                </a>
+            {% else %}
+                -
+            {% endif %}
+        </td>
+        <td class="right aligned">
+            {% if album.wyy_id %}
+                {% if album.wyy_id != 5856052 %}
+                <a href="https://music.163.com/store/newalbum/detail?id={{ album.wyy_id }}" target="_blank">
+                {% else %}
+                <a href="https://music.163.com/store/product/detail?id={{ album.wyy_id }}" target="_blank">
+                {% endif %}
+                {% if album.wyy_count > 0 %}
+                    {{ album.wyy_count }}<br>{% widthratio album.wyy_count album.count 100 %}%
+                {% else %}
+                    暂缺
+                {% endif %}
+                </a>
+            {% else %}
+                -
+            {% endif %}
+        </td>
+        <td class="right aligned">
+            {% if album.kugou_id %}
+                {% if album.kugou_id <= 69486 %}
+                <a href="http://zhuanji.kugou.com/html/mobile_commonchargeV2/index_{{ album.kugou_id }}.html" target="_blank">
+                {% else %}
+                <a href="http://zhuanjistatic.kugou.com/html/pc_commonchargeV3/index_{{ album.kugou_id }}.html" target="_blank">
+                {% endif %}
+                {% if album.kugou_count > 0 %}
+                    {{ album.kugou_count }}<br>{% widthratio album.kugou_count album.count 100 %}%
+                {% else %}
+                    暂缺
+                {% endif %}
+                </a>
+            {% else %}
+                -
+            {% endif %}
+        </td>
+        <td class="right aligned">
+            {% if album.kuwo_id %}
+                <a href="http://vip1.kuwo.cn/fans/fans/template/index.html?key={{ album.kuwo_id }}" target="_blank">
+                {% if album.kuwo_count > 0 %}
+                    {{ album.kuwo_count }}<br>{% widthratio album.kuwo_count album.count 100 %}%
+                {% else %}
+                    暂缺
+                {% endif %}
+                </a>
+            {% else %}
+                -
+            {% endif %}
+        </td>
+    </tr>{% endif %}
+    {% endfor %}
+    </tbody>
+</table>
+<script>
+{% if year %}
+    $("[data-label='year']").text("{{ year }}年");
+{% else %}
+    $("[data-label='all']").attr("class","active item");
+{% endif %}
+$(document).ready(function(){
+    $(".table[data-tab='album']").show();
+    $(".table[data-tab='single']").hide();
+});
+$(".menu .item[data-tab='album']").click(function(){
+    $(".menu .item[data-tab='album']").attr("class","active item");
+    $(".table[data-tab='album']").show();
+    $(".menu .item[data-tab='single']").attr("class","item");
+    $(".table[data-tab='single']").hide();
+});
+$(".menu .item[data-tab='single']").click(function(){
+    $(".menu .item[data-tab='album']").attr("class","item");
+    $(".table[data-tab='album']").hide();
+    $(".menu .item[data-tab='single']").attr("class","active item");
+    $(".table[data-tab='single']").show();
+});
+</script>
+{% endblock %}
