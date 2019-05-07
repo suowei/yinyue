@@ -1,9 +1,10 @@
 from django.core.management.base import BaseCommand
 from django.db.models import Sum
+from django.utils import timezone
 from urllib import request, parse
 import json
 from decimal import Decimal
-from szzj.models import Artist, Album
+from szzj.models import Artist, Album, AlbumData
 
 
 class Command(BaseCommand):
@@ -91,6 +92,12 @@ class Command(BaseCommand):
             album.count = album.qq_count + album.kugou_count + album.kuwo_count + album.wyy_count
             album.money = album.qq_money + album.kugou_money + album.kuwo_money + album.wyy_money
             album.save()
+
+            AlbumData.objects.create(
+                album=album, time=timezone.now(), qq_count=album.qq_count, qq_song_count=album.qq_song_count,
+                kugou_count= album.kugou_count, kugou_song_count=album.kugou_song_count, kuwo_count=album.kuwo_count,
+                kuwo_song_count=album.kuwo_song_count, wyy_count=album.wyy_count, wyy_song_count=album.wyy_song_count,
+                count=album.count)
 
         artist_list = Artist.objects.annotate(album_sum=Sum('album__money'))
         for artist in artist_list:

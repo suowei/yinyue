@@ -50,6 +50,20 @@ class Album(models.Model):
         return self.title
 
 
+class AlbumData(models.Model):
+    album = models.ForeignKey(Album, on_delete=models.CASCADE)
+    time = models.DateTimeField()
+    qq_count = models.IntegerField()
+    qq_song_count = models.IntegerField()
+    kugou_count = models.IntegerField()
+    kugou_song_count = models.IntegerField()
+    kuwo_count = models.IntegerField()
+    kuwo_song_count = models.IntegerField()
+    wyy_count = models.IntegerField()
+    wyy_song_count = models.IntegerField()
+    count = models.IntegerField()
+
+
 class AlbumInfo(models.Model):
     title = models.CharField(max_length=200)
     artist = models.ForeignKey(Artist, on_delete=models.CASCADE)
