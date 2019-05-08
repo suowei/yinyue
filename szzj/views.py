@@ -3,7 +3,7 @@ from django.views import generic
 from django.utils import timezone
 from django.db.models import Count
 
-from .models import Artist, Album, AlbumInfo, Concert, Site
+from .models import Artist, Album, AlbumData, AlbumInfo, Concert, Site
 
 
 def index(request):
@@ -84,6 +84,15 @@ def artist_index(request):
             album_list[i].first = True
     context = {'album_list': album_list}
     return render(request, 'szzj/artist_list.html', context)
+
+
+class AlbumDetailView(generic.DetailView):
+    model = Album
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['data_list'] = AlbumData.objects.filter(album=self.kwargs['pk'])
+        return context
 
 
 class ConcertIndexView(generic.ListView):

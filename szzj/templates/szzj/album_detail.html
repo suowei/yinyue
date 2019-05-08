@@ -1,0 +1,109 @@
+{% extends "szzj/szzj_base.html" %}
+
+{% block title %}{{ album.title }}{% endblock %}
+
+{% block content %}
+<div class="ui basic segment">
+    <h2 class="ui header">{{ album.title }} <div class="sub header">{{ album.artist.name }}</div></h2>
+    <p>{{ album.release_date }}发行，售价{{ album.price }}元。</p>
+</div>
+<table class="ui blue unstackable table">
+    <thead>
+    <tr>
+        <th>平台</th>
+        <th class="right aligned">销量</th>
+        <th class="right aligned">金额</th>
+        <th class="right aligned">占比</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% if album.qq_id %}
+    <tr><td>
+    {% if album.qq_id != 656743 %}
+    <a href="https://y.qq.com/m/digitalbum/gold/index.html?id={{ album.qq_id }}" target="_blank">
+    {% else %}
+    <a href="https://y.qq.com/m/digitalbum/silver/index.html?id={{ album.qq_id }}" target="_blank">
+    {% endif %}
+    QQ音乐</a></td>
+    {% if album.qq_count > 0 %}
+        <td class="right aligned">{% if album.album_only %}{{ album.qq_count }}张{% else %}{{ album.qq_song_count }}首{% endif %}</td>
+        <td class="right aligned">{{ album.qq_money }}元</td>
+        <td class="right aligned">{% widthratio album.qq_count album.count 100 %}%</td>
+    {% else %}
+        <td>暂缺</td><td>暂缺</td><td>暂缺</td>
+    {% endif %}
+    </tr>
+    {% endif %}
+    {% if album.wyy_id %}
+    <tr><td>
+    {% if album.wyy_id != 5856052 %}
+    <a href="https://music.163.com/store/newalbum/detail?id={{ album.wyy_id }}" target="_blank">
+    {% else %}
+    <a href="https://music.163.com/store/product/detail?id={{ album.wyy_id }}" target="_blank">
+    {% endif %}
+    网易云音乐</a></td>
+    {% if album.wyy_count > 0 %}
+        <td class="right aligned">{{ album.wyy_count }}张</td>
+        <td class="right aligned">{{ album.wyy_money }}元</td>
+        <td class="right aligned">{% widthratio album.wyy_count album.count 100 %}%</td>
+    {% else %}
+        <td>暂缺</td><td>暂缺</td><td>暂缺</td>
+    {% endif %}
+    </tr>
+    {% endif %}
+    {% if album.kugou_id %}
+    <tr><td>
+    {% if album.kugou_id <= 69486 %}
+    <a href="http://zhuanji.kugou.com/html/mobile_commonchargeV2/index_{{ album.kugou_id }}.html" target="_blank">
+    {% else %}
+    <a href="http://zhuanjistatic.kugou.com/html/pc_commonchargeV3/index_{{ album.kugou_id }}.html" target="_blank">
+    {% endif %}
+    酷狗音乐</a></td>
+    {% if album.kugou_count > 0 %}
+        <td class="right aligned">{% if album.kugou_song_count == 0 %}{{ album.kugou_count }}张{% else %}{{ album.kugou_song_count }}首{% endif %}</td>
+        <td class="right aligned">{{ album.kugou_money }}元</td>
+        <td class="right aligned">{% widthratio album.kugou_count album.count 100 %}%</td>
+    {% else %}
+        <td>暂缺</td><td>暂缺</td><td>暂缺</td>
+    {% endif %}
+    {% endif %}
+    {% if album.kuwo_id %}
+    <tr><td>
+    <a href="http://vip1.kuwo.cn/fans/fans/template/index.html?key={{ album.kuwo_id }}" target="_blank">
+    酷我音乐</a></td>
+    {% if album.kuwo_count > 0 %}
+        <td class="right aligned">{% if album.album_only or album.kuwo_song_count == 0 %}{{ album.kuwo_count }}张{% else %}{{ album.kuwo_song_count }}首{% endif %}</td>
+        <td class="right aligned">{{ album.kuwo_money }}元</td>
+        <td class="right aligned">{% widthratio album.kuwo_count album.count 100 %}%</td>
+    {% else %}
+        <td>暂缺</td><td>暂缺</td><td>暂缺</td>
+    {% endif %}
+    {% endif %}
+    </tbody>
+    <tfoot><tr><th>总销量</th><th class="right aligned">{{ album.count }}张</th><th class="right aligned">{{ album.money }}元</th><th></th></tr></tfoot>
+</table>
+<table class="ui blue small very compact unstackable table" data-tab="album">
+    <thead>
+    <tr>
+        <th>时间</th>
+        <th class="right aligned">总销量（张）</th>
+        <th class="right aligned">QQ音乐</th>
+        <th class="right aligned">网易云音乐</th>
+        <th class="right aligned">酷狗音乐</th>
+        <th class="right aligned">酷我音乐</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for data in data_list %}
+    <tr>
+        <td>{{ data.time }}</td>
+        <td class="right aligned">{{ data.count }}</td>
+        <td class="right aligned">{{ data.qq_count }}<br>{% widthratio data.qq_count data.count 100 %}%</td>
+        <td class="right aligned">{{ data.wyy_count }}<br>{% widthratio data.wyy_count data.count 100 %}%</td>
+        <td class="right aligned">{{ data.kugou_count }}<br>{% widthratio data.kugou_count data.count 100 %}%</td>
+        <td class="right aligned">{{ data.kuwo_count }}<br>{% widthratio data.kuwo_count data.count 100 %}%</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

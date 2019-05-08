@@ -12,6 +12,7 @@ urlpatterns = [
     path('szzj/artist/', views.artist_index, name='szzj.artist_index'),
     path('szzj/artist/<int:pk>/', views.ArtistDetailView.as_view(), name='szzj.artist_detail'),
     path('szzj/new/', views.new_album_index, name='szzj.new_album_index'),
+    path('szzj/album/<int:pk>/', views.AlbumDetailView.as_view(), name='szzj.album_detail'),
     path('yanchanghui/', views.ConcertIndexView.as_view(), name='yanchanghui.index'),
     path('yanchanghui/<int:year>/', views.concert_year_index, name='yanchanghui.concert_year_index'),
     path('yanchanghui/site/', views.SiteIndexView.as_view(), name='yanchanghui.site_index'),

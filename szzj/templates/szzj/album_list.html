@@ -25,7 +25,8 @@
     <tr>
         <td>
             <h4 class="ui header">
-                《{{ album.title }}》{{ album.artist.name }} <div class="sub header">{{ album.release_date }}&nbsp;&nbsp;{{ album.price }}元</div>
+                《<a href="/szzj/album/{{ album.id }}" target="_blank">{{ album.title }}</a>》{{ album.artist.name }}
+                <div class="sub header">{{ album.release_date }}&nbsp;&nbsp;{{ album.price }}元</div>
             </h4>
         </td>
         <td>{{ album.money }}</td>
