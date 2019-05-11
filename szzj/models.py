@@ -62,6 +62,7 @@ class AlbumData(models.Model):
     wyy_count = models.IntegerField()
     wyy_song_count = models.IntegerField()
     count = models.IntegerField()
+    money = models.DecimalField()
 
 
 class AlbumInfo(models.Model):

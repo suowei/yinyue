@@ -11,12 +11,7 @@ class Command(BaseCommand):
     help = 'Get sale data.'
 
     def handle(self, *args, **options):
-        album_list = Album.objects.only('song_num', 'price', 'album_only', 'song_price',
-                                        'qq_id', 'kugou_id', 'kugou_album_id', 'kugou_hashs', 'kuwo_id', 'wyy_id', 'wyy_params', 'wyy_encSecKey',
-                                        'qq_count', 'qq_song_count', 'qq_money',
-                                        'kugou_count', 'kugou_song_count', 'kugou_money',
-                                        'kuwo_count', 'kuwo_song_count', 'kuwo_money',
-                                        'wyy_count', 'wyy_song_count', 'wyy_money', 'migu_money', 'money')
+        album_list = Album.objects.all()
         for album in album_list:
             if album.qq_id:
                 url = 'https://c.y.qq.com/v8/fcg-bin/musicmall.fcg?cmd=get_album_buy_page&albumid=' + album.qq_id.__str__()
@@ -99,7 +94,7 @@ class Command(BaseCommand):
                     kugou_count=album.kugou_count, kugou_song_count=album.kugou_song_count, kuwo_count=album.kuwo_count,
                     kuwo_song_count=album.kuwo_song_count, wyy_count=album.wyy_count,
                     wyy_song_count=album.wyy_song_count,
-                    count=album.count)
+                    count=album.count, money=album.money)
 
         artist_list = Artist.objects.annotate(album_sum=Sum('album__money'))
         for artist in artist_list:
