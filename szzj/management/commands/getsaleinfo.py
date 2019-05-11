@@ -90,10 +90,11 @@ class Command(BaseCommand):
                 album.money = money
                 album.save()
                 AlbumData.objects.create(
-                    album=album, time=timezone.now(), qq_count=album.qq_count, qq_song_count=album.qq_song_count,
-                    kugou_count=album.kugou_count, kugou_song_count=album.kugou_song_count, kuwo_count=album.kuwo_count,
-                    kuwo_song_count=album.kuwo_song_count, wyy_count=album.wyy_count,
-                    wyy_song_count=album.wyy_song_count,
+                    album=album, time=timezone.now(),
+                    qq_count=album.qq_count, qq_song_count=album.qq_song_count, qq_money=album.qq_money,
+                    kugou_count=album.kugou_count, kugou_song_count=album.kugou_song_count, kugou_money=album.kugou_money,
+                    kuwo_count=album.kuwo_count, kuwo_song_count=album.kuwo_song_count, kuwo_money=album.kuwo_money,
+                    wyy_count=album.wyy_count, wyy_song_count=album.wyy_song_count, wyy_money=album.wyy_money,
                     count=album.count, money=album.money)
 
         artist_list = Artist.objects.annotate(album_sum=Sum('album__money'))

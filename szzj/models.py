@@ -55,14 +55,18 @@ class AlbumData(models.Model):
     time = models.DateTimeField()
     qq_count = models.IntegerField()
     qq_song_count = models.IntegerField()
+    qq_money = models.DecimalField(max_digits=11, decimal_places=2)
     kugou_count = models.IntegerField()
     kugou_song_count = models.IntegerField()
+    kugou_money = models.DecimalField(max_digits=11, decimal_places=2)
     kuwo_count = models.IntegerField()
     kuwo_song_count = models.IntegerField()
+    kuwo_money = models.DecimalField(max_digits=11, decimal_places=2)
     wyy_count = models.IntegerField()
     wyy_song_count = models.IntegerField()
+    wyy_money = models.DecimalField(max_digits=11, decimal_places=2)
     count = models.IntegerField()
-    money = models.DecimalField()
+    money = models.DecimalField(max_digits=11, decimal_places=2)
 
 
 class AlbumInfo(models.Model):

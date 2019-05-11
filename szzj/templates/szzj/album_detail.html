@@ -85,7 +85,7 @@
 </table>
 <div class="ui basic segment">
     <h3 class="ui blue header">销量记录
-        <div class="ui sub header">*此功能于2019年5月8日8点30分上线，在此之前的数据暂无记录。本表中各平台销量占比按张数计算。
+        <div class="ui sub header">*此功能于2019年5月11日23点上线，在此之前的数据暂无记录。
             <br>*本站销售数据每半小时获取一次，当销售金额有变化时才会生成记录，因此对于可单首购买的专辑，可能会发生金额有变化但整专销量不变的情况。
             <br>*因网络问题，某一时段的数据可能会获取失败，此时如果实际销售数据发生了变化，本站也可能记录不到。</div>
     </h3>
@@ -94,7 +94,7 @@
     <thead>
     <tr>
         <th>时间</th>
-        <th class="right aligned">总销量（张）</th>
+        <th class="right aligned">总销量</th>
         <th class="right aligned">QQ音乐</th>
         <th class="right aligned">网易云音乐</th>
         <th class="right aligned">酷狗音乐</th>
@@ -105,11 +105,11 @@
     {% for data in data_list %}
     <tr>
         <td>{{ data.time }}</td>
-        <td class="right aligned">{{ data.count }}</td>
-        <td class="right aligned">{{ data.qq_count }}<br>{% widthratio data.qq_count data.count 100 %}%</td>
-        <td class="right aligned">{{ data.wyy_count }}<br>{% widthratio data.wyy_count data.count 100 %}%</td>
-        <td class="right aligned">{{ data.kugou_count }}<br>{% widthratio data.kugou_count data.count 100 %}%</td>
-        <td class="right aligned">{{ data.kuwo_count }}<br>{% widthratio data.kuwo_count data.count 100 %}%</td>
+        <td class="right aligned">{{ data.count }}张<br>{{ data.money }}元</td>
+        <td class="right aligned">{% if album.album_only %}{{ data.qq_count }}张{% else %}{{ data.qq_song_count }}首{% endif %}<br>{{ data.qq_money }}元</td>
+        <td class="right aligned">{{ data.wyy_count }}张<br>{{ data.wyy_money }}元</td>
+        <td class="right aligned">{% if data.kugou_song_count == 0 %}{{ data.kugou_count }}张{% else %}{{ data.kugou_song_count }}首{% endif %}<br>{{ data.kugou_money }}元</td>
+        <td class="right aligned">{% if album.album_only or data.kuwo_song_count == 0 %}{{ data.kuwo_count }}张{% else %}{{ data.kuwo_song_count }}首{% endif %}<br>{{ data.kuwo_money }}元</td>
     </tr>
     {% endfor %}
     </tbody>
