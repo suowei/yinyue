@@ -94,22 +94,22 @@
     <thead>
     <tr>
         <th>时间</th>
-        <th class="right aligned">总销量</th>
-        <th class="right aligned">QQ音乐</th>
-        <th class="right aligned">网易云音乐</th>
-        <th class="right aligned">酷狗音乐</th>
-        <th class="right aligned">酷我音乐</th>
+        <th>总销量</th>
+        <th>QQ音乐</th>
+        <th>网易云音乐</th>
+        <th>酷狗音乐</th>
+        <th>酷我音乐</th>
     </tr>
     </thead>
     <tbody>
     {% for data in data_list %}
     <tr>
         <td>{{ data.time }}</td>
-        <td class="right aligned">{{ data.count }}张<br>{{ data.money }}元</td>
-        <td class="right aligned">{% if album.album_only %}{{ data.qq_count }}张{% else %}{{ data.qq_song_count }}首{% endif %}<br>{{ data.qq_money }}元</td>
-        <td class="right aligned">{{ data.wyy_count }}张<br>{{ data.wyy_money }}元</td>
-        <td class="right aligned">{% if data.kugou_song_count == 0 %}{{ data.kugou_count }}张{% else %}{{ data.kugou_song_count }}首{% endif %}<br>{{ data.kugou_money }}元</td>
-        <td class="right aligned">{% if album.album_only or data.kuwo_song_count == 0 %}{{ data.kuwo_count }}张{% else %}{{ data.kuwo_song_count }}首{% endif %}<br>{{ data.kuwo_money }}元</td>
+        <td>{{ data.count }}张<br>{{ data.money }}元</td>
+        <td>{% if album.album_only %}{{ data.qq_count }}张{% else %}{{ data.qq_song_count }}首{% endif %}<br>{{ data.qq_money }}元</td>
+        <td>{{ data.wyy_count }}张<br>{{ data.wyy_money }}元</td>
+        <td>{% if data.kugou_song_count == 0 %}{{ data.kugou_count }}张{% else %}{{ data.kugou_song_count }}首{% endif %}<br>{{ data.kugou_money }}元</td>
+        <td>{% if album.album_only or data.kuwo_song_count == 0 %}{{ data.kuwo_count }}张{% else %}{{ data.kuwo_song_count }}首{% endif %}<br>{{ data.kuwo_money }}元</td>
     </tr>
     {% endfor %}
     </tbody>
