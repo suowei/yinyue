@@ -45,6 +45,19 @@ class Album(models.Model):
     migu_money = models.DecimalField(max_digits=11, decimal_places=2, default=0.00)
     count = models.IntegerField(default=0, db_index=True)
     money = models.DecimalField(max_digits=11, decimal_places=2, default=0.00, db_index=True)
+    qq_count_today = models.IntegerField(default=0)
+    qq_song_count_today = models.IntegerField(default=0)
+    qq_money_today = models.DecimalField(max_digits=11, decimal_places=2, default=0.00)
+    kugou_count_today = models.IntegerField(default=0)
+    kugou_song_count_today = models.IntegerField(default=0)
+    kugou_money_today = models.DecimalField(max_digits=11, decimal_places=2, default=0.00)
+    kuwo_count_today = models.IntegerField(default=0)
+    kuwo_song_count_today = models.IntegerField(default=0)
+    kuwo_money_today = models.DecimalField(max_digits=11, decimal_places=2, default=0.00)
+    wyy_count_today = models.IntegerField(default=0)
+    wyy_money_today = models.DecimalField(max_digits=11, decimal_places=2, default=0.00)
+    count_today = models.IntegerField(default=0, db_index=True)
+    money_today = models.DecimalField(max_digits=11, decimal_places=2, default=0.00, db_index=True)
 
     def __str__(self):
         return self.title
