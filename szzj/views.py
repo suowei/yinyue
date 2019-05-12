@@ -29,9 +29,15 @@ def new_album_index(request):
         'qq_id', 'kugou_id', 'kuwo_id', 'wyy_id', 'qq_count', 'qq_song_count', 'qq_money',
         'kugou_count', 'kugou_song_count', 'kugou_money', 'kuwo_count', 'kuwo_song_count', 'kuwo_money',
         'wyy_count', 'wyy_song_count', 'wyy_money', 'count', 'money')
-    top_album_list = Album.objects.order_by('-money_today').filter(money_today__gt=0).select_related('artist')[:20]
-    context = {'album_list': album_list, 'album_info_list': album_info_list, 'top_album_list': top_album_list}
+    context = {'album_list': album_list, 'album_info_list': album_info_list}
     return render(request, 'szzj/new_album_list.html', context)
+
+
+class TodayAlbumIndexView(generic.ListView):
+    template_name = 'szzj/today_album_list.html'
+
+    def get_queryset(self):
+        return Album.objects.order_by('-money_today').filter(money_today__gt=0).select_related('artist')[:20]
 
 
 class AlbumIndexView(generic.ListView):
