@@ -20,7 +20,7 @@
             </h4>
         </td>
         <td>{{ concert.date }}</td>
-        <td>{{ concert.site.name }}</td>
+        <td><a href="/yanchanghui/site/{{ concert.site.id }}" target="_blank">{{ concert.site.name }}</a></td>
     </tr>
     {% endfor %}
     </tbody>

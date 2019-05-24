@@ -145,3 +145,16 @@ def concert_year_index(request, year):
 class SiteIndexView(generic.ListView):
     def get_queryset(self):
         return Site.objects.select_related('city').order_by('city', '-seats')
+
+
+class SiteDetailView(generic.DetailView):
+    model = Site
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        now = timezone.now()
+        context['concert_list_coming'] = Concert.objects.filter(
+            site=self.kwargs['pk'], date__gte=now).order_by('date').select_related('tour', 'tour__artist')
+        context['concert_list_done'] = Concert.objects.filter(
+            site=self.kwargs['pk'], date__lt=now).order_by('date').select_related('tour', 'tour__artist')
+        return context

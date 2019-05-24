@@ -8,7 +8,7 @@
     {% if concert_list_coming %}
     <h3 class="ui blue header">即将开始</h3>
     {% for concert in concert_list_coming %}
-        {{ concert.tour.title }}-{{ concert.site.city.name }}站 {{ concert.date }}&nbsp;{{ concert.site.name }}<br>
+        {{ concert.date|date:"Y-m-d" }} {{ concert.tour.title }}-{{ concert.site.city.name }}站 {{ concert.site.name }}<br>
     {% endfor %}
     {% endif %}
 </div>
@@ -16,7 +16,7 @@
     {% if concert_list_done %}
     <h3 class="ui blue header">演唱会<div class="ui sub header">*从2018年起统计。</div></h3>
     {% for concert in concert_list_done %}
-        {{ concert.tour.title }}-{{ concert.site.city.name }}站 {{ concert.date }}&nbsp;{{ concert.site.name }}<br>
+        {{ concert.date|date:"Y-m-d" }} {{ concert.tour.title }}-{{ concert.site.city.name }}站 {{ concert.site.name }}<br>
     {% endfor %}
     {% endif %}
 </div>

@@ -17,4 +17,5 @@ urlpatterns = [
     path('yanchanghui/', views.ConcertIndexView.as_view(), name='yanchanghui.index'),
     path('yanchanghui/<int:year>/', views.concert_year_index, name='yanchanghui.concert_year_index'),
     path('yanchanghui/site/', views.SiteIndexView.as_view(), name='yanchanghui.site_index'),
+    path('yanchanghui/site/<int:pk>/', views.SiteDetailView.as_view(), name='yanchanghui.site_detail'),
 ]

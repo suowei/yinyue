@@ -1,0 +1,23 @@
+{% extends "szzj/yanchanghui_base.html" %}
+
+{% block title %}{{ site.name }}{% endblock %}
+
+{% block content %}
+<div class="ui basic segment">
+    <h2 class="ui header">{{ site.name }}<div class="sub header">{{ site.city.name }} {{ site.seats }}座</div></h2>
+    {% if concert_list_coming %}
+    <h3 class="ui blue header">即将开始</h3>
+    {% for concert in concert_list_coming %}
+        {{ concert.date|date:"Y-m-d" }} <a href="/szzj/artist/{{ concert.tour.artist.id }}" target="_blank">{{ concert.tour.artist.name }}</a>-{{ concert.tour.title }}<br>
+    {% endfor %}
+    {% endif %}
+</div>
+<div class="ui basic segment">
+    {% if concert_list_done %}
+    <h3 class="ui blue header">演唱会<div class="ui sub header">*从2018年起统计。</div></h3>
+    {% for concert in concert_list_done %}
+        {{ concert.date|date:"Y-m-d" }} <a href="/szzj/artist/{{ concert.tour.artist.id }}" target="_blank">{{ concert.tour.artist.name }}</a>-{{ concert.tour.title }}<br>
+    {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}
