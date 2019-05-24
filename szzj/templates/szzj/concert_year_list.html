@@ -14,7 +14,7 @@
     <tbody>
     {% for artist in artist_list %}
     <tr class="top aligned">
-        <td><h4 class="ui header">{{ artist.name }}</h4></td>
+        <td><h4 class="ui header"><a href="/szzj/artist/{{ artist.id }}" target="_blank">{{ artist.name }}</a></h4></td>
         <td>{{ artist.num_concert }}</td>
         <td><div class="ui relaxed list">
             {% for concert in artist.concert_list %}

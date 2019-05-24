@@ -16,7 +16,7 @@
     <tr>
         <td>
             <h4 class="ui header">
-                {{ concert.tour.artist.name }}-{{ concert.tour.title }}-{{ concert.site.city.name }}站
+                <a href="/szzj/artist/{{ concert.tour.artist.id }}" target="_blank">{{ concert.tour.artist.name }}</a>-{{ concert.tour.title }}-{{ concert.site.city.name }}站
             </h4>
         </td>
         <td>{{ concert.date }}</td>

@@ -84,6 +84,15 @@ def album_sales_year_index(request, year):
 class ArtistDetailView(generic.DetailView):
     model = Artist
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        now = timezone.now()
+        context['concert_list_coming'] = Concert.objects.filter(
+            tour__artist=self.kwargs['pk'], date__gte=now).order_by('date').select_related('tour', 'site', 'site__city')
+        context['concert_list_done'] = Concert.objects.filter(
+            tour__artist=self.kwargs['pk'], date__lt=now).order_by('date').select_related('tour', 'site', 'site__city')
+        return context
+
 
 def artist_index(request):
     album_list = Album.objects.order_by('-artist__money', 'release_date').select_related('artist').only('title', 'artist', 'release_date', 'money')
