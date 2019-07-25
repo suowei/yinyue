@@ -113,7 +113,7 @@ class AlbumDetailView(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['data_list'] = AlbumData.objects.filter(album=self.kwargs['pk'])
+        context['data_list'] = AlbumData.objects.filter(album=self.kwargs['pk']).order_by('-id')[:144]
         return context
 
 
