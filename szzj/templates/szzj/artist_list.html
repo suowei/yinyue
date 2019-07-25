@@ -19,18 +19,18 @@
             {% if album.first %}
                 </div></td></tr>
                 <tr class="top aligned">
-                    <td>{{ album.artist.name }}</td>
+                    <td><a href="/szzj/artist/{{ album.artist.id }}" target="_blank">{{ album.artist.name }}</a></td>
                     <td>{{ album.artist.money }}</td>
                     <td>
                     <div class="ui relaxed list">
                         <div class="item">
-                            <div class="header">{{ album.title }}</div>
+                            <div class="header"><a href="/szzj/album/{{ album.id }}" target="_blank">{{ album.title }}</a></div>
                             <div class="description">{{ album.release_date }}&nbsp;{{ album.money }}元</div>
                         </div>
             {% else %}
                 <div class="item">
-                <div class="header">{{ album.title }}</div>
-                <div class="description">{{ album.release_date }}&nbsp;{{ album.money }}元</div>
+                    <div class="header"><a href="/szzj/album/{{ album.id }}" target="_blank">{{ album.title }}</a></div>
+                    <div class="description">{{ album.release_date }}&nbsp;{{ album.money }}元</div>
                 </div>
             {% endif %}
         {% endfor %}

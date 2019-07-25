@@ -91,11 +91,12 @@ class ArtistDetailView(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['album_list'] = Album.objects.filter(artist=self.kwargs['pk']).order_by('-release_date')
         now = timezone.now()
         context['concert_list_coming'] = Concert.objects.filter(
             tour__artist=self.kwargs['pk'], date__gte=now).order_by('date').select_related('tour', 'site', 'site__city')
         context['concert_list_done'] = Concert.objects.filter(
-            tour__artist=self.kwargs['pk'], date__lt=now).order_by('date').select_related('tour', 'site', 'site__city')
+            tour__artist=self.kwargs['pk'], date__lt=now).order_by('-date').select_related('tour', 'site', 'site__city')
         return context
 
 
@@ -161,5 +162,5 @@ class SiteDetailView(generic.DetailView):
         context['concert_list_coming'] = Concert.objects.filter(
             site=self.kwargs['pk'], date__gte=now).order_by('date').select_related('tour', 'tour__artist')
         context['concert_list_done'] = Concert.objects.filter(
-            site=self.kwargs['pk'], date__lt=now).order_by('date').select_related('tour', 'tour__artist')
+            site=self.kwargs['pk'], date__lt=now).order_by('-date').select_related('tour', 'tour__artist')
         return context

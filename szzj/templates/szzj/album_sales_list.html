@@ -29,7 +29,7 @@
     <tr>
         <td>
             <h5 class="ui header">
-                <a href="/szzj/album/{{ album.id }}" target="_blank">{{ album.title }}</a>-{{ album.artist.name }}
+                <a href="/szzj/album/{{ album.id }}" target="_blank">{{ album.title }}</a>-<a href="/szzj/artist/{{ album.artist.id }}" target="_blank">{{ album.artist.name }}</a>
                 <div class="sub header">{{ album.release_date|date:"Y.n.j" }}&nbsp;&nbsp;¥{{ album.price }}</div>
             </h5>
         </td>
@@ -118,7 +118,7 @@
     <tr>
         <td>
             <h5 class="ui header">
-                <a href="/szzj/album/{{ album.id }}" target="_blank">{{ album.title }}</a>-{{ album.artist.name }}
+                <a href="/szzj/album/{{ album.id }}" target="_blank">{{ album.title }}</a>-<a href="/szzj/artist/{{ album.artist.id }}" target="_blank">{{ album.artist.name }}</a>
                 <div class="sub header">{{ album.release_date|date:"Y.n.j" }}&nbsp;&nbsp;¥{{ album.price }}</div>
             </h5>
         </td>
