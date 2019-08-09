@@ -33,19 +33,29 @@ class Command(BaseCommand):
                     json_data = json.loads(data)
                     album.kugou_count = json_data['buy_num']
                     album.kugou_money = album.price * album.kugou_count
+                    album.kugou_song_count = 0
                 if album.kugou_album_id:
+                    album.kugou_song_count = album.kugou_count * album.song_num
                     url = 'https://zhuanjidata.kugou.com/v3/Commoncharge/getSongsInfo?album_id=' + album.kugou_album_id.__str__() + '&hashs=' + album.kugou_hashs
                     with request.urlopen(url) as f:
                         data = f.read().decode('utf-8')
                         json_data = json.loads(data)
                         song_sales = json_data['data']
-                        album.kugou_song_count = 0
-                        actual_song_num = 0
                         for song_sale in song_sales:
+                            extra_song_count = song_sale['buy_count'] - album.kugou_count
+                            album.kugou_song_count += extra_song_count
                             if song_sale['pay_type'] > 0:
-                                album.kugou_song_count += song_sale['buy_count']
-                                actual_song_num += 1
-                        album.kugou_money += (album.kugou_song_count - album.kugou_count * actual_song_num) * album.song_price
+                                album.kugou_money += extra_song_count * album.song_price
+                                continue
+                            if song_sale['privilege'] == 0:
+                                album.kugou_song_count -= album.kugou_count
+                        # album.kugou_song_count = 0
+                        # actual_song_num = 0
+                        # for song_sale in song_sales:
+                        #     if song_sale['pay_type'] > 0:
+                        #         album.kugou_song_count += song_sale['buy_count']
+                        #         actual_song_num += 1
+                        # album.kugou_money += (album.kugou_song_count - album.kugou_count * actual_song_num) * album.song_price
 
             if album.kuwo_id:
                 data = {'key': album.kuwo_id, 'op': 'gfc'}
