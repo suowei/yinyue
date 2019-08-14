@@ -200,6 +200,28 @@
 <table class="ui blue unstackable table">
     <thead>
     <tr>
+        <th>新增演唱会</th>
+        <th>时间</th>
+        <th>场馆</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for concert in new_concert_list %}
+    <tr>
+        <td>
+            <h4 class="ui header">
+                <a href="/szzj/artist/{{ concert.tour.artist.id }}" target="_blank">{{ concert.tour.artist.name }}</a>-{{ concert.tour.title }}-{{ concert.site.city.name }}站
+            </h4>
+        </td>
+        <td>{{ concert.date|date:"Y年n月j日" }}</td>
+        <td><a href="/yanchanghui/site/{{ concert.site.id }}" target="_blank">{{ concert.site.name }}</a></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<table class="ui blue unstackable table">
+    <thead>
+    <tr>
         <th>近期演唱会</th>
         <th>时间</th>
         <th>场馆</th>

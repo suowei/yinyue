@@ -17,11 +17,13 @@ def index(request):
         'kugou_count', 'kugou_song_count', 'kugou_money', 'kuwo_count', 'kuwo_song_count', 'kuwo_money',
         'wyy_count', 'wyy_song_count', 'wyy_money', 'count', 'money')
     top_album_list = Album.objects.order_by('-money_today').filter(money_today__gt=0).select_related('artist')[:20]
+    new_concert_list = Concert.objects.filter(date__gte=now).select_related(
+        'tour', 'tour__artist', 'site', 'site__city').order_by('-id')[:15]
     date = now + timezone.timedelta(days=7)
     concert_list = Concert.objects.filter(date__gte=now, date__lt=date).select_related(
         'tour', 'tour__artist', 'site', 'site__city').order_by('date')
-    context = {'album_list': album_list, 'album_info_list': album_info_list,
-               'top_album_list': top_album_list, 'concert_list': concert_list}
+    context = {'album_list': album_list, 'album_info_list': album_info_list, 'top_album_list': top_album_list,
+               'new_concert_list': new_concert_list, 'concert_list': concert_list}
     return render(request, 'szzj/index.html', context)
 
 
