@@ -107,24 +107,9 @@ class Command(BaseCommand):
                     count=album.count, money=album.money)
 
                 initial_data = AlbumData.objects.filter(album=album, time__lte=start_time).order_by('-id')[0:1]
-                if len(initial_data) > 0:
-                    initial_data = initial_data[0]
-                else:
-                    initial_data = AlbumData()
-                    initial_data.qq_count = 0
-                    initial_data.qq_song_count = 0
-                    initial_data.qq_money = Decimal(0.00)
-                    initial_data.kugou_count = 0
-                    initial_data.kugou_song_count = 0
-                    initial_data.kugou_money = Decimal(0.00)
-                    initial_data.kuwo_count = 0
-                    initial_data.kuwo_song_count = 0
-                    initial_data.kuwo_money = Decimal(0.00)
-                    initial_data.wyy_count = 0
-                    initial_data.wyy_song_count = 0
-                    initial_data.wyy_money = Decimal(0.00)
-                    initial_data.count = 0
-                    initial_data.money = Decimal(0.00)
+                if len(initial_data) == 0:
+                    initial_data = AlbumData.objects.filter(album=album).order_by('id')[0:1]
+                initial_data = initial_data[0]
                 qq_count_today = album.qq_count - initial_data.qq_count
                 qq_song_count_today = album.qq_song_count - initial_data.qq_song_count
                 qq_money_today = album.qq_money - initial_data.qq_money

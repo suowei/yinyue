@@ -78,6 +78,7 @@
     </tbody>
     <tfoot><tr><th>总销量</th><th class="right aligned">{{ album.count }}张</th><th class="right aligned">{{ album.money }}元</th></tr></tfoot>
 </table>
+{% if daily_list %}
 <div class="ui basic segment">
     <h3 class="ui blue header">每日销量
         <div class="ui sub header">*此功能于2019年5月11日上线，在此之前的数据暂无记录。
@@ -109,4 +110,5 @@
     {% endfor %}
     </tbody>
 </table>
+{% endif %}
 {% endblock %}
