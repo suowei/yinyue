@@ -3,14 +3,20 @@ from django.db.models import Sum
 from django.utils import timezone
 from urllib import request, parse
 import json
+import datetime
 from decimal import Decimal
-from szzj.models import Artist, Album, AlbumData
+from szzj.models import Artist, Album, AlbumData, AlbumDataDaily
 
 
 class Command(BaseCommand):
     help = 'Get sale data.'
 
     def handle(self, *args, **options):
+        now = datetime.datetime.now()
+        today = now.date()
+        if now.hour == 0 and now.minute < 30:
+            today += datetime.timedelta(days=-1)
+        start_time = datetime.datetime(today.year, today.month, today.day, 0, 20, 0)
         album_list = Album.objects.all()
         for album in album_list:
             if album.qq_id:
@@ -49,13 +55,6 @@ class Command(BaseCommand):
                                 continue
                             if song_sale['privilege'] == 0:
                                 album.kugou_song_count -= album.kugou_count
-                        # album.kugou_song_count = 0
-                        # actual_song_num = 0
-                        # for song_sale in song_sales:
-                        #     if song_sale['pay_type'] > 0:
-                        #         album.kugou_song_count += song_sale['buy_count']
-                        #         actual_song_num += 1
-                        # album.kugou_money += (album.kugou_song_count - album.kugou_count * actual_song_num) * album.song_price
 
             if album.kuwo_id:
                 data = {'key': album.kuwo_id, 'op': 'gfc'}
@@ -107,43 +106,70 @@ class Command(BaseCommand):
                     wyy_count=album.wyy_count, wyy_song_count=album.wyy_song_count, wyy_money=album.wyy_money,
                     count=album.count, money=album.money)
 
+                initial_data = AlbumData.objects.filter(album=album, time__lte=start_time).order_by('-id')[0:1]
+                if len(initial_data) > 0:
+                    initial_data = initial_data[0]
+                else:
+                    initial_data = AlbumData()
+                    initial_data.qq_count = 0
+                    initial_data.qq_song_count = 0
+                    initial_data.qq_money = Decimal(0.00)
+                    initial_data.kugou_count = 0
+                    initial_data.kugou_song_count = 0
+                    initial_data.kugou_money = Decimal(0.00)
+                    initial_data.kuwo_count = 0
+                    initial_data.kuwo_song_count = 0
+                    initial_data.kuwo_money = Decimal(0.00)
+                    initial_data.wyy_count = 0
+                    initial_data.wyy_song_count = 0
+                    initial_data.wyy_money = Decimal(0.00)
+                    initial_data.count = 0
+                    initial_data.money = Decimal(0.00)
+                qq_count_today = album.qq_count - initial_data.qq_count
+                qq_song_count_today = album.qq_song_count - initial_data.qq_song_count
+                qq_money_today = album.qq_money - initial_data.qq_money
+                kugou_count_today = album.kugou_count - initial_data.kugou_count
+                kugou_song_count_today = album.kugou_song_count - initial_data.kugou_song_count
+                kugou_money_today = album.kugou_money - initial_data.kugou_money
+                kuwo_count_today = album.kuwo_count - initial_data.kuwo_count
+                kuwo_song_count_today = album.kuwo_song_count - initial_data.kuwo_song_count
+                kuwo_money_today = album.kuwo_money - initial_data.kuwo_money
+                wyy_count_today = album.wyy_count - initial_data.wyy_count
+                wyy_song_count_today = album.wyy_song_count - initial_data.wyy_song_count
+                wyy_money_today = album.wyy_money - initial_data.wyy_money
+                count_today = album.count - initial_data.count
+                money_today = album.money - initial_data.money
+                sale_today = AlbumDataDaily.objects.filter(album=album, date=today)[0:1]
+                if len(sale_today) > 0:
+                    sale_today = sale_today[0]
+                    sale_today.qq_count = qq_count_today
+                    sale_today.qq_song_count = qq_song_count_today
+                    sale_today.qq_money = qq_money_today
+                    sale_today.kugou_count = kugou_count_today
+                    sale_today.kugou_song_count = kugou_song_count_today
+                    sale_today.kugou_money = kugou_money_today
+                    sale_today.kuwo_count = kuwo_count_today
+                    sale_today.kuwo_song_count = kuwo_song_count_today
+                    sale_today.kuwo_money = kuwo_money_today
+                    sale_today.wyy_count = wyy_count_today
+                    sale_today.wyy_song_count = wyy_song_count_today
+                    sale_today.wyy_money = wyy_money_today
+                    sale_today.count = count_today
+                    sale_today.money = money_today
+                    sale_today.save()
+                else:
+                    AlbumDataDaily.objects.create(
+                        album=album, date=today,
+                        qq_count=qq_count_today, qq_song_count=qq_song_count_today, qq_money=qq_money_today,
+                        kugou_count=kugou_count_today, kugou_song_count=kugou_song_count_today,
+                        kugou_money=kugou_money_today,
+                        kuwo_count=kuwo_count_today, kuwo_song_count=kuwo_song_count_today,
+                        kuwo_money=kuwo_money_today,
+                        wyy_count=wyy_count_today, wyy_song_count=wyy_song_count_today, wyy_money=wyy_money_today,
+                        count=count_today, money=money_today)
+
         artist_list = Artist.objects.annotate(album_sum=Sum('album__money'))
         for artist in artist_list:
             if artist.album_sum:
                 artist.money = artist.album_sum
                 artist.save()
-
-        now = timezone.now()
-        zero_today = now - timezone.timedelta(
-            hours=now.hour + 8, minutes=now.minute, seconds=now.second, microseconds=now.microsecond)
-        for album in album_list:
-            initial_data_today = AlbumData.objects.filter(time__gte=zero_today, album=album).order_by('id')[0:1]
-            if len(initial_data_today) > 0:
-                album.qq_count_today = album.qq_count - initial_data_today[0].qq_count
-                album.qq_song_count_today = album.qq_song_count - initial_data_today[0].qq_song_count
-                album.qq_money_today = album.qq_money - initial_data_today[0].qq_money
-                album.kugou_count_today = album.kugou_count - initial_data_today[0].kugou_count
-                album.kugou_song_count_today = album.kugou_song_count - initial_data_today[0].kugou_song_count
-                album.kugou_money_today = album.kugou_money - initial_data_today[0].kugou_money
-                album.kuwo_count_today = album.kuwo_count - initial_data_today[0].kuwo_count
-                album.kuwo_song_count_today = album.kuwo_song_count - initial_data_today[0].kuwo_song_count
-                album.kuwo_money_today = album.kuwo_money - initial_data_today[0].kuwo_money
-                album.wyy_count_today = album.wyy_count - initial_data_today[0].wyy_count
-                album.wyy_money_today = album.wyy_money - initial_data_today[0].wyy_money
-                album.count_today = album.count - initial_data_today[0].count
-                album.money_today = album.money - initial_data_today[0].money
-            else:
-                album.qq_count_today = 0
-                album.qq_song_count_today = 0
-                album.qq_money_today = 0
-                album.kugou_count_today = 0
-                album.kugou_song_count_today = 0
-                album.kugou_money_today = 0
-                album.kuwo_count_today = 0
-                album.kuwo_song_count_today = 0
-                album.kuwo_money_today = 0
-                album.wyy_count_today = 0
-                album.wyy_money_today = 0
-                album.count_today = 0
-                album.money_today = 0
-            album.save()

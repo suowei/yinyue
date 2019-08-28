@@ -121,7 +121,7 @@
 </table>
 <div class="ui basic segment">
     <h3 class="ui blue header">今日销量
-        <div class="ui sub header">*今日销量按最近一次获取到的数据减去今日第一次获取到的数据计算，非准确数据。从0点30分起，大约半小时更新一次。</div>
+        <div class="ui sub header">*今日销量按最近一次获取到的数据减去今日0点左右获取到的数据计算，非准确数据。从0点30分起，大约半小时更新一次。</div>
     </h3>
 </div>
 <table class="ui blue unstackable table">
@@ -136,58 +136,58 @@
     </tr>
     </thead>
     <tbody>
-    {% for album in top_album_list %}
+    {% for data in top_album_list %}
     <tr>
         <td>
             <h4 class="ui header">
-                《<a href="/szzj/album/{{ album.id }}" target="_blank">{{ album.title }}</a>》<a href="/szzj/artist/{{ album.artist.id }}" target="_blank">{{ album.artist.name }}</a>
-                <div class="sub header">{{ album.release_date }}&nbsp;&nbsp;{{ album.money }}元</div>
+                《<a href="/szzj/album/{{ data.album.id }}" target="_blank">{{ data.album.title }}</a>》<a href="/szzj/artist/{{ data.album.artist.id }}" target="_blank">{{ data.album.artist.name }}</a>
+                <div class="sub header">{{ data.album.release_date }}&nbsp;&nbsp;{{ data.album.money }}元</div>
             </h4>
         </td>
-        <td>{{ album.count_today }}张<br>{{ album.money_today }}元</td></td>
+        <td>{{ data.count }}张<br>{{ data.money }}元</td></td>
         <td>
-            {% if album.qq_id %}
-                {% if album.qq_id != 656743 %}
-                <a href="https://y.qq.com/m/digitalbum/gold/index.html?id={{ album.qq_id }}" target="_blank">
+            {% if data.album.qq_id %}
+                {% if data.album.qq_id != 656743 %}
+                <a href="https://y.qq.com/m/digitalbum/gold/index.html?id={{ data.album.qq_id }}" target="_blank">
                 {% else %}
-                <a href="https://y.qq.com/m/digitalbum/silver/index.html?id={{ album.qq_id }}" target="_blank">
+                <a href="https://y.qq.com/m/digitalbum/silver/index.html?id={{ data.album.qq_id }}" target="_blank">
                 {% endif %}
-                    {% if album.album_only %}{{ album.qq_count_today }}张{% else %}{{ album.qq_song_count_today }}首{% endif %}<br>{{ album.qq_money_today }}元
+                    {% if data.album.album_only %}{{ data.qq_count }}张{% else %}{{ data.qq_song_count }}首{% endif %}<br>{{ data.qq_money }}元
                 </a>
             {% else %}
                 -
             {% endif %}
         </td>
         <td>
-            {% if album.wyy_id %}
-                {% if album.wyy_id != 5856052 %}
-                <a href="https://music.163.com/store/newalbum/detail?id={{ album.wyy_id }}" target="_blank">
+            {% if data.album.wyy_id %}
+                {% if data.album.wyy_id != 5856052 %}
+                <a href="https://music.163.com/store/newalbum/detail?id={{ data.album.wyy_id }}" target="_blank">
                 {% else %}
-                <a href="https://music.163.com/store/product/detail?id={{ album.wyy_id }}" target="_blank">
+                <a href="https://music.163.com/store/product/detail?id={{ data.album.wyy_id }}" target="_blank">
                 {% endif %}
-                    {{ album.wyy_count_today }}张<br>{{ album.wyy_money_today }}元
+                    {{ data.wyy_count }}张<br>{{ data.wyy_money }}元
                 </a>
             {% else %}
                 -
             {% endif %}
         </td>
         <td>
-            {% if album.kugou_id %}
-                {% if album.kugou_id <= 69486 %}
-                <a href="http://zhuanji.kugou.com/html/mobile_commonchargeV2/index_{{ album.kugou_id }}.html" target="_blank">
+            {% if data.album.kugou_id %}
+                {% if data.album.kugou_id <= 69486 %}
+                <a href="http://zhuanji.kugou.com/html/mobile_commonchargeV2/index_{{ data.album.kugou_id }}.html" target="_blank">
                 {% else %}
-                <a href="http://zhuanjistatic.kugou.com/html/pc_commonchargeV3/index_{{ album.kugou_id }}.html" target="_blank">
+                <a href="http://zhuanjistatic.kugou.com/html/pc_commonchargeV3/index_{{ data.album.kugou_id }}.html" target="_blank">
                 {% endif %}
-                    {% if album.kugou_song_count_today == 0 %}{{ album.kugou_count_today }}张{% else %}{{ album.kugou_song_count_today }}首{% endif %}<br>{{ album.kugou_money_today }}元
+                    {% if data.kugou_song_count == 0 %}{{ data.kugou_count }}张{% else %}{{ data.kugou_song_count }}首{% endif %}<br>{{ data.kugou_money }}元
                 </a>
             {% else %}
                 -
             {% endif %}
         </td>
         <td>
-            {% if album.kuwo_id %}
-                <a href="http://vip1.kuwo.cn/fans/fans/template/index.html?key={{ album.kuwo_id }}" target="_blank">
-                    {% if album.album_only or album.kuwo_song_count_today == 0 %}{{ album.kuwo_count_today }}张{% else %}{{ album.kuwo_song_count_today }}首{% endif %}<br>{{ album.kuwo_money_today }}元
+            {% if data.album.kuwo_id %}
+                <a href="http://vip1.kuwo.cn/fans/fans/template/index.html?key={{ data.album.kuwo_id }}" target="_blank">
+                    {% if data.album.album_only or data.kuwo_song_count == 0 %}{{ data.kuwo_count }}张{% else %}{{ data.kuwo_song_count }}首{% endif %}<br>{{ data.kuwo_money }}元
                 </a>
             {% else %}
                 -

@@ -1,25 +1,29 @@
 from django.shortcuts import render
 from django.views import generic
-from django.utils import timezone
 from django.db.models import Count
+import datetime
 
-from .models import Artist, Album, AlbumData, AlbumInfo, Concert, Site
+from .models import Artist, Album, AlbumData, AlbumDataDaily, AlbumInfo, Concert, Site
 
 
 def index(request):
     album_info_list = AlbumInfo.objects.select_related('artist').order_by('sale_time').only(
         'title', 'artist_id', 'artist__name', 'sale_time', 'info')
-    now = timezone.now()
-    date = now.date() + timezone.timedelta(days=-30)
+    now = datetime.datetime.now()
+    date = now.date() + datetime.timedelta(days=-30)
     album_list = Album.objects.filter(release_date__gte=date).select_related('artist').order_by('-release_date').only(
         'title', 'artist_id', 'artist__name', 'release_date', 'price', 'album_only',
         'qq_id', 'kugou_id', 'kuwo_id', 'wyy_id', 'qq_count', 'qq_song_count', 'qq_money',
         'kugou_count', 'kugou_song_count', 'kugou_money', 'kuwo_count', 'kuwo_song_count', 'kuwo_money',
         'wyy_count', 'wyy_song_count', 'wyy_money', 'count', 'money')
-    top_album_list = Album.objects.order_by('-money_today').filter(money_today__gt=0).select_related('artist')[:20]
+    today = now.date()
+    if now.hour == 0 and now.minute < 30:
+        today += datetime.timedelta(days=-1)
+    top_album_list = AlbumDataDaily.objects.filter(date=today).order_by('-money').select_related(
+        'album', 'album__artist')[:20]
     new_concert_list = Concert.objects.filter(date__gte=now).select_related(
-        'tour', 'tour__artist', 'site', 'site__city').order_by('-id')[:15]
-    date = now + timezone.timedelta(days=7)
+        'tour', 'tour__artist', 'site', 'site__city').order_by('-id')[:10]
+    date = now + datetime.timedelta(days=7)
     concert_list = Concert.objects.filter(date__gte=now, date__lt=date).select_related(
         'tour', 'tour__artist', 'site', 'site__city').order_by('date')
     context = {'album_list': album_list, 'album_info_list': album_info_list, 'top_album_list': top_album_list,
@@ -30,7 +34,7 @@ def index(request):
 def new_album_index(request):
     album_info_list = AlbumInfo.objects.select_related('artist').order_by('sale_time').only(
         'title', 'artist_id', 'artist__name', 'sale_time', 'info')
-    date = timezone.now().date() + timezone.timedelta(days=-30)
+    date = datetime.date.today() + datetime.timedelta(days=-30)
     album_list = Album.objects.filter(release_date__gte=date).select_related('artist').order_by('-release_date').only(
         'title', 'artist_id', 'artist__name', 'release_date', 'price', 'album_only',
         'qq_id', 'kugou_id', 'kuwo_id', 'wyy_id', 'qq_count', 'qq_song_count', 'qq_money',
@@ -41,21 +45,23 @@ def new_album_index(request):
 
 
 class TodayAlbumIndexView(generic.ListView):
+    context_object_name = 'data_list'
+    now = datetime.datetime.now()
+    today = now.date()
+    if now.hour == 0 and now.minute < 30:
+        today += datetime.timedelta(days=-1)
+    queryset = AlbumDataDaily.objects.filter(date=today).order_by('-money').select_related(
+        'album', 'album__artist')[:20]
     template_name = 'szzj/today_album_list.html'
-
-    def get_queryset(self):
-        return Album.objects.order_by('-money_today').filter(money_today__gt=0).select_related('artist')[:20]
 
 
 class AlbumIndexView(generic.ListView):
     def get_queryset(self):
-        return Album.objects.select_related('artist').order_by('-money').only('title', 'artist_id', 'artist__name',
-                                                                              'release_date', 'price', 'album_only',
-                                                                              'qq_id', 'kugou_id', 'kuwo_id', 'wyy_id',
-                                                                              'qq_count', 'qq_song_count', 'qq_money',
-                                                                              'kugou_count', 'kugou_song_count', 'kugou_money',
-                                                                              'kuwo_count', 'kuwo_song_count', 'kuwo_money',
-                                                                              'wyy_count', 'wyy_song_count', 'wyy_money', 'money')
+        return Album.objects.select_related('artist').order_by('-money').only(
+            'title', 'artist_id', 'artist__name', 'release_date', 'price', 'album_only',
+            'qq_id', 'kugou_id', 'kuwo_id', 'wyy_id',
+            'qq_count', 'qq_song_count', 'qq_money', 'kugou_count', 'kugou_song_count', 'kugou_money',
+            'kuwo_count', 'kuwo_song_count', 'kuwo_money', 'wyy_count', 'wyy_song_count', 'wyy_money', 'money')
 
 
 def album_sales_index(request):
@@ -68,13 +74,11 @@ def album_sales_index(request):
 
 
 def album_year_index(request, year):
-    album_list = Album.objects.filter(release_date__year=year).select_related('artist').order_by('-money').only('title', 'artist_id', 'artist__name',
-                                                                              'release_date', 'price', 'album_only',
-                                                                              'qq_id', 'kugou_id', 'kuwo_id', 'wyy_id',
-                                                                              'qq_count', 'qq_song_count', 'qq_money',
-                                                                              'kugou_count', 'kugou_song_count', 'kugou_money',
-                                                                              'kuwo_count', 'kuwo_song_count', 'kuwo_money',
-                                                                              'wyy_count', 'wyy_song_count', 'wyy_money', 'money')
+    album_list = Album.objects.filter(release_date__year=year).select_related('artist').order_by('-money').only(
+        'title', 'artist_id', 'artist__name', 'release_date', 'price', 'album_only',
+        'qq_id', 'kugou_id', 'kuwo_id', 'wyy_id',
+        'qq_count', 'qq_song_count', 'qq_money', 'kugou_count', 'kugou_song_count', 'kugou_money',
+        'kuwo_count', 'kuwo_song_count', 'kuwo_money', 'wyy_count', 'wyy_song_count', 'wyy_money', 'money')
     context = {'year': year, 'album_list': album_list}
     return render(request, 'szzj/album_list.html', context)
 
@@ -94,7 +98,7 @@ class ArtistDetailView(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['album_list'] = Album.objects.filter(artist=self.kwargs['pk']).order_by('-release_date')
-        now = timezone.now()
+        now = datetime.datetime.now()
         context['concert_list_coming'] = Concert.objects.filter(
             tour__artist=self.kwargs['pk'], date__gte=now).order_by('date').select_related('tour', 'site', 'site__city')
         context['concert_list_done'] = Concert.objects.filter(
@@ -103,7 +107,8 @@ class ArtistDetailView(generic.DetailView):
 
 
 def artist_index(request):
-    album_list = Album.objects.order_by('-artist__money', 'release_date').select_related('artist').only('title', 'artist', 'release_date', 'money')
+    album_list = Album.objects.order_by('-artist__money', 'release_date').select_related('artist').only(
+        'title', 'artist', 'release_date', 'money')
     for i in range(0, len(album_list)):
         if i == 0 or album_list[i].artist_id != album_list[i-1].artist_id:
             album_list[i].first = True
@@ -116,19 +121,28 @@ class AlbumDetailView(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['daily_list'] = AlbumDataDaily.objects.filter(album=self.kwargs['pk']).order_by('-id')
         context['data_list'] = AlbumData.objects.filter(album=self.kwargs['pk']).order_by('-id')[:144]
         return context
+
+
+def album_data_daily_detail(request, album, year, month, day):
+    start_time = datetime.datetime(year, month, day, 0, 0)
+    end_time = datetime.datetime(year, month, day, 23, 59)
+    data_list = AlbumData.objects.filter(album=album, time__range=(start_time, end_time))
+    context = {'data_list': data_list}
+    return render(request, 'szzj/album_data_daily_detail.html', context)
 
 
 class ConcertIndexView(generic.ListView):
     def get_queryset(self):
         return Concert.objects.select_related('tour', 'tour__artist', 'site', 'site__city').filter(
-            date__gte=timezone.now()).order_by('date').only('tour__artist__name', 'tour__title', 'date',
-                                                            'site__city__name', 'site__name')
+            date__gte=datetime.datetime.now()).order_by('date').only('tour__artist__name', 'tour__title', 'date',
+                                                                     'site__city__name', 'site__name')
 
 
 def concert_year_index(request, year):
-    now = timezone.now()
+    now = datetime.datetime.now()
     if year == now.year:
         artist_list = Artist.objects.filter(tour__concert__date__year=year, tour__concert__date__lte=now).annotate(
             num_concert=Count('tour__concert')).only('name').order_by('-num_concert')
@@ -160,7 +174,7 @@ class SiteDetailView(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        now = timezone.now()
+        now = datetime.datetime.now()
         context['concert_list_coming'] = Concert.objects.filter(
             site=self.kwargs['pk'], date__gte=now).order_by('date').select_related('tour', 'tour__artist')
         context['concert_list_done'] = Concert.objects.filter(

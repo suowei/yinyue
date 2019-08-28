@@ -1,0 +1,36 @@
+{% extends "szzj/szzj_base.html" %}
+
+{% block title %}当日销量记录{% endblock %}
+
+{% block content %}
+<div class="ui basic segment">
+    <h3 class="ui blue header">当日销量记录
+        <div class="ui sub header">*本站数据每半小时获取一次，当销售金额有变化时才会生成记录。
+            <br>*因网络问题，某一时段的数据可能会获取失败，此时如果实际销售数据发生了变化，本站可能会记录不到。</div>
+    </h3>
+</div>
+<table class="ui blue small very compact unstackable table" data-tab="album">
+    <thead>
+    <tr>
+        <th>时间</th>
+        <th>总销量</th>
+        <th>QQ音乐</th>
+        <th>网易云音乐</th>
+        <th>酷狗音乐</th>
+        <th>酷我音乐</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for data in data_list %}
+    <tr>
+        <td>{{ data.time }}</td>
+        <td>{{ data.count }}张<br>{{ data.money }}元</td>
+        <td>{{ data.qq_count }}张<br>{{ data.qq_money }}元</td>
+        <td>{{ data.wyy_count }}张<br>{{ data.wyy_money }}元</td>
+        <td>{{ data.kugou_count }}张<br>{{ data.kugou_money }}元</td>
+        <td>{{ data.kuwo_count }}张<br>{{ data.kuwo_money }}元</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -82,6 +82,25 @@ class AlbumData(models.Model):
     money = models.DecimalField(max_digits=11, decimal_places=2, default=0.00)
 
 
+class AlbumDataDaily(models.Model):
+    album = models.ForeignKey(Album, on_delete=models.CASCADE)
+    date = models.DateField()
+    qq_count = models.IntegerField(default=0)
+    qq_song_count = models.IntegerField(default=0)
+    qq_money = models.DecimalField(max_digits=11, decimal_places=2, default=0.00)
+    kugou_count = models.IntegerField(default=0)
+    kugou_song_count = models.IntegerField(default=0)
+    kugou_money = models.DecimalField(max_digits=11, decimal_places=2, default=0.00)
+    kuwo_count = models.IntegerField(default=0)
+    kuwo_song_count = models.IntegerField(default=0)
+    kuwo_money = models.DecimalField(max_digits=11, decimal_places=2, default=0.00)
+    wyy_count = models.IntegerField(default=0)
+    wyy_song_count = models.IntegerField(default=0)
+    wyy_money = models.DecimalField(max_digits=11, decimal_places=2, default=0.00)
+    count = models.IntegerField(default=0)
+    money = models.DecimalField(max_digits=11, decimal_places=2, default=0.00)
+
+
 class AlbumInfo(models.Model):
     title = models.CharField(max_length=200)
     artist = models.ForeignKey(Artist, on_delete=models.CASCADE)

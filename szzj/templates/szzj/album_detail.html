@@ -6,7 +6,7 @@
 <div class="ui basic segment">
     <h2 class="ui header">{{ album.title }} <div class="sub header">{{ album.artist.name }}</div></h2>
     <p>{{ album.release_date }}发行，售价{{ album.price }}元。</p>
-    <h3 class="ui blue header">各平台销售详情<div class="ui sub header">*销量占比按张数计算。</div></h3>
+    <h3 class="ui blue header">各平台销售详情<div class="ui sub header">*部分单曲在网易云音乐销量榜上和单独页面中显示的数据不一致，此处以销量榜数据为准。</div></h3>
 </div>
 <table class="ui blue unstackable table">
     <thead>
@@ -14,7 +14,6 @@
         <th>平台</th>
         <th class="right aligned">销量</th>
         <th class="right aligned">金额</th>
-        <th class="right aligned">占比</th>
     </tr>
     </thead>
     <tbody>
@@ -29,9 +28,8 @@
     {% if album.qq_count > 0 %}
         <td class="right aligned">{% if album.album_only %}{{ album.qq_count }}张{% else %}{{ album.qq_song_count }}首{% endif %}</td>
         <td class="right aligned">{{ album.qq_money }}元</td>
-        <td class="right aligned">{% widthratio album.qq_count album.count 100 %}%</td>
     {% else %}
-        <td>暂缺</td><td>暂缺</td><td>暂缺</td>
+        <td>暂缺</td><td>暂缺</td>
     {% endif %}
     </tr>
     {% endif %}
@@ -46,9 +44,8 @@
     {% if album.wyy_count > 0 %}
         <td class="right aligned">{{ album.wyy_count }}张</td>
         <td class="right aligned">{{ album.wyy_money }}元</td>
-        <td class="right aligned">{% widthratio album.wyy_count album.count 100 %}%</td>
     {% else %}
-        <td>暂缺</td><td>暂缺</td><td>暂缺</td>
+        <td>暂缺</td><td>暂缺</td>
     {% endif %}
     </tr>
     {% endif %}
@@ -63,9 +60,8 @@
     {% if album.kugou_count > 0 %}
         <td class="right aligned">{% if album.kugou_song_count == 0 %}{{ album.kugou_count }}张{% else %}{{ album.kugou_song_count }}首{% endif %}</td>
         <td class="right aligned">{{ album.kugou_money }}元</td>
-        <td class="right aligned">{% widthratio album.kugou_count album.count 100 %}%</td>
     {% else %}
-        <td>暂缺</td><td>暂缺</td><td>暂缺</td>
+        <td>暂缺</td><td>暂缺</td>
     {% endif %}
     {% endif %}
     {% if album.kuwo_id %}
@@ -75,26 +71,25 @@
     {% if album.kuwo_count > 0 %}
         <td class="right aligned">{% if album.album_only or album.kuwo_song_count == 0 %}{{ album.kuwo_count }}张{% else %}{{ album.kuwo_song_count }}首{% endif %}</td>
         <td class="right aligned">{{ album.kuwo_money }}元</td>
-        <td class="right aligned">{% widthratio album.kuwo_count album.count 100 %}%</td>
     {% else %}
-        <td>暂缺</td><td>暂缺</td><td>暂缺</td>
+        <td>暂缺</td><td>暂缺</td>
     {% endif %}
     {% endif %}
     </tbody>
-    <tfoot><tr><th>总销量</th><th class="right aligned">{{ album.count }}张</th><th class="right aligned">{{ album.money }}元</th><th></th></tr></tfoot>
+    <tfoot><tr><th>总销量</th><th class="right aligned">{{ album.count }}张</th><th class="right aligned">{{ album.money }}元</th></tr></tfoot>
 </table>
 <div class="ui basic segment">
-    <h3 class="ui blue header">最新销量记录
-        <div class="ui sub header">*此功能于2019年5月11日23点上线，在此之前的数据暂无记录。
-            <br>*本站销售数据每半小时获取一次，当销售金额有变化时才会生成记录。
-            <br>*因网络问题，某一时段的数据可能会获取失败，此时如果实际销售数据发生了变化，本站可能会记录不到。</div>
+    <h3 class="ui blue header">每日销量
+        <div class="ui sub header">*此功能于2019年5月11日上线，在此之前的数据暂无记录。
+            <br>*当日销量等于次日0点获取到的数据与当日0点获取到的数据之间的差值，非准确结果。
+            <br>*对于未在开售当日添加信息的专辑，添加信息当日及之前的日销量无法计算，请参考次日数据。</div>
     </h3>
 </div>
 <table class="ui blue small very compact unstackable table" data-tab="album">
     <thead>
     <tr>
-        <th>时间</th>
-        <th>总销量</th>
+        <th>日期</th>
+        <th>当日销量</th>
         <th>QQ音乐</th>
         <th>网易云音乐</th>
         <th>酷狗音乐</th>
@@ -102,9 +97,9 @@
     </tr>
     </thead>
     <tbody>
-    {% for data in data_list %}
+    {% for data in daily_list %}
     <tr>
-        <td>{{ data.time }}</td>
+        <td><a href="/szzj/album/{{ album.id }}/{{ data.date|date:'Y' }}/{{ data.date|date:'n' }}/{{ data.date|date:'j' }}" target="_blank">{{ data.date }}</a></td>
         <td>{{ data.count }}张<br>{{ data.money }}元</td>
         <td>{% if album.album_only %}{{ data.qq_count }}张{% else %}{{ data.qq_song_count }}首{% endif %}<br>{{ data.qq_money }}元</td>
         <td>{{ data.wyy_count }}张<br>{{ data.wyy_money }}元</td>
