@@ -1,7 +1,11 @@
 from django.shortcuts import render
 from django.views import generic
 from django.db.models import Count
+from django.http import HttpResponse
+from django.utils import timezone
 import datetime
+import csv
+import codecs
 
 from .models import Artist, Album, AlbumData, AlbumDataDaily, AlbumInfo, Concert, Site
 
@@ -124,6 +128,21 @@ class AlbumDetailView(generic.DetailView):
         context['daily_list'] = AlbumDataDaily.objects.filter(album=self.kwargs['pk']).order_by('-id')
         context['data_list'] = AlbumData.objects.filter(album=self.kwargs['pk']).order_by('-id')[:144]
         return context
+
+
+def album_data_csv(request, album):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="album_data.csv"'
+    response.write(codecs.BOM_UTF8)
+    writer = csv.writer(response)
+    writer.writerow(['时间', '总销量（张）', '总销量（元）', 'QQ音乐（张）', 'QQ音乐（元）', '网易云音乐（张）', '网易云音乐（元）',
+                     '酷狗音乐（张）', '酷狗音乐（元）', '酷我音乐（张）', '酷我音乐（元）'])
+    data_list = AlbumData.objects.filter(album=album)
+    for data in data_list:
+        writer.writerow([timezone.localtime(data.time).strftime('%Y-%m-%d %H:%M'), data.count, data.money,
+                         data.qq_count, data.qq_money, data.wyy_count, data.wyy_money,
+                         data.kugou_count, data.kugou_money, data.kuwo_count, data.kuwo_money])
+    return response
 
 
 def album_data_daily_detail(request, album, year, month, day):

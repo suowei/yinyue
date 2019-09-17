@@ -14,6 +14,7 @@ urlpatterns = [
     path('szzj/new/', views.new_album_index, name='szzj.new_album_index'),
     path('szzj/today', views.TodayAlbumIndexView.as_view(), name='szzj.today_album_index'),
     path('szzj/album/<int:pk>/', views.AlbumDetailView.as_view(), name='szzj.album_detail'),
+    path('szzj/album/<int:album>/data', views.album_data_csv, name='szzj.album_data_csv'),
     path('szzj/album/<int:album>/<int:year>/<int:month>/<int:day>/', views.album_data_daily_detail, name='szzj.album_data_daily_detail'),
     path('yanchanghui/', views.ConcertIndexView.as_view(), name='yanchanghui.index'),
     path('yanchanghui/<int:year>/', views.concert_year_index, name='yanchanghui.concert_year_index'),
