@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.views import generic
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.http import HttpResponse
 from django.utils import timezone
 import datetime
@@ -78,11 +78,13 @@ def album_sales_index(request):
 
 
 def album_year_index(request, year):
-    album_list = Album.objects.filter(release_date__year=year).select_related('artist').order_by('-money').only(
-        'title', 'artist_id', 'artist__name', 'release_date', 'price', 'album_only',
-        'qq_id', 'kugou_id', 'kuwo_id', 'wyy_id',
-        'qq_count', 'qq_song_count', 'qq_money', 'kugou_count', 'kugou_song_count', 'kugou_money',
-        'kuwo_count', 'kuwo_song_count', 'kuwo_money', 'wyy_count', 'wyy_song_count', 'wyy_money', 'money')
+    if year == 2014:
+        album_list = Album.objects.filter(id=150).select_related('artist').order_by('-money')
+    elif year == 2016:
+        album_list = Album.objects.filter(
+            Q(release_date__year=2016) | Q(id=46)).select_related('artist').order_by('-money')
+    else:
+        album_list = Album.objects.filter(release_date__year=year).select_related('artist').order_by('-money')
     context = {'year': year, 'album_list': album_list}
     return render(request, 'szzj/album_list.html', context)
 
