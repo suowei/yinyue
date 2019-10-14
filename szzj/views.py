@@ -155,6 +155,22 @@ def album_data_daily_detail(request, album, year, month, day):
     return render(request, 'szzj/album_data_daily_detail.html', context)
 
 
+def album_download(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="{}.csv"'.format(datetime.datetime.now())
+    response.write(codecs.BOM_UTF8)
+    writer = csv.writer(response)
+    writer.writerow(['专辑', '歌手', '发行日期', '价格（元）', '歌曲数', '总销量（张）', '总销量（元）',
+                     'QQ音乐（张）', 'QQ音乐（元）', '网易云音乐（张）', '网易云音乐（元）',
+                     '酷狗音乐（张）', '酷狗音乐（元）', '酷我音乐（张）', '酷我音乐（元）'])
+    album_list = Album.objects.select_related('artist').order_by('-money')
+    for album in album_list:
+        writer.writerow([album.title, album.artist.name, album.release_date, album.price, album.song_num,
+                         album.count, album.money, album.qq_count, album.qq_money, album.wyy_count, album.wyy_money,
+                         album.kugou_count, album.kugou_money, album.kuwo_count, album.kuwo_money])
+    return response
+
+
 class ConcertIndexView(generic.ListView):
     def get_queryset(self):
         return Concert.objects.select_related('tour', 'tour__artist', 'site', 'site__city').filter(
