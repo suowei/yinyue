@@ -15,11 +15,7 @@ def index(request):
         'title', 'artist_id', 'artist__name', 'sale_time', 'info')
     now = datetime.datetime.now()
     date = now.date() + datetime.timedelta(days=-30)
-    album_list = Album.objects.filter(release_date__gte=date).select_related('artist').order_by('-release_date').only(
-        'title', 'artist_id', 'artist__name', 'release_date', 'price', 'album_only',
-        'qq_id', 'kugou_id', 'kuwo_id', 'wyy_id', 'qq_count', 'qq_song_count', 'qq_money',
-        'kugou_count', 'kugou_song_count', 'kugou_money', 'kuwo_count', 'kuwo_song_count', 'kuwo_money',
-        'wyy_count', 'wyy_song_count', 'wyy_money', 'count', 'money')
+    album_list = Album.objects.filter(release_date__gte=date).select_related('artist').order_by('-release_date')
     today = now.date()
     if now.hour == 0 and now.minute < 30:
         today += datetime.timedelta(days=-1)
@@ -39,11 +35,7 @@ def new_album_index(request):
     album_info_list = AlbumInfo.objects.select_related('artist').order_by('sale_time').only(
         'title', 'artist_id', 'artist__name', 'sale_time', 'info')
     date = datetime.date.today() + datetime.timedelta(days=-30)
-    album_list = Album.objects.filter(release_date__gte=date).select_related('artist').order_by('-release_date').only(
-        'title', 'artist_id', 'artist__name', 'release_date', 'price', 'album_only',
-        'qq_id', 'kugou_id', 'kuwo_id', 'wyy_id', 'qq_count', 'qq_song_count', 'qq_money',
-        'kugou_count', 'kugou_song_count', 'kugou_money', 'kuwo_count', 'kuwo_song_count', 'kuwo_money',
-        'wyy_count', 'wyy_song_count', 'wyy_money', 'count', 'money')
+    album_list = Album.objects.filter(release_date__gte=date).select_related('artist').order_by('-release_date')
     context = {'album_list': album_list, 'album_info_list': album_info_list}
     return render(request, 'szzj/new_album_list.html', context)
 
@@ -61,18 +53,11 @@ class TodayAlbumIndexView(generic.ListView):
 
 class AlbumIndexView(generic.ListView):
     def get_queryset(self):
-        return Album.objects.select_related('artist').order_by('-money').only(
-            'title', 'artist_id', 'artist__name', 'release_date', 'price', 'album_only',
-            'qq_id', 'kugou_id', 'kuwo_id', 'wyy_id',
-            'qq_count', 'qq_song_count', 'qq_money', 'kugou_count', 'kugou_song_count', 'kugou_money',
-            'kuwo_count', 'kuwo_song_count', 'kuwo_money', 'wyy_count', 'wyy_song_count', 'wyy_money', 'money')
+        return Album.objects.select_related('artist').order_by('-money')
 
 
 def album_sales_index(request):
-    album_list = Album.objects.select_related('artist').order_by('-count').only(
-        'title', 'artist_id', 'artist__name', 'release_date', 'is_album', 'price',
-        'qq_id', 'kugou_id', 'kuwo_id', 'wyy_id',
-        'qq_count', 'kugou_count', 'kuwo_count', 'wyy_count', 'count')
+    album_list = Album.objects.select_related('artist').order_by('-count')
     context = {'album_list': album_list}
     return render(request, 'szzj/album_sales_list.html', context)
 
@@ -90,10 +75,7 @@ def album_year_index(request, year):
 
 
 def album_sales_year_index(request, year):
-    album_list = Album.objects.filter(release_date__year=year).select_related('artist').order_by('-count').only(
-        'title', 'artist_id', 'artist__name', 'release_date', 'is_album', 'price',
-        'qq_id', 'kugou_id', 'kuwo_id', 'wyy_id',
-        'qq_count', 'kugou_count', 'kuwo_count', 'wyy_count', 'count')
+    album_list = Album.objects.filter(release_date__year=year).select_related('artist').order_by('-count')
     context = {'album_list': album_list, 'year': year}
     return render(request, 'szzj/album_sales_list.html', context)
 
@@ -157,7 +139,7 @@ def album_data_daily_detail(request, album, year, month, day):
 
 def album_download(request):
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="{}.csv"'.format(datetime.datetime.now())
+    response['Content-Disposition'] = 'attachment; filename="szzj_{}.csv"'.format(datetime.datetime.now())
     response.write(codecs.BOM_UTF8)
     writer = csv.writer(response)
     writer.writerow(['专辑', '歌手', '发行日期', '价格（元）', '歌曲数', '总销量（张）', '总销量（元）',
