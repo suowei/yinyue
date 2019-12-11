@@ -17,7 +17,7 @@ class Command(BaseCommand):
         if now.hour == 0 and now.minute < 30:
             today += datetime.timedelta(days=-1)
         start_time = datetime.datetime(today.year, today.month, today.day, 0, 20, 0)
-        album_list = Album.objects.all()
+        album_list = Album.objects.order_by('-id')
         for album in album_list:
             if album.qq_id:
                 url = 'https://c.y.qq.com/v8/fcg-bin/musicmall.fcg?cmd=get_album_buy_page&albumid=' + album.qq_id.__str__()
@@ -58,7 +58,7 @@ class Command(BaseCommand):
 
             if album.kuwo_id:
                 data = {'key': album.kuwo_id, 'op': 'gfc'}
-                req = request.Request('http://vip1.kuwo.cn/fans/admin/sysInfo',
+                req = request.Request('https://vip1.kuwo.cn/fans/admin/sysInfo',
                                       data=parse.urlencode(data).encode('utf-8'))
                 with request.urlopen(req) as f:
                     response = f.read().decode('utf-8')
