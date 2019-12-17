@@ -74,7 +74,7 @@ def album_year_index(request, year):
             Q(release_date__year=2016) | Q(id=46)).select_related('artist').order_by('-money')
     else:
         album_list = Album.objects.filter(release_date__year=year).select_related('artist').order_by('-money')
-    context = {'year': year, 'album_list': album_list}
+    context = {'year': year, 'albums': album_list}
     return render(request, 'szzj/album_list.html', context)
 
 
