@@ -21,7 +21,7 @@
     </tr>
     </thead>
     <tbody>
-    {% for album in album_list %}
+    {% for album in albums %}
     <tr>
         <td>
             <h4 class="ui header">
@@ -98,6 +98,15 @@
     {% endfor %}
     </tbody>
 </table>
+<div class="ui pagination menu">
+    {% for i in albums.paginator.page_range %}
+        {% if i == albums.number %}
+            <a href="?page={{ i }}" class="active item">{{ i }}</a>
+        {% else %}
+            <a href="?page={{ i }}" class="item">{{ i }}</a>
+        {% endif %}
+    {% endfor %}
+</div>
 <script>
 {% if year %}
     $("[data-label='year']").text("{{ year }}年");

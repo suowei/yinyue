@@ -3,6 +3,7 @@ from django.views import generic
 from django.db.models import Count, Q
 from django.http import HttpResponse
 from django.utils import timezone
+from django.core.paginator import Paginator
 import datetime
 import csv
 import codecs
@@ -51,9 +52,12 @@ class TodayAlbumIndexView(generic.ListView):
     template_name = 'szzj/today_album_list.html'
 
 
-class AlbumIndexView(generic.ListView):
-    def get_queryset(self):
-        return Album.objects.select_related('artist').order_by('-money')
+def album_index(request):
+    album_list = Album.objects.select_related('artist').order_by('-money')
+    paginator = Paginator(album_list, 100)
+    page = request.GET.get('page')
+    albums = paginator.get_page(page)
+    return render(request, 'szzj/album_list.html', {'albums': albums})
 
 
 def album_sales_index(request):

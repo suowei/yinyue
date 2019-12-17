@@ -5,7 +5,7 @@ from . import views
 app_name = 'szzj'
 urlpatterns = [
     path('', views.index, name='index'),
-    path('szzj/', views.AlbumIndexView.as_view(), name='szzj.index'),
+    path('szzj/', views.album_index, name='szzj.index'),
     path('szzj/<int:year>/', views.album_year_index, name='szzj.album_year_index'),
     path('szzj/sales/', views.album_sales_index, name='szzj.album_sales_index'),
     path('szzj/<int:year>/sales/', views.album_sales_year_index, name='szzj.album_sales_year_index'),
