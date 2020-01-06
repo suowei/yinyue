@@ -208,6 +208,6 @@ class SiteDetailView(generic.DetailView):
 def search(request):
     q = request.GET['q']
     artist_list = Artist.objects.filter(name__icontains=q)
-    album_list = Album.objects.filter(title__icontains=q)
+    album_list = Album.objects.filter(title__icontains=q).select_related('artist')
     context = {'artist_list': artist_list, 'album_list': album_list}
     return render(request, 'szzj/search.html', context)

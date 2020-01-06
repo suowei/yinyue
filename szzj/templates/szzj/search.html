@@ -11,15 +11,19 @@
 <div class="ui basic segment">
     {% if artist_list %}
     <h2 class="ui header">歌手</h2>
+    <div class="ui list">
     {% for artist in artist_list %}
-    <a href="/szzj/artist/{{ artist.id }}">{{ artist.name }}</a><br>
+        <div class="item"><a href="/szzj/artist/{{ artist.id }}">{{ artist.name }}</a></div>
     {% endfor %}
+    </div>
     {% endif %}
     {% if album_list %}
     <h2 class="ui header">数字专辑</h2>
+    <div class="ui list">
     {% for album in album_list %}
-    <a href="/szzj/album/{{ album.id }}">{{ album.title }}</a><br>
+    <div class="item"><a href="/szzj/album/{{ album.id }}">{{ album.title }}</a> - <a href="/szzj/artist/{{ album.artist.id }}">{{ album.artist.name }}</a></div>
     {% endfor %}
+    </div>
     {% endif %}
 </div>
 {% endblock %}
