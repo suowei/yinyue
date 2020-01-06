@@ -203,3 +203,11 @@ class SiteDetailView(generic.DetailView):
         context['concert_list_done'] = Concert.objects.filter(
             site=self.kwargs['pk'], date__lt=now).order_by('-date').select_related('tour', 'tour__artist')
         return context
+
+
+def search(request):
+    q = request.GET['q']
+    artist_list = Artist.objects.filter(name__icontains=q)
+    album_list = Album.objects.filter(title__icontains=q)
+    context = {'artist_list': artist_list, 'album_list': album_list}
+    return render(request, 'szzj/search.html', context)

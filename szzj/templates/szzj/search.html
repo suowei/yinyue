@@ -1,0 +1,25 @@
+{% extends "szzj/base.html" %}
+
+{% block title %}{{ 搜索结果 }}{% endblock %}
+
+{% block content %}
+<div class="ui blue inverted three item menu">
+  <a class="item" href="/">最新</a>
+  <a class="item" href="/szzj">数字专辑销售数据</a>
+  <a class="item" href="/yanchanghui">演唱会信息</a>
+</div>
+<div class="ui basic segment">
+    {% if artist_list %}
+    <h2 class="ui header">歌手</h2>
+    {% for artist in artist_list %}
+    <a href="/szzj/artist/{{ artist.id }}">{{ artist.name }}</a><br>
+    {% endfor %}
+    {% endif %}
+    {% if album_list %}
+    <h2 class="ui header">数字专辑</h2>
+    {% for album in album_list %}
+    <a href="/szzj/album/{{ album.id }}">{{ album.title }}</a><br>
+    {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}
