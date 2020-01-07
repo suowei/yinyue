@@ -25,5 +25,8 @@
     {% endfor %}
     </div>
     {% endif %}
+    {% if not album_list and not artist_list %}
+    <p>抱歉，未找到结果。</p>
+    {% endif %}
 </div>
 {% endblock %}

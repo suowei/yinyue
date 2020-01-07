@@ -24,11 +24,19 @@
     </script>
 </head>
 <body>
-    {% block header %}{% endblock %}
-    {% block content %}{% endblock %}
-    {% block footer %}{% endblock %}
-    <div class="ui center aligned container">
-        <p>©2018-2020 y.saoju.net&nbsp;&nbsp;&nbsp;&nbsp;邮箱：szzj@saoju.net</p>
+<div class="ui small one item secondary menu">
+    <div class="fitted item">
+        <form action="/search/" class="ui action input">
+            <input type="search" name="q" id="id_q" required="required" placeholder="搜索歌手、数字专辑">
+            <button class="ui blue icon button" type="submit"><i class="search icon"></i></button>
+        </form>
     </div>
+</div>
+{% block header %}{% endblock %}
+{% block content %}{% endblock %}
+{% block footer %}{% endblock %}
+<div class="ui center aligned container">
+    <p>©2018-2020 y.saoju.net&nbsp;&nbsp;&nbsp;&nbsp;邮箱：szzj@saoju.net</p>
+</div>
 </body>
 </html>
