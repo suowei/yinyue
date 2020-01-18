@@ -61,8 +61,9 @@ def album_index(request):
 
 
 def album_sales_index(request):
-    album_list = Album.objects.select_related('artist').order_by('-count')
-    context = {'album_list': album_list}
+    album_list = Album.objects.filter(is_album=True).select_related('artist').order_by('-count')[:50]
+    single_list = Album.objects.filter(is_album=False).select_related('artist').order_by('-count')[:50]
+    context = {'album_list': album_list, 'single_list': single_list}
     return render(request, 'szzj/album_sales_list.html', context)
 
 
