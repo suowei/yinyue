@@ -80,8 +80,9 @@ def album_year_index(request, year):
 
 
 def album_sales_year_index(request, year):
-    album_list = Album.objects.filter(release_date__year=year).select_related('artist').order_by('-count')
-    context = {'album_list': album_list, 'year': year}
+    album_list = Album.objects.filter(release_date__year=year, is_album=True).select_related('artist').order_by('-count')
+    single_list = Album.objects.filter(release_date__year=year, is_album=False).select_related('artist').order_by('-count')[:50]
+    context = {'album_list': album_list, 'single_list': single_list, 'year': year}
     return render(request, 'szzj/album_sales_list.html', context)
 
 
