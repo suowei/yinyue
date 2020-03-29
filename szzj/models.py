@@ -15,7 +15,7 @@ class Album(models.Model):
     release_date = models.DateField()
     is_album = models.BooleanField(default=True)
     song_num = models.SmallIntegerField()
-    price = models.DecimalField(max_digits=4, decimal_places=2)
+    price = models.DecimalField(max_digits=5, decimal_places=2)
     album_only = models.BooleanField(default=True)
     song_price = models.DecimalField(max_digits=3, decimal_places=2, default=0.00)
     qq_id = models.IntegerField(null=True, blank=True)
