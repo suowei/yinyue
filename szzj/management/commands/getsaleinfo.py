@@ -5,34 +5,7 @@ from urllib import request, parse
 import json
 import datetime
 from decimal import Decimal
-from Crypto.Cipher import AES
-import base64
-import codecs
 from szzj.models import Artist, Album, AlbumData, AlbumDataDaily
-
-
-def to_16(key):
-    while len(key) % 16 != 0:
-        key += '\0'
-    return str.encode(key)
-
-
-def pad2(s):
-    bs = AES.block_size
-    return s + (bs - len(s) % bs) * chr(bs - len(s) % bs)
-
-
-def aes_encrypt(text, key, iv):
-    encryptor = AES.new(to_16(key), AES.MODE_CBC, to_16(iv))
-    encrypt_aes = encryptor.encrypt(str.encode(pad2(text)))
-    encrypt_text = str(base64.encodebytes(encrypt_aes), encoding='utf-8')
-    return encrypt_text
-
-
-def rsa_encrypt(text, pub_key, modulus):
-    text = text[::-1]
-    rs = int(codecs.encode(text.encode('utf-8'), 'hex_codec'), 16) ** int(pub_key, 16) % int(modulus, 16)
-    return format(rs, 'x').zfill(256)
 
 
 class Command(BaseCommand):
@@ -47,13 +20,6 @@ class Command(BaseCommand):
     wyy_url_ref = 'https://music.163.com/octave/m/album/detail?id='
     wyy_url_old = 'https://music.163.com/store/api/product/detail?id='
     wyy_url_old_ref = 'https://music.163.com/store/product/detail?id='
-    wyy_g = '0CoJUm6Qyw8W8jud'
-    wyy_b = "010001"
-    wyy_c = '00e0b509f6259df8642dbc35662901477df22677ec152b5ff68ace615bb7b725152b3ab17a876aea8a5aa76d2e417629ec4ee341f56135fccf695280104e0312ecbda92557c93870114af6c9d05c4f7f0c3685b7a46bee255932575cce10b424d813cfe4875d3e82047b97ddef52741d546b8e289dc6935b3ece0462db0a22b8e7'
-    wyy_i = '0123456789abcdef'
-    wyy_iv = "0102030405060708"
-    wyy_api_sales = '/api/vipmall/albumproduct/album/query/sales'
-    wyy_api_song_sales = '/api/vipmall/albumproduct/album/query/song/sales'
     wyy_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36 OPR/56.0.3051.116'
     wyy_cookie = '_iuqxldmzr_=32; _ntes_nnid=6f5d1bca43ec729e8282602fb832fda6,1544339887101; _ntes_nuid=6f5d1bca43ec729e8282602fb832fda6; __utmz=94650624.1544339888.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); WM_TID=fOqk5KJk8dRAQBFBEBd8b9dXsnCTxHUE; JSESSIONID-WYYY=f1bPtYWmY56lpA4QwvyQSe%2FjiCQkvM0Betc%2FHOkxZzfiDnlKjeKglOXmvTXQ7AbBV9PzSsbm%2BziUVlJhjeP7xKR0wmt5Po9rqsS5Ed8di0c2TWpPgwxRwfxpO2Vn%2F3qi9738C1GxtNZgZSCsuFdSu9bzr4sMhwJ3Y3aM6%5CX7725iF7YN%3A1544530566006; __utma=94650624.1924053452.1544339888.1544439650.1544528767.3; __utmc=94650624; WM_NI=hHAptLBX1Prj7Rff4OKPwlgZplx0SmlkRc9%2F5TtejVhC3BqECF%2Bj%2Fam6UdijxEdcvjgEdntU15w2VB%2FmFG73jEElfaqsAmlaUh3pe%2BxjFhg31D3dfP8BD90AvHKkiZ6cRmY%3D; WM_NIKE=9ca17ae2e6ffcda170e2e6ee8ff25289abb9d3bc4b92ef8ba7c55b828b8f84f36af794b7b7e939a1b9acb7f82af0fea7c3b92aac988f91f7488288ffb1f162f58eaa87b7458990b98de652b4b4b8d1d267b0b59e84bc25f78cbc86e95eac9dfda3f44f819ae58bae6bafea9b85ec62bc9bac84f562a59bac8ff75ff3ebb9d3d54aedb38aa8b639aa9b8b8de56bb3ad8f8eef6b97b8fd91e821bcb68a89e639f39cfd85e55cfc9e8cdab34bb698858cec52f6bd9e8edc37e2a3; __utmb=94650624.4.10.1544528767'
 
@@ -127,13 +93,7 @@ class Command(BaseCommand):
                         album.wyy_count = json_data['sales']
                         album.wyy_money = album.price * album.wyy_count
                 else:
-                    wyy_enc_text = str({
-                        self.wyy_api_sales: '{albumIds:' + str(album.wyy_id) + '}',
-                        self.wyy_api_song_sales: '{albumId:' + str(album.wyy_id) + '}'
-                    })
-                    params = aes_encrypt(aes_encrypt(wyy_enc_text, self.wyy_g, self.wyy_iv), self.wyy_i, self.wyy_iv)
-                    enc_sec_key = rsa_encrypt(self.wyy_i, self.wyy_b, self.wyy_c)
-                    data = {'params': params, 'encSecKey': enc_sec_key}
+                    data = {'params': album.wyy_params, 'encSecKey': album.wyy_encSecKey}
                     req = request.Request(self.wyy_url, data=parse.urlencode(data).encode('utf-8'))
                     req.add_header('Referer', self.wyy_url_ref + str(album.wyy_id))
                     req.add_header('User-Agent', self.wyy_agent)
@@ -141,8 +101,8 @@ class Command(BaseCommand):
                     with request.urlopen(req) as f:
                         response = f.read().decode('utf-8')
                         json_data = json.loads(response)
-                        album.wyy_count = json_data[self.wyy_api_sales]['data'][str(album.wyy_id)]
-                        song_sales = json_data[self.wyy_api_song_sales]['data']
+                        album.wyy_count = json_data['/api/vipmall/albumproduct/album/query/sales']['data'][str(album.wyy_id)]
+                        song_sales = json_data['/api/vipmall/albumproduct/album/query/song/sales']['data']
                         album.wyy_song_count = album.wyy_count * album.song_num
                         for song_sale in song_sales.values():
                             album.wyy_song_count += song_sale
