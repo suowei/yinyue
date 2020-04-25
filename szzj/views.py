@@ -43,13 +43,14 @@ def new_album_index(request):
 
 class TodayAlbumIndexView(generic.ListView):
     context_object_name = 'data_list'
-    now = datetime.datetime.now()
-    today = now.date()
-    if now.hour == 0 and now.minute < 30:
-        today += datetime.timedelta(days=-1)
-    queryset = AlbumDataDaily.objects.filter(date=today).order_by('-money').select_related(
-        'album', 'album__artist')[:20]
     template_name = 'szzj/today_album_list.html'
+
+    def get_queryset(self):
+        now = datetime.datetime.now()
+        today = now.date()
+        if now.hour == 0 and now.minute < 30:
+            today += datetime.timedelta(days=-1)
+        return AlbumDataDaily.objects.filter(date=today).order_by('-money').select_related('album', 'album__artist')[:20]
 
 
 def album_index(request):
