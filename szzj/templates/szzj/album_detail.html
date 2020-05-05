@@ -63,6 +63,7 @@
     {% else %}
         <td>暂缺</td><td>暂缺</td>
     {% endif %}
+    </tr>
     {% endif %}
     {% if album.kuwo_id %}
     <tr><td>
@@ -74,6 +75,19 @@
     {% else %}
         <td>暂缺</td><td>暂缺</td>
     {% endif %}
+    </tr>
+    {% endif %}
+    {% if album.migu_id %}
+    <tr><td>
+    <a href="https://h5.nf.migu.cn/app/v3/p/digital-album/detail/index.html?id={{ album.migu_id }}" target="_blank">
+    咪咕音乐</a></td>
+    {% if album.migu_count > 0 %}
+        <td class="right aligned">{{ album.migu_count }}张</td>
+        <td class="right aligned">{{ album.migu_money }}元</td>
+    {% else %}
+        <td>暂缺</td><td>暂缺</td>
+    {% endif %}
+    </tr>
     {% endif %}
     </tbody>
     <tfoot><tr><th>总销量</th><th class="right aligned">{{ album.count }}张</th><th class="right aligned">{{ album.money }}元</th></tr></tfoot>
@@ -95,6 +109,7 @@
         <th>网易云音乐</th>
         <th>酷狗音乐</th>
         <th>酷我音乐</th>
+        <th>咪咕音乐</th>
     </tr>
     </thead>
     <tbody>
@@ -106,6 +121,7 @@
         <td>{{ data.wyy_count }}张<br>{{ data.wyy_money }}元</td>
         <td>{% if data.kugou_song_count == 0 %}{{ data.kugou_count }}张{% else %}{{ data.kugou_song_count }}首{% endif %}<br>{{ data.kugou_money }}元</td>
         <td>{% if album.album_only or data.kuwo_song_count == 0 %}{{ data.kuwo_count }}张{% else %}{{ data.kuwo_song_count }}首{% endif %}<br>{{ data.kuwo_money }}元</td>
+        <td>{{ data.migu_count }}张<br>{{ data.migu_money }}元</td>
     </tr>
     {% endfor %}
     </tbody>

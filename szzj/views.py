@@ -127,12 +127,13 @@ def album_data_csv(request, album):
     response.write(codecs.BOM_UTF8)
     writer = csv.writer(response)
     writer.writerow(['时间', '总销量（张）', '总销量（元）', 'QQ音乐（张）', 'QQ音乐（元）', '网易云音乐（张）', '网易云音乐（元）',
-                     '酷狗音乐（张）', '酷狗音乐（元）', '酷我音乐（张）', '酷我音乐（元）'])
+                     '酷狗音乐（张）', '酷狗音乐（元）', '酷我音乐（张）', '酷我音乐（元）', '咪咕音乐（张）', '咪咕音乐（元）'])
     data_list = AlbumData.objects.filter(album=album)
     for data in data_list:
         writer.writerow([timezone.localtime(data.time).strftime('%Y-%m-%d %H:%M'), data.count, data.money,
                          data.qq_count, data.qq_money, data.wyy_count, data.wyy_money,
-                         data.kugou_count, data.kugou_money, data.kuwo_count, data.kuwo_money])
+                         data.kugou_count, data.kugou_money, data.kuwo_count, data.kuwo_money,
+                         data.migu_count, data.migu_money])
     return response
 
 
@@ -151,12 +152,13 @@ def album_download(request):
     writer = csv.writer(response)
     writer.writerow(['专辑', '歌手', '发行日期', '价格（元）', '歌曲数', '总销量（张）', '总销量（元）',
                      'QQ音乐（张）', 'QQ音乐（元）', '网易云音乐（张）', '网易云音乐（元）',
-                     '酷狗音乐（张）', '酷狗音乐（元）', '酷我音乐（张）', '酷我音乐（元）'])
+                     '酷狗音乐（张）', '酷狗音乐（元）', '酷我音乐（张）', '酷我音乐（元）', '咪咕音乐（张）', '咪咕音乐（元）'])
     album_list = Album.objects.select_related('artist').order_by('-money')
     for album in album_list:
         writer.writerow([album.title, album.artist.name, album.release_date, album.price, album.song_num,
                          album.count, album.money, album.qq_count, album.qq_money, album.wyy_count, album.wyy_money,
-                         album.kugou_count, album.kugou_money, album.kuwo_count, album.kuwo_money])
+                         album.kugou_count, album.kugou_money, album.kuwo_count, album.kuwo_money,
+                         album.migu_count, album.migu_money])
     return response
 
 

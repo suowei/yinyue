@@ -13,6 +13,7 @@
         <th>网易云音乐</th>
         <th>酷狗音乐</th>
         <th>酷我音乐</th>
+        <th>咪咕音乐</th>
     </tr>
     </thead>
     <tbody>
@@ -68,6 +69,15 @@
             {% if data.album.kuwo_id %}
                 <a href="http://vip1.kuwo.cn/fans/fans/template/index.html?key={{ data.album.kuwo_id }}" target="_blank">
                     {% if data.album.album_only or data.kuwo_song_count == 0 %}{{ data.kuwo_count }}张{% else %}{{ data.kuwo_song_count }}首{% endif %}<br>{{ data.kuwo_money }}元
+                </a>
+            {% else %}
+                -
+            {% endif %}
+        </td>
+        <td>
+            {% if data.album.migu_id %}
+                <a href="https://h5.nf.migu.cn/app/v3/p/digital-album/detail/index.html?id={{ data.album.migu_id }}" target="_blank">
+                    {{ data.migu_count }}张<br>{{ data.migu_money }}元
                 </a>
             {% else %}
                 -

@@ -26,6 +26,7 @@ class Album(models.Model):
     wyy_id = models.IntegerField(null=True, blank=True)
     wyy_params = models.TextField(null=True, blank=True)
     wyy_encSecKey = models.TextField(null=True, blank=True)
+    migu_id = models.BigIntegerField(null=True, blank=True)
     qq_count = models.IntegerField(default=0)
     qq_song_count = models.IntegerField(default=0)
     qq_money = models.DecimalField(max_digits=11, decimal_places=2, default=0.00)
@@ -38,6 +39,8 @@ class Album(models.Model):
     wyy_count = models.IntegerField(default=0)
     wyy_song_count = models.IntegerField(default=0)
     wyy_money = models.DecimalField(max_digits=11, decimal_places=2, default=0.00)
+    migu_count = models.IntegerField(default=0)
+    migu_money = models.DecimalField(max_digits=11, decimal_places=2, default=0.00)
     count = models.IntegerField(default=0, db_index=True)
     money = models.DecimalField(max_digits=11, decimal_places=2, default=0.00, db_index=True)
 
@@ -60,6 +63,8 @@ class AlbumData(models.Model):
     wyy_count = models.IntegerField(default=0)
     wyy_song_count = models.IntegerField(default=0)
     wyy_money = models.DecimalField(max_digits=11, decimal_places=2, default=0.00)
+    migu_count = models.IntegerField(default=0)
+    migu_money = models.DecimalField(max_digits=11, decimal_places=2, default=0.00)
     count = models.IntegerField(default=0)
     money = models.DecimalField(max_digits=11, decimal_places=2, default=0.00)
 
@@ -79,6 +84,8 @@ class AlbumDataDaily(models.Model):
     wyy_count = models.IntegerField(default=0)
     wyy_song_count = models.IntegerField(default=0)
     wyy_money = models.DecimalField(max_digits=11, decimal_places=2, default=0.00)
+    migu_count = models.IntegerField(default=0)
+    migu_money = models.DecimalField(max_digits=11, decimal_places=2, default=0.00)
     count = models.IntegerField(default=0)
     money = models.DecimalField(max_digits=11, decimal_places=2, default=0.00)
 

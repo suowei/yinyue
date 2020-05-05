@@ -24,6 +24,7 @@
         <th>网易云音乐</th>
         <th>酷狗音乐</th>
         <th>酷我音乐</th>
+        <th>咪咕音乐</th>
     </tr>
     </thead>
     <tbody>
@@ -100,10 +101,23 @@
                 -
             {% endif %}
         </td>
+        <td>
+            {% if album.migu_id %}
+                <a href="https://h5.nf.migu.cn/app/v3/p/digital-album/detail/index.html?id={{ album.migu_id }}" target="_blank">
+                {% if album.migu_count > 0 %}
+                    {{ album.migu_count }}张<br>{{ album.migu_money }}元
+                {% else %}
+                    暂缺
+                {% endif %}
+                </a>
+            {% else %}
+                -
+            {% endif %}
+        </td>
     </tr>
     {% endfor %}
     </tbody>
-    <tfoot><tr><th>总销量</th><th>{{ artist.money }}元</th><th></th><th></th><th></th><th></th></tr></tfoot>
+    <tfoot><tr><th>总销量</th><th>{{ artist.money }}元</th><th></th><th></th><th></th><th></th><th></th></tr></tfoot>
 </table>
 {% endif %}
 {% if concert_list_coming %}
