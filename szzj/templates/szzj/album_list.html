@@ -78,6 +78,8 @@
                     暂缺
                 {% endif %}
                 </a>
+            {% elif album.kugou_album_id %}
+                {{ album.kugou_count }}张<br>{{ album.kugou_money }}元
             {% else %}
                 -
             {% endif %}

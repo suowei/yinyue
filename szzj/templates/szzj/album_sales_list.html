@@ -82,6 +82,8 @@
                     暂缺
                 {% endif %}
                 </a>
+            {% elif album.kugou_album_id %}
+                {{ album.kugou_count }}
             {% else %}
                 -
             {% endif %}
@@ -185,6 +187,8 @@
                     暂缺
                 {% endif %}
                 </a>
+            {% elif album.kugou_album_id %}
+                {{ album.kugou_count }}
             {% else %}
                 -
             {% endif %}

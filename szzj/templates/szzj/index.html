@@ -195,6 +195,8 @@
                 {% endif %}
                     {% if data.kugou_song_count == 0 %}{{ data.kugou_count }}张{% else %}{{ data.kugou_song_count }}首{% endif %}<br>{{ data.kugou_money }}元
                 </a>
+            {% elif data.album.kugou_album_id %}
+                {{ data.kugou_count }}张<br>{{ data.kugou_money }}元
             {% else %}
                 -
             {% endif %}

@@ -64,6 +64,8 @@
         <td>暂缺</td><td>暂缺</td>
     {% endif %}
     </tr>
+    {% elif album.kugou_album_id %}
+    <tr><td>酷狗音乐</td><td class="right aligned">{{ album.kugou_count }}张</td><td class="right aligned">{{ album.kugou_money }}元</td></tr>
     {% endif %}
     {% if album.kuwo_id %}
     <tr><td>
