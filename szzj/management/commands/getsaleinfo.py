@@ -116,10 +116,12 @@ class Command(BaseCommand):
                         album.wyy_money = album.price * album.wyy_count
                 else:
                     data = {'params': album.wyy_params, 'encSecKey': album.wyy_encSecKey}
-                    req = request.Request(self.wyy_url, data=parse.urlencode(data).encode('utf-8'))
-                    req.add_header('Referer', self.wyy_url_ref + str(album.wyy_id))
-                    req.add_header('User-Agent', self.wyy_agent)
-                    req.add_header('Cookie', self.wyy_cookie)
+                    headers = {
+                        'Referer': self.wyy_url_ref + str(album.wyy_id),
+                        'User-Agent': self.wyy_agent,
+                        'Cookie': self.wyy_cookie
+                    }
+                    req = request.Request(self.wyy_url, data=parse.urlencode(data).encode('utf-8'), headers=headers)
                     with request.urlopen(req) as f:
                         response = f.read().decode('utf-8')
                         json_data = json.loads(response)

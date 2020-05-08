@@ -70,7 +70,7 @@ def album_sales_index(request):
 
 def album_year_index(request, year):
     if year == 2014:
-        album_list = Album.objects.filter(id=150).select_related('artist').order_by('-money')
+        album_list = Album.objects.filter(id=150).select_related('artist')[:1]
     elif year == 2016:
         album_list = Album.objects.filter(
             Q(release_date__year=2016) | Q(id=46)).select_related('artist').order_by('-money')
@@ -81,8 +81,17 @@ def album_year_index(request, year):
 
 
 def album_sales_year_index(request, year):
-    album_list = Album.objects.filter(release_date__year=year, is_album=True).select_related('artist').order_by('-count')
-    single_list = Album.objects.filter(release_date__year=year, is_album=False).select_related('artist').order_by('-count')[:50]
+    if year == 2014:
+        album_list = Album.objects.filter(id=150).select_related('artist')[:1]
+        single_list = None
+    else:
+        if year == 2016:
+            album_list = Album.objects.filter(
+                Q(release_date__year=2016) & Q(is_album=True) | Q(id=46)).select_related('artist').order_by('-count')
+        else:
+            album_list = Album.objects.filter(
+                release_date__year=year, is_album=True).select_related('artist').order_by('-count')
+        single_list = Album.objects.filter(release_date__year=year, is_album=False).select_related('artist').order_by('-count')[:50]
     context = {'album_list': album_list, 'single_list': single_list, 'year': year}
     return render(request, 'szzj/album_sales_list.html', context)
 
