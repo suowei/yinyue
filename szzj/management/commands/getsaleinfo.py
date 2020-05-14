@@ -1,6 +1,8 @@
 from django.core.management.base import BaseCommand
 from django.db.models import Sum
 from django.utils import timezone
+from django.core.cache import cache
+from django.core.paginator import Paginator
 from urllib import request, parse
 import json
 import datetime
@@ -212,3 +214,9 @@ class Command(BaseCommand):
             if artist.album_sum:
                 artist.money = artist.album_sum
                 artist.save()
+
+        cache.set('latest_time', now)
+        album_list = Album.objects.select_related('artist').order_by('-money')
+        paginator = Paginator(album_list, 100)
+        albums = paginator.get_page(1)
+        cache.set('albums', albums)

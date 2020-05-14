@@ -4,6 +4,7 @@ from django.db.models import Count, Q
 from django.http import HttpResponse
 from django.utils import timezone
 from django.core.paginator import Paginator
+from django.core.cache import cache
 import datetime
 import csv
 import codecs
@@ -54,11 +55,16 @@ class TodayAlbumIndexView(generic.ListView):
 
 
 def album_index(request):
-    album_list = Album.objects.select_related('artist').order_by('-money')
-    paginator = Paginator(album_list, 100)
     page = request.GET.get('page')
-    albums = paginator.get_page(page)
-    return render(request, 'szzj/album_list.html', {'albums': albums})
+    albums = cache.get('albums')
+    if not page and albums:
+        context = {'albums': albums, 'latest_time': cache.get('latest_time')}
+    else:
+        album_list = Album.objects.select_related('artist').order_by('-money')
+        paginator = Paginator(album_list, 100)
+        albums = paginator.get_page(page)
+        context = {'albums': albums}
+    return render(request, 'szzj/album_list.html', context)
 
 
 def album_sales_index(request):
