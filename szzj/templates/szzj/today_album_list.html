@@ -3,7 +3,7 @@
 {% block title %}今日销量{% endblock %}
 
 {% block content %}
-<p>*今日销量按最近一次获取到的数据减去今日0点左右获取到的数据计算，非准确数据。从0点30分起，大约半小时更新一次。</p>
+<p>*今日销量按最近一次获取到的数据减去今日0点左右获取到的数据计算，非准确数据。从0点30分起，大约半小时更新一次。{% if latest_time %}最近更新：{{ latest_time }}{% endif %}</p>
 <table class="ui blue unstackable table">
     <thead>
     <tr>

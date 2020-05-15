@@ -18,18 +18,20 @@ def index(request):
     now = datetime.datetime.now()
     date = now.date() + datetime.timedelta(days=-30)
     album_list = Album.objects.filter(release_date__gte=date).select_related('artist').order_by('-release_date')
-    today = now.date()
-    if now.hour == 0 and now.minute < 30:
-        today += datetime.timedelta(days=-1)
-    top_album_list = AlbumDataDaily.objects.filter(date=today).order_by('-money').select_related(
-        'album', 'album__artist')[:20]
+    top_album_list = cache.get('top_albums_today')
+    if not top_album_list:
+        today = now.date()
+        if now.hour == 0 and now.minute < 30:
+            today += datetime.timedelta(days=-1)
+        top_album_list = AlbumDataDaily.objects.filter(date=today).order_by('-money').select_related(
+            'album', 'album__artist')[:20]
     new_concert_list = Concert.objects.filter(date__gte=now).select_related(
         'tour', 'tour__artist', 'site', 'site__city').order_by('-id')[:10]
     date = now + datetime.timedelta(days=7)
     concert_list = Concert.objects.filter(date__gte=now, date__lt=date).select_related(
         'tour', 'tour__artist', 'site', 'site__city').order_by('date')
-    context = {'album_list': album_list, 'album_info_list': album_info_list, 'top_album_list': top_album_list,
-               'new_concert_list': new_concert_list, 'concert_list': concert_list}
+    context = {'album_list': album_list, 'album_info_list': album_info_list, 'latest_time': cache.get('latest_time'),
+               'top_album_list': top_album_list, 'new_concert_list': new_concert_list, 'concert_list': concert_list}
     return render(request, 'szzj/index.html', context)
 
 
@@ -42,21 +44,22 @@ def new_album_index(request):
     return render(request, 'szzj/new_album_list.html', context)
 
 
-class TodayAlbumIndexView(generic.ListView):
-    context_object_name = 'data_list'
-    template_name = 'szzj/today_album_list.html'
-
-    def get_queryset(self):
+def today_album_index(request):
+    top_albums_today = cache.get('top_albums_today')
+    if not top_albums_today:
         now = datetime.datetime.now()
         today = now.date()
         if now.hour == 0 and now.minute < 30:
             today += datetime.timedelta(days=-1)
-        return AlbumDataDaily.objects.filter(date=today).order_by('-money').select_related('album', 'album__artist')[:20]
+        top_albums_today = AlbumDataDaily.objects.filter(date=today).order_by('-money').select_related(
+            'album', 'album__artist')[:20]
+    context = {'data_list': top_albums_today, 'latest_time': cache.get('latest_time')}
+    return render(request, 'szzj/today_album_list.html', context)
 
 
 def album_index(request):
     page = request.GET.get('page')
-    albums = cache.get('albums')
+    albums = cache.get('top_albums')
     if not page and albums:
         context = {'albums': albums, 'latest_time': cache.get('latest_time')}
     else:

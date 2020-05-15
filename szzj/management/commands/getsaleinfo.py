@@ -218,5 +218,8 @@ class Command(BaseCommand):
         cache.set('latest_time', now)
         album_list = Album.objects.select_related('artist').order_by('-money')
         paginator = Paginator(album_list, 100)
-        albums = paginator.get_page(1)
-        cache.set('albums', albums)
+        top_albums = paginator.get_page(1)
+        cache.set('top_albums', top_albums)
+        top_albums_today = AlbumDataDaily.objects.filter(date=today).order_by('-money').select_related(
+            'album', 'album__artist')[:20]
+        cache.set('top_albums_today', top_albums_today)
