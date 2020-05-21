@@ -216,10 +216,25 @@ class Command(BaseCommand):
                 artist.save()
 
         cache.set('latest_time', now)
+
         album_list = Album.objects.select_related('artist').order_by('-money')
         paginator = Paginator(album_list, 100)
         top_albums = paginator.get_page(1)
         cache.set('top_albums', top_albums)
+
+        artist_list = Artist.objects.filter(money__gt=0).order_by('-money').values_list('pk')
+        paginator = Paginator(artist_list, 50)
+        artists = paginator.get_page(1)
+        albums = Album.objects.filter(artist__in=artists).order_by(
+            '-artist__money', 'release_date').select_related('artist').only(
+            'title', 'artist', 'release_date', 'money')
+        for i in range(0, len(albums)):
+            if i == 0 or albums[i].artist_id != albums[i - 1].artist_id:
+                albums[i].first = True
+        albums.page_range = artists.paginator.page_range
+        albums.number = artists.number
+        cache.set('top_artists', albums)
+
         top_albums_today = AlbumDataDaily.objects.filter(date=today).order_by('-money').select_related(
             'album', 'album__artist')[:20]
         cache.set('top_albums_today', top_albums_today)

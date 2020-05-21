@@ -3,8 +3,8 @@
 {% block title %}歌手列表{% endblock %}
 
 {% block content %}
-<p>*大约30分钟更新一次。当前时间：{% now "SHORT_DATETIME_FORMAT" %}<br>
-*不含虾米音乐和咪咕音乐数据。<br>
+<p>*大约30分钟更新一次。{% if latest_time %}最近更新：{{ latest_time }}{% else %}当前时间：{% now "SHORT_DATETIME_FORMAT" %}{% endif %}<br>
+*不含虾米音乐数据。<br>
 *多人合作的数字专辑（单曲）单独列出，不计入歌手总销量。</p>
 <table class="ui blue celled structured unstackable table">
     <thead>
@@ -37,6 +37,15 @@
         </div></td></tr>
     </tbody>
 </table>
+<div class="ui pagination menu">
+    {% for i in album_list.page_range %}
+        {% if i == album_list.number %}
+            <a href="?page={{ i }}" class="active item">{{ i }}</a>
+        {% else %}
+            <a href="?page={{ i }}" class="item">{{ i }}</a>
+        {% endif %}
+    {% endfor %}
+</div>
 <script>
 $("[data-label='artist']").attr("class","active item");
 </script>

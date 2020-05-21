@@ -120,12 +120,23 @@ class ArtistDetailView(generic.DetailView):
 
 
 def artist_index(request):
-    album_list = Album.objects.order_by('-artist__money', 'release_date').select_related('artist').only(
-        'title', 'artist', 'release_date', 'money')
-    for i in range(0, len(album_list)):
-        if i == 0 or album_list[i].artist_id != album_list[i-1].artist_id:
-            album_list[i].first = True
-    context = {'album_list': album_list}
+    page = request.GET.get('page')
+    albums = cache.get('top_artists')
+    if not page and albums:
+        context = {'album_list': albums, 'latest_time': cache.get('latest_time')}
+    else:
+        artist_list = Artist.objects.filter(money__gt=0).order_by('-money').values_list('pk')
+        paginator = Paginator(artist_list, 50)
+        artists = paginator.get_page(page)
+        albums = Album.objects.filter(artist__in=artists).order_by(
+            '-artist__money', 'release_date').select_related('artist').only(
+            'title', 'artist', 'release_date', 'money')
+        for i in range(0, len(albums)):
+            if i == 0 or albums[i].artist_id != albums[i - 1].artist_id:
+                albums[i].first = True
+        albums.page_range = artists.paginator.page_range
+        albums.number = artists.number
+        context = {'album_list': albums}
     return render(request, 'szzj/artist_list.html', context)
 
 
