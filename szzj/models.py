@@ -14,6 +14,7 @@ class Album(models.Model):
     artist = models.ForeignKey(Artist, on_delete=models.CASCADE)
     release_date = models.DateField()
     is_album = models.BooleanField(default=True)
+    is_free = models.BooleanField(default=False)
     song_num = models.SmallIntegerField()
     price = models.DecimalField(max_digits=5, decimal_places=2)
     album_only = models.BooleanField(default=True)

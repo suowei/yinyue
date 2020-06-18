@@ -37,6 +37,9 @@ class Command(BaseCommand):
         while i > 0:
             album = Album.objects.get(pk=i)
             i -= 1
+            if album.is_free:
+                continue
+
             if album.qq_id:
                 url = self.qq_url + str(album.qq_id)
                 with request.urlopen(url) as f:
