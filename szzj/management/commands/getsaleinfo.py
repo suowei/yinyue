@@ -42,13 +42,16 @@ class Command(BaseCommand):
 
             if album.qq_id:
                 url = self.qq_url + str(album.qq_id)
-                with request.urlopen(url) as f:
-                    data = f.read().decode('gbk')
-                    json_data = json.loads(data[18:-1])
-                    info = json_data['data']['sale_info']
-                    album.qq_count = info['album_count']
-                    album.qq_song_count = info['total_song_count']
-                    album.qq_money = Decimal(info['sale_money'])
+                for qq_i in range(10):
+                    with request.urlopen(url) as f:
+                        data = f.read().decode('gbk')
+                        json_data = json.loads(data[18:-1])
+                        if 'data' in json_data.keys():
+                            info = json_data['data']['sale_info']
+                            album.qq_count = info['album_count']
+                            album.qq_song_count = info['total_song_count']
+                            album.qq_money = Decimal(info['sale_money'])
+                            break
 
             if album.kugou_id:
                 if album.kugou_id > 69486 and album.kugou_id != 90201:
@@ -140,11 +143,14 @@ class Command(BaseCommand):
             if album.migu_id:
                 url = self.migu_url + str(album.migu_id)
                 req = request.Request(url, headers=self.migu_header)
-                with request.urlopen(req) as f:
-                    response = f.read().decode('utf-8')
-                    json_data = json.loads(response)
-                    album.migu_count = int(json_data['subDAlbumCounts'][0]['count'])
-                    album.migu_money = album.price * album.migu_count
+                for migu_i in range(10):
+                    with request.urlopen(req) as f:
+                        response = f.read().decode('utf-8')
+                        json_data = json.loads(response)
+                        if 'subDAlbumCounts' in json_data.keys():
+                            album.migu_count = int(json_data['subDAlbumCounts'][0]['count'])
+                            album.migu_money = album.price * album.migu_count
+                            break
 
             album.count = album.qq_count + album.kugou_count + album.kuwo_count + album.wyy_count + album.migu_count
             money = album.qq_money + album.kugou_money + album.kuwo_money + album.wyy_money + album.migu_money
