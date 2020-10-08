@@ -131,5 +131,16 @@
     {% endfor %}
     </tbody>
 </table>
+{% if daily_list.paginator.num_pages > 1 %}
+<div class="ui pagination menu">
+    {% for i in daily_list.paginator.page_range %}
+        {% if i == daily_list.number %}
+            <a href="?page={{ i }}" class="active item">{{ i }}</a>
+        {% else %}
+            <a href="?page={{ i }}" class="item">{{ i }}</a>
+        {% endif %}
+    {% endfor %}
+</div>
+{% endif %}
 {% endif %}
 {% endblock %}

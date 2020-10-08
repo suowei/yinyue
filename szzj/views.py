@@ -2,7 +2,6 @@ from django.shortcuts import render
 from django.views import generic
 from django.db.models import Count, Q
 from django.http import HttpResponse
-from django.utils import timezone
 from django.core.paginator import Paginator
 from django.core.cache import cache
 import datetime
@@ -140,14 +139,14 @@ def artist_index(request):
     return render(request, 'szzj/artist_list.html', context)
 
 
-class AlbumDetailView(generic.DetailView):
-    model = Album
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['daily_list'] = AlbumDataDaily.objects.filter(album=self.kwargs['pk']).order_by('-id')
-        context['data_list'] = AlbumData.objects.filter(album=self.kwargs['pk']).order_by('-id')[:144]
-        return context
+def album_detail(request, pk):
+    album = Album.objects.get(pk=pk)
+    daily_data = AlbumDataDaily.objects.filter(album=album).order_by('-id')
+    paginator = Paginator(daily_data, 30)
+    page = request.GET.get('page')
+    daily_list = paginator.get_page(page)
+    context = {'album': album, 'daily_list': daily_list}
+    return render(request, 'szzj/album_detail.html', context)
 
 
 def album_data_daily(request, album):
