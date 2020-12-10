@@ -149,6 +149,8 @@ class Command(BaseCommand):
                         json_data = json.loads(response)
                         if 'subDAlbumCounts' in json_data.keys():
                             album.migu_count = int(json_data['subDAlbumCounts'][0]['count'])
+                            if album.id == 473:
+                                album.migu_count = album.migu_count - 1183
                             album.migu_money = album.price * album.migu_count
                             break
 
