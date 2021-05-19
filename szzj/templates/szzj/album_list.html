@@ -3,11 +3,12 @@
 {% block title %}{% if year %}{{ year }}年{% endif %}数字专辑销售数据{% endblock %}
 
 {% block content %}
-<p>*大约30分钟更新一次。{% if latest_time %}最近更新：{{ latest_time }}{% else %}当前时间：{% now "SHORT_DATETIME_FORMAT" %}{% endif %}
+<p>
+    {% if year %}*本页为该年份发行专辑的当前销售数据。{% endif %}
     <button class="ui right floated primary basic button">
         &nbsp;&nbsp;&nbsp;&nbsp;<a href="{{ request.path }}sales">按销量查询 <i class="long arrow alternate right icon"></i></a>
     </button>
-<br>*不含虾米音乐数据。{% if year %}本页为该年份发行专辑的当前销售数据。{% endif %}
+    <br>*大约30分钟更新一次。{% if latest_time %}最近更新：{{ latest_time }}{% else %}当前时间：{% now "SHORT_DATETIME_FORMAT" %}{% endif %}
 </p>
 <table class="ui blue unstackable table">
     <thead>
