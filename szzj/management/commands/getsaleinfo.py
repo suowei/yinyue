@@ -90,15 +90,6 @@ class Command(BaseCommand):
                             buy_count_audios = data['buy_count_audios']
                             album.kugou_song_count = album.kugou_count * album.song_num + buy_count_audios
                             album.kugou_money = album.price * album.kugou_count + buy_count_audios * album.song_price
-            elif album.kugou_album_id:
-                url = self.kugou_url_song + str(album.kugou_album_id)
-                with request.urlopen(url) as f:
-                    data = f.read().decode('utf-8')
-                    json_data = json.loads(data)
-                    data = json_data['data'][0]
-                    album.kugou_count = data['buy_count']
-                    album.kugou_money = album.price * album.kugou_count
-                    album.kugou_song_count = 0
 
             if album.kuwo_id:
                 data = {'key': album.kuwo_id, 'op': 'gfc'}
