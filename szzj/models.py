@@ -22,7 +22,6 @@ class Album(models.Model):
     qq_id = models.IntegerField(null=True, blank=True)
     kugou_id = models.IntegerField(null=True, blank=True)
     kugou_album_id = models.IntegerField(null=True, blank=True)
-    kugou_hashs = models.TextField(null=True, blank=True)
     kuwo_id = models.CharField(max_length=20, null=True, blank=True)
     wyy_id = models.IntegerField(null=True, blank=True)
     wyy_params = models.TextField(null=True, blank=True)

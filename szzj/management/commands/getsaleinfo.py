@@ -65,31 +65,15 @@ class Command(BaseCommand):
                     album.kugou_money = album.price * album.kugou_count
                     album.kugou_song_count = 0
                 if album.kugou_album_id:
-                    if album.kugou_hashs:
-                        album.kugou_song_count = album.kugou_count * album.song_num
-                        url = self.kugou_url_song + str(album.kugou_album_id) + '&hashs=' + album.kugou_hashs
-                        with request.urlopen(url) as f:
-                            data = f.read().decode('utf-8')
-                            json_data = json.loads(data)
-                            song_sales = json_data['data']
-                            for song_sale in song_sales:
-                                extra_song_count = song_sale['buy_count'] - album.kugou_count
-                                album.kugou_song_count += extra_song_count
-                                if song_sale['pay_type'] > 0:
-                                    album.kugou_money += extra_song_count * album.song_price
-                                    continue
-                                if song_sale['privilege'] == 0:
-                                    album.kugou_song_count -= album.kugou_count
-                    else:
-                        url = self.kugou_url_song + str(album.kugou_album_id)
-                        with request.urlopen(url) as f:
-                            data = f.read().decode('utf-8')
-                            json_data = json.loads(data)
-                            data = json_data['data'][0]
-                            album.kugou_count = data['buy_count']
-                            buy_count_audios = data['buy_count_audios']
-                            album.kugou_song_count = album.kugou_count * album.song_num + buy_count_audios
-                            album.kugou_money = album.price * album.kugou_count + buy_count_audios * album.song_price
+                    url = self.kugou_url_song + str(album.kugou_album_id)
+                    with request.urlopen(url) as f:
+                        data = f.read().decode('utf-8')
+                        json_data = json.loads(data)
+                        data = json_data['data'][0]
+                        album.kugou_count = data['buy_count']
+                        buy_count_audios = data['buy_count_audios']
+                        album.kugou_song_count = album.kugou_count * album.song_num + buy_count_audios
+                        album.kugou_money = album.price * album.kugou_count + buy_count_audios * album.song_price
 
             if album.kuwo_id:
                 data = {'key': album.kuwo_id, 'op': 'gfc'}
