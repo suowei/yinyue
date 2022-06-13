@@ -53,7 +53,6 @@ class Command(BaseCommand):
             album_list = Album.objects.filter(is_free=False, frequency=0).order_by('-id')
         else:
             album_list = Album.objects.filter(is_free=False).order_by('-id')
-        print(len(album_list))
         for album in album_list:
             if album.qq_id:
                 url = self.qq_url + str(album.qq_id)
