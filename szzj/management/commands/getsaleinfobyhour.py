@@ -38,17 +38,17 @@ class Command(BaseCommand):
         start_time = datetime.datetime(today.year, today.month, today.day, 0, 29, 0)
         hour = options['hour']
         if hour == 0:
-            album_list = Album.objects.filter(frequency__gte=48).order_by('-id')
+            album_list = Album.objects.filter(is_free=False, frequency__gte=48).order_by('-id')
         elif hour == 1:
-            album_list = Album.objects.filter(frequency__range=(24, 47)).order_by('-id')
+            album_list = Album.objects.filter(is_free=False, frequency__range=(24, 47)).order_by('-id')
         elif hour == 2:
-            album_list = Album.objects.filter(frequency__range=(12, 23)).order_by('-id')
+            album_list = Album.objects.filter(is_free=False, frequency__range=(12, 23)).order_by('-id')
         elif hour == 4:
-            album_list = Album.objects.filter(frequency__range=(6, 11)).order_by('-id')
+            album_list = Album.objects.filter(is_free=False, frequency__range=(6, 11)).order_by('-id')
         elif hour == 8:
-            album_list = Album.objects.filter(frequency__range=(3, 5)).order_by('-id')
+            album_list = Album.objects.filter(is_free=False, frequency__range=(3, 5)).order_by('-id')
         elif hour == 12:
-            album_list = Album.objects.filter(frequency__range=(1, 2)).order_by('-id')
+            album_list = Album.objects.filter(is_free=False, frequency__range=(1, 2)).order_by('-id')
         elif hour == 24:
             album_list = Album.objects.filter(is_free=False, frequency=0).order_by('-id')
         else:
