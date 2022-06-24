@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from .models import Artist
+from .models import Company
 from .models import Album
 from .models import AlbumData
 from .models import AlbumDataDaily
@@ -15,9 +16,13 @@ class ArtistAdmin(admin.ModelAdmin):
     search_fields = ['name']
 
 
+class CompanyAdmin(admin.ModelAdmin):
+    search_fields = ['name']
+
+
 class AlbumAdmin(admin.ModelAdmin):
     search_fields = ['title']
-    autocomplete_fields = ['artist']
+    autocomplete_fields = ['artist', 'company']
 
 
 class AlbumInfoAdmin(admin.ModelAdmin):
@@ -47,6 +52,7 @@ class ConcertAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Artist, ArtistAdmin)
+admin.site.register(Company, CompanyAdmin)
 admin.site.register(Album, AlbumAdmin)
 admin.site.register(AlbumData, AlbumDataAdmin)
 admin.site.register(AlbumDataDaily)

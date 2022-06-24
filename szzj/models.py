@@ -9,9 +9,17 @@ class Artist(models.Model):
         return self.name
 
 
+class Company(models.Model):
+    name = models.CharField(max_length=200, unique=True)
+
+    def __str__(self):
+        return self.name
+
+
 class Album(models.Model):
     title = models.CharField(max_length=200)
     artist = models.ForeignKey(Artist, on_delete=models.CASCADE)
+    company = models.ForeignKey(Company, on_delete=models.SET_NULL, blank=True, null=True)
     release_date = models.DateField()
     is_album = models.BooleanField(default=True)
     is_free = models.BooleanField(default=False)
