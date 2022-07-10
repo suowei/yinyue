@@ -9,7 +9,12 @@
         <a href="/szzj/artist/{{ album.artist.id }}" target="_blank"><div class="sub header">{{ album.artist.name }}</div></a>
     </h2>
     <p>{{ album.release_date }}发行，售价{{ album.price }}元。</p>
-    <h3 class="ui blue header">各平台销售详情<div class="ui sub header">*部分单曲在网易云音乐销量榜上和单独页面中显示的数据不一致，此处以销量榜数据为准。</div></h3>
+    <h3 class="ui blue header">各平台销售详情
+        <div class="ui sub header">
+            *部分单曲在网易云音乐销量榜上和单独页面中显示的数据不一致，此处以销量榜数据为准。
+            <br>*不考虑专辑打折销售或已购单曲减免等情况。对于整张销售的专辑，金额=销量×专辑售价。对于可单首购买的专辑，金额=整专销量×专辑售价+单首购买数量×单首价格。
+        </div>
+    </h3>
 </div>
 <table class="ui blue unstackable table">
     <thead>
