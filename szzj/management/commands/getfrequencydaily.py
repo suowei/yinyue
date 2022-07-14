@@ -4,7 +4,7 @@ from szzj.models import Album, AlbumDataDaily
 
 
 class Command(BaseCommand):
-    help = 'Get frequency everyday.'
+    help = 'Get frequency by yesterday sales count.'
 
     def handle(self, *args, **options):
         yesterday = datetime.datetime.now().date() + datetime.timedelta(days=-1)
