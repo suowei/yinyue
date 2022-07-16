@@ -138,13 +138,15 @@
 </table>
 {% if daily_list.paginator.num_pages > 1 %}
 <div class="ui pagination menu">
-    {% for i in daily_list.paginator.page_range %}
-        {% if i == daily_list.number %}
-            <a href="?page={{ i }}" class="active item">{{ i }}</a>
-        {% else %}
-            <a href="?page={{ i }}" class="item">{{ i }}</a>
-        {% endif %}
-    {% endfor %}
+    {% if daily_list.has_previous %}
+        <a href="?page=1" class="item"><i class="step backward icon"></i></a>
+        <a href="?page={{ daily_list.previous_page_number }}" class="item"><i class="chevron left icon"></i></a>
+    {% endif %}
+    <a href="?page={{ daily_list.number }}" class="active item">{{ daily_list.number }}</a>
+    {% if daily_list.has_next %}
+        <a href="?page={{ daily_list.next_page_number }}" class="item"><i class="chevron right icon"></i></a>
+        <a href="?page={{ daily_list.paginator.num_pages }}" class="item"><i class="step forward icon"></i></a>
+    {% endif %}
 </div>
 {% endif %}
 {% endif %}
