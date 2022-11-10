@@ -24,8 +24,8 @@ class Command(BaseCommand):
     wyy_url_old_ref = 'https://music.163.com/store/product/detail?id='
     wyy_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36 OPR/56.0.3051.116'
     wyy_cookie = '_iuqxldmzr_=32; _ntes_nnid=6f5d1bca43ec729e8282602fb832fda6,1544339887101; _ntes_nuid=6f5d1bca43ec729e8282602fb832fda6; __utmz=94650624.1544339888.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); WM_TID=fOqk5KJk8dRAQBFBEBd8b9dXsnCTxHUE; JSESSIONID-WYYY=f1bPtYWmY56lpA4QwvyQSe%2FjiCQkvM0Betc%2FHOkxZzfiDnlKjeKglOXmvTXQ7AbBV9PzSsbm%2BziUVlJhjeP7xKR0wmt5Po9rqsS5Ed8di0c2TWpPgwxRwfxpO2Vn%2F3qi9738C1GxtNZgZSCsuFdSu9bzr4sMhwJ3Y3aM6%5CX7725iF7YN%3A1544530566006; __utma=94650624.1924053452.1544339888.1544439650.1544528767.3; __utmc=94650624; WM_NI=hHAptLBX1Prj7Rff4OKPwlgZplx0SmlkRc9%2F5TtejVhC3BqECF%2Bj%2Fam6UdijxEdcvjgEdntU15w2VB%2FmFG73jEElfaqsAmlaUh3pe%2BxjFhg31D3dfP8BD90AvHKkiZ6cRmY%3D; WM_NIKE=9ca17ae2e6ffcda170e2e6ee8ff25289abb9d3bc4b92ef8ba7c55b828b8f84f36af794b7b7e939a1b9acb7f82af0fea7c3b92aac988f91f7488288ffb1f162f58eaa87b7458990b98de652b4b4b8d1d267b0b59e84bc25f78cbc86e95eac9dfda3f44f819ae58bae6bafea9b85ec62bc9bac84f562a59bac8ff75ff3ebb9d3d54aedb38aa8b639aa9b8b8de56bb3ad8f8eef6b97b8fd91e821bcb68a89e639f39cfd85e55cfc9e8cdab34bb698858cec52f6bd9e8edc37e2a3; __utmb=94650624.4.10.1544528767'
-    migu_url = 'https://c.musicapp.migu.cn/MIGUM3.0/strategy/album-sub-rank/v1.0?queryType=01&resourceId='
-    migu_header = {'channel': '014000D'}
+    migu_url = 'https://c.musicapp.migu.cn/MIGUM3.0/strategy/album-sub-rank/v1.0?queryType=06&resourceId='
+    migu_header = {'channel': '014X031'}
 
     def handle(self, *args, **options):
         now = datetime.datetime.now()
@@ -124,9 +124,7 @@ class Command(BaseCommand):
                         json_data = json.loads(response)
                         if json_data['code'] == '000000':
                             if json_data['subDAlbumCounts']:
-                                album.migu_count = int(json_data['subDAlbumCounts'][0]['count'])
-                                if album.id == 473:
-                                    album.migu_count = album.migu_count - 1183
+                                album.migu_count = int(json_data['subDAlbumCounts'][0]['sum'])
                                 album.migu_money = album.price * album.migu_count
                             break
 
