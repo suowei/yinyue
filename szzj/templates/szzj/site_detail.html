@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="ui basic segment">
-    <h2 class="ui header">{{ site.name }}<div class="sub header">{{ site.city.name }} {{ site.seats }}座</div></h2>
+    <h2 class="ui header">{{ site.name }}<div class="sub header"><a href="/yanchanghui/city/{{ site.city.id }}" target="_blank">{{ site.city.name }}</a> {{ site.seats }}座</div></h2>
     {% if concert_list_coming %}
     <h3 class="ui blue header">即将开始</h3>
     {% for concert in concert_list_coming %}

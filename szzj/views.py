@@ -8,7 +8,7 @@ import datetime
 import csv
 import codecs
 
-from .models import Artist, Album, AlbumData, AlbumDataDaily, AlbumInfo, Concert, Site
+from .models import Artist, Album, AlbumData, AlbumDataDaily, AlbumInfo, Concert, City, Site
 
 
 def index(request):
@@ -193,8 +193,7 @@ def album_download(request):
 class ConcertIndexView(generic.ListView):
     def get_queryset(self):
         return Concert.objects.select_related('tour', 'tour__artist', 'site', 'site__city').filter(
-            date__gte=datetime.datetime.now()).order_by('date').only('tour__artist__name', 'tour__title', 'date',
-                                                                     'site__city__name', 'site__name')
+            date__gte=datetime.datetime.now()).order_by('date')
 
 
 def concert_year_index(request, year):
@@ -218,6 +217,19 @@ def concert_year_index(request, year):
                 artist.concert_list.append(concert)
     context = {'year': year, 'artist_list': artist_list}
     return render(request, 'szzj/concert_year_list.html', context)
+
+
+class CityDetailView(generic.DetailView):
+    model = City
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        now = datetime.datetime.now()
+        context['concert_list_coming'] = Concert.objects.filter(
+            site__city=self.kwargs['pk'], date__gte=now).order_by('date').select_related('tour', 'tour__artist', 'site')
+        context['concert_list_done'] = Concert.objects.filter(
+            site__city=self.kwargs['pk'], date__lt=now).order_by('-date').select_related('tour', 'tour__artist', 'site')
+        return context
 
 
 class SiteIndexView(generic.ListView):

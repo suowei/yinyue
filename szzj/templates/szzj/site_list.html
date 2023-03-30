@@ -12,7 +12,7 @@
     <tbody>
     {% for site in site_list %}
     <tr>
-        <td><h4 class="ui header">{{ site.city.name }}</h4></td>
+        <td><h4 class="ui header"><a href="/yanchanghui/city/{{ site.city.id }}" target="_blank">{{ site.city.name }}</a></h4></td>
         <td><h4 class="ui header"><a href="/yanchanghui/site/{{ site.id }}" target="_blank">{{ site.name }}</a></h4></td>
         <td>{{ site.seats }}</td>
     </tr>
