@@ -5,27 +5,27 @@
 {% block content %}
 <p>
     <button class="ui right floated primary basic button">
-        &nbsp;&nbsp;&nbsp;&nbsp;<a href="{{ request.path }}city">按城市查询 <i class="long arrow alternate right icon"></i></a>
+        &nbsp;&nbsp;&nbsp;&nbsp;<a href="/yanchanghui/{{ year }}">按歌手查询 <i class="long arrow alternate right icon"></i></a>
     </button>
     <br>&nbsp;&nbsp;&nbsp;&nbsp;总计：{{ num }}
 </p>
 <table class="ui blue unstackable table">
     <thead>
     <tr>
-        <th>歌手</th>
+        <th>城市</th>
         <th>场次</th>
         <th>演唱会</th>
     </tr>
     </thead>
     <tbody>
-    {% for artist in artist_list %}
+    {% for city in city_list %}
     <tr class="top aligned">
-        <td><h4 class="ui header"><a href="/szzj/artist/{{ artist.id }}" target="_blank">{{ artist.name }}</a></h4></td>
-        <td>{{ artist.num_concert }}</td>
+        <td><h4 class="ui header"><a href="/yanchanghui/city/{{ city.id }}" target="_blank">{{ city.name }}</a></h4></td>
+        <td>{{ city.num_concert }}</td>
         <td><div class="ui relaxed list">
-            {% for concert in artist.concert_list %}
+            {% for concert in city.concert_list %}
             <div class="item">
-                <div class="header">{{ concert.tour.title }}-{{ concert.site.city.name }}站</div>
+                <div class="header"><a href="/szzj/artist/{{ concert.tour.artist.id }}" target="_blank">{{ concert.tour.artist.name }}</a>-{{ concert.tour.title }}</div>
                 <div class="description">{{ concert.date }}&nbsp;{{ concert.site.name }}</div>
             </div>
             {% endfor %}
