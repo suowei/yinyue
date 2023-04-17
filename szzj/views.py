@@ -215,8 +215,29 @@ def concert_year_index(request, year):
         for concert in concert_list:
             if concert.tour.artist_id == artist.id:
                 artist.concert_list.append(concert)
-    context = {'year': year, 'artist_list': artist_list}
+    context = {'year': year, 'num': concert_list.count(), 'artist_list': artist_list}
     return render(request, 'szzj/concert_year_list.html', context)
+
+
+def concert_city_year_index(request, year):
+    now = datetime.datetime.now()
+    if year == now.year:
+        city_list = City.objects.filter(site__concert__date__year=year, site__concert__date__lte=now).annotate(
+            num_concert=Count('site__concert')).only('name').order_by('-num_concert')
+        concert_list = Concert.objects.select_related('tour', 'tour__artist', 'site').filter(
+            date__year=year, date__lte=now).order_by('date')
+    else:
+        city_list = City.objects.filter(site__concert__date__year=year).annotate(
+            num_concert=Count('site__concert')).only('name').order_by('-num_concert')
+        concert_list = Concert.objects.select_related('tour', 'tour__artist', 'site').filter(
+            date__year=year).order_by('date')
+    for city in city_list:
+        city.concert_list = []
+        for concert in concert_list:
+            if concert.site.city_id == city.id:
+                city.concert_list.append(concert)
+    context = {'year': year, 'num': concert_list.count(), 'city_list': city_list}
+    return render(request, 'szzj/concert_city_year_list.html', context)
 
 
 class CityDetailView(generic.DetailView):
