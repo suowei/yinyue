@@ -3,11 +3,11 @@
 {% block title %}{{ year }}年演唱会信息{% endblock %}
 
 {% block content %}
-<p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;城市：{{ city_num }}
     <button class="ui right floated primary basic button">
         &nbsp;&nbsp;&nbsp;&nbsp;<a href="/yanchanghui/{{ year }}">按歌手查询 <i class="long arrow alternate right icon"></i></a>
     </button>
-    <br>&nbsp;&nbsp;&nbsp;&nbsp;总计：{{ num }}
+    <br>&nbsp;&nbsp;&nbsp;&nbsp;总场次：{{ concert_num }}
 </p>
 <table class="ui blue unstackable table">
     <thead>

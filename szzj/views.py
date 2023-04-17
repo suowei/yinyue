@@ -215,7 +215,7 @@ def concert_year_index(request, year):
         for concert in concert_list:
             if concert.tour.artist_id == artist.id:
                 artist.concert_list.append(concert)
-    context = {'year': year, 'num': concert_list.count(), 'artist_list': artist_list}
+    context = {'year': year, 'artist_num': artist_list.count(), 'concert_num': concert_list.count(), 'artist_list': artist_list}
     return render(request, 'szzj/concert_year_list.html', context)
 
 
@@ -236,7 +236,7 @@ def concert_city_year_index(request, year):
         for concert in concert_list:
             if concert.site.city_id == city.id:
                 city.concert_list.append(concert)
-    context = {'year': year, 'num': concert_list.count(), 'city_list': city_list}
+    context = {'year': year, 'city_num': city_list.count(), 'concert_num': concert_list.count(), 'city_list': city_list}
     return render(request, 'szzj/concert_city_year_list.html', context)
 
 
