@@ -19,7 +19,6 @@ urlpatterns = [
     path('szzj/album/download/', views.album_download, name='szzj.album_download'),
     path('yanchanghui/', views.ConcertIndexView.as_view(), name='yanchanghui.index'),
     path('yanchanghui/<int:year>/', views.concert_year_index, name='yanchanghui.concert_year_index'),
-    path('yanchanghui/<int:year>/city/', views.concert_city_year_index, name='yanchanghui.concert_city_year_index'),
     path('yanchanghui/city/<int:pk>/', views.CityDetailView.as_view(), name='yanchanghui.city_detail'),
     path('yanchanghui/site/', views.SiteIndexView.as_view(), name='yanchanghui.site_index'),
     path('yanchanghui/site/<int:pk>/', views.SiteDetailView.as_view(), name='yanchanghui.site_detail'),
