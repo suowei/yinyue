@@ -20,9 +20,23 @@ class CompanyAdmin(admin.ModelAdmin):
     search_fields = ['name']
 
 
+class AlbumDataInline(admin.TabularInline):
+    model = AlbumData
+    fields = ('time',)
+    extra = 1
+
+
 class AlbumAdmin(admin.ModelAdmin):
     search_fields = ['title']
     autocomplete_fields = ['artist', 'company']
+    inlines = [
+        AlbumDataInline,
+    ]
+
+    def get_formsets_with_inlines(self, request, obj=None):
+        for inline in self.get_inline_instances(request, obj):
+            if isinstance(inline, AlbumDataInline) and obj is None:
+                yield inline.get_formset(request, obj), inline
 
 
 class AlbumInfoAdmin(admin.ModelAdmin):
@@ -48,6 +62,7 @@ class SiteAdmin(admin.ModelAdmin):
 
 
 class ConcertAdmin(admin.ModelAdmin):
+    save_as = True
     autocomplete_fields = ['tour', 'site']
 
 
