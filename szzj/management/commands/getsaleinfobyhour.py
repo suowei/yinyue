@@ -18,6 +18,8 @@ class Command(BaseCommand):
     kugou_url_old = 'http://zhuanji.kugou.com/index.php?r=commonchargeV2/getBuyNum&topic_id='
     kugou_url_song = 'https://zhuanjidata.kugou.com/v3/Commoncharge/getSongsInfo?album_id='
     kuwo_url = 'https://vip1.kuwo.cn/fans/admin/sysInfo'
+    wyy_url_new = 'https://interface.music.163.com/api/vipmall/albumproduct/sales/v2?albumId='
+    wyy_url_album = 'https://interface.music.163.com/api/vipmall/albumproduct/album/query/sales?albumIds='
     wyy_url = 'https://music.163.com/weapi/batch'
     wyy_url_ref = 'https://music.163.com/octave/m/album/detail?id='
     wyy_url_old = 'https://music.163.com/store/api/product/detail?id='
@@ -104,13 +106,23 @@ class Command(BaseCommand):
 
             if album.wyy_id:
                 if not album.wyy_params:
-                    req = request.Request(self.wyy_url_old + str(album.wyy_id))
-                    req.add_header('Referer', self.wyy_url_old_ref + str(album.wyy_id))
+                    req = request.Request(self.wyy_url_new + str(album.wyy_id))
                     with request.urlopen(req) as f:
                         response = f.read().decode('utf-8')
                         json_data = json.loads(response)
-                        album.wyy_count = json_data['sales']
-                        album.wyy_money = album.price * album.wyy_count
+                        if json_data['data']['salesDisplayType'] == 0:
+                            album.wyy_count = json_data['data']['sales']
+                            album.wyy_money = album.price * album.wyy_count
+                        else:
+                            album.wyy_song_count = json_data['data']['sales']
+                            req = request.Request(self.wyy_url_album + str(album.wyy_id))
+                            with request.urlopen(req) as f2:
+                                response = f2.read().decode('utf-8')
+                                json_data = json.loads(response)
+                                album.wyy_count = json_data['data'][str(album.wyy_id)]
+                                album.wyy_money = album.price * album.wyy_count
+                                if not album.album_only and album.wyy_song_count > 0:
+                                    album.wyy_money += (album.wyy_song_count - album.wyy_count * album.song_num) * album.song_price
                 else:
                     data = {'params': album.wyy_params, 'encSecKey': album.wyy_encSecKey}
                     headers = {
