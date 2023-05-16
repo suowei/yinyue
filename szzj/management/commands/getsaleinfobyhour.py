@@ -104,42 +104,28 @@ class Command(BaseCommand):
                     if not album.album_only and album.kuwo_song_count > 0:
                         album.kuwo_money += (album.kuwo_song_count - album.kuwo_count * album.song_num) * album.song_price
 
-            if album.wyy_id:
-                if not album.wyy_params:
-                    req = request.Request(self.wyy_url_new + str(album.wyy_id))
+            if album.wyy_id and album.id != 41:
+                req = request.Request(self.wyy_url_new + str(album.wyy_id))
+                for wyy_i in range(10):
                     with request.urlopen(req) as f:
                         response = f.read().decode('utf-8')
                         json_data = json.loads(response)
-                        if json_data['data']['salesDisplayType'] == 0:
-                            album.wyy_count = json_data['data']['sales']
-                            album.wyy_money = album.price * album.wyy_count
-                        else:
-                            album.wyy_song_count = json_data['data']['sales']
-                            req = request.Request(self.wyy_url_album + str(album.wyy_id))
-                            with request.urlopen(req) as f2:
-                                response = f2.read().decode('utf-8')
-                                json_data = json.loads(response)
-                                album.wyy_count = json_data['data'][str(album.wyy_id)]
+                        if json_data['code'] == 200:
+                            if json_data['data']['salesDisplayType'] == 0:
+                                album.wyy_count = json_data['data']['sales']
+                                album.wyy_song_count = 0
                                 album.wyy_money = album.price * album.wyy_count
-                                if not album.album_only and album.wyy_song_count > 0:
-                                    album.wyy_money += (album.wyy_song_count - album.wyy_count * album.song_num) * album.song_price
-                else:
-                    data = {'params': album.wyy_params, 'encSecKey': album.wyy_encSecKey}
-                    headers = {
-                        'Referer': self.wyy_url_ref + str(album.wyy_id),
-                        'User-Agent': self.wyy_agent,
-                        'Cookie': self.wyy_cookie
-                    }
-                    req = request.Request(self.wyy_url, data=parse.urlencode(data).encode('utf-8'), headers=headers)
-                    with request.urlopen(req) as f:
-                        response = f.read().decode('utf-8')
-                        json_data = json.loads(response)
-                        album.wyy_count = json_data['/api/vipmall/albumproduct/album/query/sales']['data'][str(album.wyy_id)]
-                        song_sales = json_data['/api/vipmall/albumproduct/album/query/song/sales']['data']
-                        album.wyy_song_count = album.wyy_count * album.song_num
-                        for song_sale in song_sales.values():
-                            album.wyy_song_count += song_sale
-                        album.wyy_money = album.price * album.wyy_count
+                            else:
+                                album.wyy_song_count = json_data['data']['sales']
+                                req = request.Request(self.wyy_url_album + str(album.wyy_id))
+                                with request.urlopen(req) as f2:
+                                    response = f2.read().decode('utf-8')
+                                    json_data = json.loads(response)
+                                    album.wyy_count = json_data['data'][str(album.wyy_id)]
+                                    album.wyy_money = album.price * album.wyy_count
+                                    if not album.album_only and album.wyy_song_count > 0:
+                                        album.wyy_money += (album.wyy_song_count - album.wyy_count * album.song_num) * album.song_price
+                            break
 
             if album.migu_id:
                 url = self.migu_url + str(album.migu_id)

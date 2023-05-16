@@ -11,8 +11,7 @@
     <p>{{ album.release_date }}发行，售价{{ album.price }}元。</p>
     <h3 class="ui blue header">各平台销售详情
         <div class="ui sub header">
-            *部分单曲在网易云音乐销量榜上和单独页面中显示的数据不一致，此处以销量榜数据为准。
-            <br>*不考虑专辑打折销售或已购单曲减免等情况。对于整张销售的专辑，金额=销量×专辑售价。对于可单首购买的专辑，金额=整专销量×专辑售价+单首购买数量×单首价格。
+            *不考虑专辑打折销售或已购单曲减免等情况。对于整张销售的专辑，金额=销量×专辑售价。对于可单首购买的专辑，金额=整专销量×专辑售价+单首购买数量×单首价格。
         </div>
     </h3>
 </div>
@@ -50,7 +49,7 @@
     {% endif %}
     网易云音乐</a></td>
     {% if album.wyy_count > 0 %}
-        <td class="right aligned">{{ album.wyy_count }}张</td>
+        <td class="right aligned">{% if album.wyy_song_count == 0 %}{{ album.wyy_count }}张{% else %}{{ album.wyy_song_count }}首{% endif %}</td>
         <td class="right aligned">{{ album.wyy_money }}元</td>
     {% else %}
         <td>暂缺</td><td>暂缺</td>

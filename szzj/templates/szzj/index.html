@@ -77,7 +77,7 @@
                 <a href="https://music.163.com/store/product/detail?id={{ album.wyy_id }}" target="_blank">
                 {% endif %}
                 {% if album.wyy_count > 0 %}
-                    {{ album.wyy_count }}张<br>{{ album.wyy_money }}元
+                    {% if album.wyy_song_count == 0 %}{{ album.wyy_count }}张{% else %}{{ album.wyy_song_count }}首{% endif %}<br>{{ album.wyy_money }}元
                 {% else %}
                     暂缺
                 {% endif %}
@@ -180,7 +180,7 @@
                 {% else %}
                 <a href="https://music.163.com/store/product/detail?id={{ data.album.wyy_id }}" target="_blank">
                 {% endif %}
-                    {{ data.wyy_count }}张<br>{{ data.wyy_money }}元
+                    {% if data.album.album_only or data.wyy_song_count == 0 %}{{ data.wyy_count }}张{% else %}{{ data.wyy_song_count }}首{% endif %}<br>{{ data.wyy_money }}元
                 </a>
             {% else %}
                 -
