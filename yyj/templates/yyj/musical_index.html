@@ -1,0 +1,62 @@
+{% extends "yyj/base.html" %}
+
+{% block title %}音乐剧列表{% endblock %}
+
+{% block content %}
+{% if musical_list_zz %}
+<table class="ui pink single line unstackable compact table">
+    <thead>
+    <tr><th>制作中<i class="hourglass half icon"></i></th><th>原创性</th><th>预计首演日期</th><th>其他信息</th></tr>
+    </thead>
+    <tbody>
+    {% for musical in musical_list_zz %}
+    <tr>
+        <td><a href="{{ musical.get_absolute_url }}">{{ musical.name }}</a></td>
+        <td>{% if musical.is_original %}原创{% else %}引进{% endif %}</td>
+        <td>{{ musical.premiere_date_text }}</td>
+        <td>{{ musical.info }}</td>
+    </tr>
+    {% endfor %}
+    <tr><td colspan="4"></td></tr>
+    </tbody>
+</table>
+{% endif %}
+{% if musical_list_dd %}
+<table class="ui pink single line unstackable compact table">
+    <thead>
+    <tr><th>已定档 <i class="stopwatch icon"></i></th><th>原创性</th><th>首演日期</th><th>其他信息</th></tr>
+    </thead>
+    <tbody>
+    {% for musical in musical_list_dd %}
+    <tr>
+        <td><a href="{{ musical.get_absolute_url }}">{{ musical.name }}</a></td>
+        <td>{% if musical.is_original %}原创{% else %}引进{% endif %}</td>
+        <td>{{ musical.premiere_date }}</td>
+        <td>{{ musical.info }}</td>
+    </tr>
+    {% endfor %}
+    <tr><td colspan="4"></td></tr>
+    </tbody>
+</table>
+{% endif %}
+{% if musical_list_ss %}
+<table class="ui pink single line unstackable compact table">
+    <thead>
+    <tr><th>已上演 <i class="bell icon"></i></th><th>原创性</th><th>首演日期</th><th>其他信息</th></tr>
+    </thead>
+    <tbody>
+    {% for musical in musical_list_ss %}
+    <tr>
+        <td><a href="{{ musical.get_absolute_url }}">{{ musical.name }}</a></td>
+        <td>{% if musical.is_original %}原创{% else %}引进{% endif %}</td>
+        <td>{% if musical.premiere_date_text %}{{ musical.premiere_date_text }}{% else %}{{ musical.premiere_date }}{% endif %}</td>
+        <td>{{ musical.info }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+<script>
+$("[data-label='musical']").attr("class","active item");
+</script>
+{% endblock %}

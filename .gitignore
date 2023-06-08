@@ -2,6 +2,7 @@
 .idea/*
 
 szzj/migrations/*
+yyj/migrations/*
 
 *.pyc
 

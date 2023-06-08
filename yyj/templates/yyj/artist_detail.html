@@ -1,0 +1,76 @@
+{% extends "yyj/base.html" %}
+
+{% block title %}{{ artist.name }}{% endblock %}
+
+{% block content %}
+<div class="ui basic segment">
+    <h2 class="ui header">{{ artist.name }}</h2>
+    {% if musical_staff_list %}
+    <h3 class="ui pink header">参与制作</h3>
+    {% for musical_staff in musical_staff_list %}
+    {% ifchanged musical_staff.musical %}
+        {% if not forloop.first %}<br>{% endif %}<a href="{{ musical_staff.musical.get_absolute_url }}">{{ musical_staff.musical.name }}</a>
+    {% else %} {% endifchanged %}
+    {{ musical_staff.job }}
+    {% endfor %}
+    {% endif %}
+    {% if musical_cast_list %}
+    <h3 class="ui pink header">出演剧目</h3>
+    {% for musical_cast in musical_cast_list %}
+        {% ifchanged musical_cast.role.musical %}
+            {% if not forloop.first %}<br>{% endif %}
+            <a href="{{ musical_cast.role.musical.get_absolute_url }}">
+                {{ musical_cast.role.musical.name }}
+            </a>
+        {% else %} {% endifchanged %}
+        {{ musical_cast.role.name }}
+    {% endfor %}
+    {% endif %}
+    {% if show_list_coming %}
+    <h3 class="ui pink header">演出日程</h3>
+</div>
+<table class="ui striped celled pink unstackable compact table">
+    <thead>
+        <tr>
+            <th class="center aligned">时间</th>
+            <th class="center aligned">音乐剧</th>
+            <th class="center aligned">角色</th>
+            <th class="center aligned">剧院</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for show in show_list_coming %}
+        <tr>
+            <td class="center aligned">
+                {% ifchanged show.time.date %}{{ show.time|date:"n月j日" }} {{ show.time|date:"l" }}{% endifchanged %}
+                {{ show.time|time }}
+            </td>
+            <td class="center aligned">
+                <h4 class="ui header"><a href="{{ show.schedule.tour.musical.get_absolute_url }}">{{ show.schedule.tour.musical.name }}</a></h4>
+            </td>
+            <td class="center aligned">
+                {{ show.role.name }}
+            </td>
+            <td class="center aligned">
+                <a href="{{ show.schedule.stage.theatre.city.get_absolute_url }}">
+                    {{ show.schedule.stage.theatre.city.name }}
+                </a>
+                <a href="{{ show.schedule.stage.get_absolute_url }}">
+                    {{ show.schedule.stage.theatre.name }}{{ show.schedule.stage.name|default_if_none:"" }}
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+{% if show_list_done %}
+<div class="ui basic segment">
+    <h5 class="ui header">
+        <a href="{% url 'yyj:yyj.artist_show_index' artist.id %}">
+            查看过往演出<i class="angle double right icon"></i>
+        </a>
+    </h5>
+    {% endif %}
+</div>
+{% endblock %}

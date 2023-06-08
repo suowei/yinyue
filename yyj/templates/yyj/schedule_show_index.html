@@ -1,0 +1,67 @@
+{% extends "yyj/base.html" %}
+
+{% block title %}过往演出详情{% endblock %}
+
+{% block content %}
+<div class="ui basic segment">
+    <h2><a href="{{ schedule.tour.get_absolute_url }}">{{ schedule.tour.musical.name }}{{ schedule.tour.name|default_if_none:"" }}</a></h2>
+    <i class="map marker alternate icon"></i>
+    <a href="{{ schedule.stage.theatre.city.get_absolute_url }}">{{ schedule.stage.theatre.city.name }}</a>
+    ·
+    <a href="{{ schedule.stage.get_absolute_url }}">
+        {{ schedule.stage.theatre.name }}{{ schedule.stage.name|default_if_none:"" }}
+    </a><br>
+</div>
+{% if show_list %}
+<div class="ui basic segment">
+    <h3 class="ui pink header">演出详情</h3>
+    {% if schedule.has_cast_table %}
+        <table class="ui collapsing single line unstackable striped compact table">
+            <thead>
+            <tr>
+                <th class="center aligned">演出时间</th>
+                {% for role in role_list %}
+                <th class="center aligned">{{ role.name }}</th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for show in show_list %}
+            <tr>
+                <td class="right aligned">
+                    {% ifchanged show.time.date %}{{ show.time|date:"n月j日" }}{% endifchanged %}
+                    {{ show.time|time }}
+                </td>
+                {% for show_cast in show.cast_table %}
+                <td class="center aligned">
+                    <a href="{{ show_cast.artist.get_absolute_url }}">{{ show_cast.artist.name }}</a>
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        {% for show in show_list %}
+            {% ifchanged show.time.date %}
+                {% if not forloop.first %}<br>{% endif %}{{ show.time|date:"n月j日" }}
+            {% endifchanged %}
+                {{ show.time|time }}
+        {% endfor %}
+    {% endif %}
+</div>
+{% if show_list.paginator.num_pages > 1 %}
+<div class="ui pagination menu">
+    {% if show_list.has_previous %}
+        <a href="?page=1" class="item"><i class="step backward icon"></i></a>
+        <a href="?page={{ show_list.previous_page_number }}" class="item"><i class="chevron left icon"></i></a>
+    {% endif %}
+    <a href="?page={{ show_list.number }}" class="active item">{{ show_list.number }}</a>
+    {% if show_list.has_next %}
+        <a href="?page={{ show_list.next_page_number }}" class="item"><i class="chevron right icon"></i></a>
+        <a href="?page={{ show_list.paginator.num_pages }}" class="item"><i class="step forward icon"></i></a>
+    {% endif %}
+</div>
+{% endif %}
+{% endif %}
+{% endblock %}

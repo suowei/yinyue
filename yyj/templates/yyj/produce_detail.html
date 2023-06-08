@@ -1,0 +1,26 @@
+{% extends "yyj/base.html" %}
+
+{% block title %}{{ produce.name }}{% endblock %}
+
+{% block content %}
+<div class="ui basic segment"><h2 class="ui header">{{ produce.name }}</h2></div>
+{% if musical_produce_list %}
+<table class="ui pink single line unstackable compact table">
+    <thead>
+    <tr><th>参与度</th><th>剧目</th><th>原创性</th><th>进度</th><th>首演日期</th><th>其他信息</th></tr>
+    </thead>
+    <tbody>
+    {% for musical_produce in musical_produce_list %}
+    <tr>
+        <td>{{ musical_produce.title }}</td>
+        <td><a href="{{ musical_produce.musical.get_absolute_url }}">{{ musical_produce.musical.name }}</a></td>
+        <td>{% if musical_produce.musical.is_original %}原创{% else %}引进{% endif %}</td>
+        <td>{{ musical_produce.musical.get_progress_display }}</td>
+        <td>{% if musical_produce.musical.premiere_date_text %}{{ musical_produce.musical.premiere_date_text }}{% else %}{{ musical_produce.musical.premiere_date }}{% endif %}</td>
+        <td>{{ musical_produce.musical.info }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+{% endblock %}

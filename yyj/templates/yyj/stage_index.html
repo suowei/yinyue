@@ -1,0 +1,25 @@
+{% extends "yyj/base.html" %}
+
+{% block title %}剧场列表{% endblock %}
+
+{% block content %}
+<table class="ui pink unstackable table">
+    <thead>
+    <th>城市</th>
+    <th>剧场</th>
+    <th>座位数</th>
+    </tr></thead>
+    <tbody>
+    {% for stage in stage_list %}
+    <tr>
+        <td><h4 class="ui header"><a href="{{ stage.theatre.city.get_absolute_url }}">{{ stage.theatre.city.name }}</a></h4></td>
+        <td><h4 class="ui header"><a href="{{ stage.get_absolute_url }}">{{ stage.theatre.name }}{{ stage.name|default_if_none:"" }}</a></h4></td>
+        <td>{{ stage.seats }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<script>
+$("[data-label='stage']").attr("class","active item");
+</script>
+{% endblock %}

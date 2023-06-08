@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="renderer" content="webkit">
+    <title>{% block title %}{% endblock %}</title>
+    <meta name="description" content="本站是一个中文音乐剧演出信息记录网站。">
+    <meta name="keywords" content="音乐剧,中文音乐剧,演出信息">
+
+    <link rel="stylesheet" type="text/css" href="https://lib.baomitu.com/semantic-ui/2.4.1/semantic.min.css">
+    <script crossorigin="anonymous" integrity="sha384-tsQFqpEReu7ZLhBV2VZlAu7zcOV+rXbYlF2cqB8txI/8aZajjp4Bqd+V6D5IgvKT" src="https://lib.baomitu.com/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://lib.baomitu.com/semantic-ui/2.4.1/semantic.min.js"></script>
+
+    <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?5a23a22a8b0592235a20280da39e127b";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+    </script>
+</head>
+<body>
+<div class="ui small one item secondary menu">
+    <div class="fitted item">
+        <form action="{% url 'yyj:yyj.search' %}" class="ui action input">
+            <input type="search" name="q" id="id_q" required="required" placeholder="搜索演员/主创、音乐剧">
+            <button class="ui pink icon button" type="submit"><i class="search icon"></i></button>
+        </form>
+    </div>
+</div>
+<div class="ui secondary two item pink inverted menu">
+    <a href="{% url 'yyj:yyj.index' %}" class="item" data-label="new"><i class="bullhorn icon"></i> 最新演出</a>
+<!--    <a href="{% url 'yyj:yyj.musical_index' %}" class="item" data-label="musical"><i class="music icon"></i> 音乐剧列表</a>-->
+    <a href="{% url 'yyj:yyj.stage_index' %}" class="item" data-label="stage"><i class="building icon"></i> 剧院列表</a>
+</div>
+{% block content %}{% endblock %}
+<div class="ui center aligned container">
+    <p>©2023 y.saoju.net&nbsp;&nbsp;&nbsp;&nbsp;邮箱：szzj@saoju.net</p>
+</div>
+</body>
+</html>

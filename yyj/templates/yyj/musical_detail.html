@@ -1,0 +1,33 @@
+{% extends "yyj/base.html" %}
+
+{% block title %}{{ musical.name }}{% endblock %}
+
+{% block content %}
+<div class="ui basic segment">
+    <h1 class="ui header">{{ musical.name }}</h1>
+    <p>
+        {% if musical.is_original %}原创{% else %}引进{% endif %}
+        <br>首演：{% if musical.premiere_date_text %}{{ musical.premiere_date_text }}{% else %}{{ musical.premiere_date }}{% endif %}
+        <br>{{ musical.info|linebreaksbr }}
+        {% for produce in produces %}
+        {% ifchanged produce.title %}<br>{{ produce.title }}：{% else %} {% endifchanged %}
+        <a href="{{ produce.produce.get_absolute_url }}">{{ produce.produce.name }}</a>
+        {% endfor %}
+    </p>
+    {% if staff_list %}
+    <strong>主创</strong>
+    {% for staff in staff_list %}
+    {% ifchanged staff.job %}<br>{{ staff.job }}：{% else %} {% endifchanged %}
+    <a href="{{ staff.artist.get_absolute_url }}">{{ staff.artist.name }}</a>
+    {% endfor %}
+    {% endif %}
+    {% if tour_list %}
+    {% for tour in tour_list %}
+        <h5>
+            {% if tour.name %}{{ tour.name }}{% endif %}{{ tour.info }}
+            <a href="{{ tour.get_absolute_url }}">演出排期<i class="angle double right icon"></i></a>
+        </h5>
+    {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}

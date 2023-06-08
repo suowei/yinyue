@@ -1,0 +1,139 @@
+{% extends "yyj/base.html" %}
+
+{% block title %}{{ tour.musical.name }}{% if tour.name %}{{ tour.name }}{% else %}演出排期{% endif %}{% endblock %}
+
+{% block content %}
+<div class="ui basic segment">
+    <h2 class="ui header">
+        <a href="{{ tour.musical.get_absolute_url }}">{{ tour.musical.name }}</a>{% if tour.name %}{{ tour.name }}{% else %}演出排期{% endif %}
+        <div class="sub header">
+            {% if tour.is_long_term %}
+                {% if tour.musical.premiere_date_text %}{{ tour.musical.premiere_date_text }}{% else %}{{ tour.begin_date }}{% endif %}起长期驻演
+            {% endif %}
+        </div>
+    </h2>
+    {% if schedule_list_coming %}
+    <h3 class="ui pink header">演出日程</h3>
+    {% for schedule in schedule_list_coming %}
+        <h4 class="ui header">
+            <div class="content">
+                <i class="map marker alternate icon"></i>
+                <a href="{{ schedule.stage.theatre.city.get_absolute_url }}">
+                    {{ schedule.stage.theatre.city.name }}
+                </a>
+                <a href="{{ schedule.stage.get_absolute_url }}">
+                    {{ schedule.stage.theatre.name }}{{ schedule.stage.name|default_if_none:"" }}
+                </a>
+                {% if not schedule.is_long_term %}
+                {{ schedule.begin_date|date:"Y-m-d" }} {{ schedule.end_date|date:"Y-m-d" }}
+                {% endif %}
+            </div>
+        </h4>
+        {% if schedule.has_cast_table %}
+        <table class="ui collapsing single line unstackable striped compact table">
+            <thead>
+            <tr>
+                <th></th>
+                {% for role in role_list %}
+                <th class="center aligned">{{ role.name }}</th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for show in schedule.shows %}
+            <tr>
+                <td class="right aligned">
+                    {% ifchanged show.time.date %}{{ show.time|date:"n月j日" }}{% endifchanged %}
+                    {{ show.time|time }}
+                </td>
+                {% for show_cast in show.cast_table %}
+                <td class="center aligned">
+                    {% for cast in show_cast %}
+                    <a href="{{ cast.artist.get_absolute_url }}">{{ cast.artist.name }}</a>
+                    {% endfor %}
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            {% for show in schedule.shows %}
+                {% ifchanged show.time.date %}
+                    {% if not forloop.first %}<br>{% endif %}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ show.time|date:"n月j日" }}
+                {% endifchanged %}
+                {{ show.time|time }}
+            {% endfor %}
+        {% endif %}
+        {% if schedule.show_list_done %}
+            <h5 class="ui header">
+                <a href="{% url 'yyj:yyj.schedule_show_index' schedule.id %}">
+                    查看过往演出<i class="angle double right icon"></i>
+                </a>
+            </h5>
+        {% endif %}
+    {% endfor %}
+    {% endif %}
+    {% if schedule_list_done %}
+    <h3 class="ui pink header">过往演出</h3>
+    {% for schedule in schedule_list_done %}
+        <h4 class="ui header">
+            <div class="content">
+            <i class="map marker alternate icon"></i>
+            <a href="{{ schedule.stage.theatre.city.get_absolute_url }}">
+                {{ schedule.stage.theatre.city.name }}
+            </a>
+            {{ schedule.begin_date|date:"Y-m-d" }}
+            {{ schedule.end_date|date:"Y-m-d" }}
+            <a href="{{ schedule.stage.get_absolute_url }}">
+                {{ schedule.stage.theatre.name }}{{ schedule.stage.name|default_if_none:"" }}
+            </a>
+            </div>
+        </h4>
+        {% if schedule.has_cast_table %}
+        <table class="ui collapsing single line unstackable striped compact table">
+            <thead>
+            <tr>
+                <th></th>
+                {% for role in role_list %}
+                <th class="center aligned">{{ role.name }}</th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for show in schedule.shows %}
+            <tr>
+                <td class="right aligned">
+                    {% ifchanged show.time.date %}{{ show.time|date:"n月j日" }}{% endifchanged %}
+                    {{ show.time|time }}
+                </td>
+                {% for show_cast in show.cast_table %}
+                <td class="center aligned">
+                    {% for cast in show_cast %}
+                    <a href="{{ cast.artist.get_absolute_url }}">{{ cast.artist.name }}</a>
+                    {% endfor %}
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            {% for show in schedule.shows %}
+                {% ifchanged show.time.date %}
+                    {% if not forloop.first %}<br>{% endif %}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ show.time|date:"n月j日" }}
+                {% endifchanged %}
+                {{ show.time|time }}
+            {% endfor %}
+        {% endif %}
+        {% if schedule.show_list_done %}
+            <h5 class="ui header">
+                <a href="{% url 'yyj:yyj.schedule_show_index' schedule.id %}">
+                    查看演出详情<i class="angle double right icon"></i>
+                </a>
+            </h5>
+        {% endif %}
+    {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}

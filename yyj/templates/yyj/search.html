@@ -1,0 +1,27 @@
+{% extends "yyj/base.html" %}
+
+{% block title %}搜索结果{% endblock %}
+
+{% block content %}
+<div class="ui basic segment">
+    {% if artist_list %}
+    <h2 class="ui header">演员/主创</h2>
+    <div class="ui list">
+    {% for artist in artist_list %}
+        <div class="item"><a href="{{ artist.get_absolute_url }}">{{ artist.name }}</a></div>
+    {% endfor %}
+    </div>
+    {% endif %}
+    {% if musical_list %}
+    <h2 class="ui header">音乐剧</h2>
+    <div class="ui list">
+    {% for musical in musical_list %}
+    <div class="item"><a href="{{ musical.get_absolute_url }}">{{ musical.name }}</a></div>
+    {% endfor %}
+    </div>
+    {% endif %}
+    {% if not musical_list and not artist_list %}
+    <p>抱歉，未找到结果。</p>
+    {% endif %}
+</div>
+{% endblock %}

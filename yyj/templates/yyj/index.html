@@ -1,0 +1,170 @@
+{% extends "yyj/base.html" %}
+
+{% block title %}中文音乐剧演出信息{% endblock %}
+
+{% block content %}
+{% if day_list %}
+<div class="ui one column grid">
+    <div class="computer tablet large screen only column">
+        <div class="ui pink secondary pointing menu">
+            {% for day in day_list %}
+            {% with show=day|first %}
+                {% if forloop.first %}
+                <div class="active item" data-tab="{{ show.time.date }}">
+                {% else %}
+                <div class="item" data-tab="{{ show.time.date }}">
+                {% endif %}
+                {{ show.time|date:"n月j日 l" }}
+                </div>
+            {% endwith %}
+            {% endfor %}
+<!--            <a class="item" href="#">更多</a>-->
+        </div>
+    </div>
+</div>
+<div class="ui one column grid">
+    <div class="mobile only column">
+        <div class="ui one item pink menu">
+            <div class="ui dropdown item">
+                <div class="text">
+                    {% with show=day_list|first|first %}{{ show.time|date:"n月j日 l" }}{% endwith %}
+                </div><i class="dropdown icon"></i>
+                <div class="menu">
+                    {% for day in day_list %}
+                    {% with show=day|first %}
+                        {% if forloop.first %}
+                        <a class="active item" data-tab="{{ show.time.date }}" data-text="{{ show.time.date|date:'n月j日 l' }}" data-value="default">
+                        {% else %}
+                        <a class="item" data-tab="{{ show.time.date }}" data-text="{{ show.time.date|date:'n月j日 l' }}">
+                        {% endif %}
+                            {{ show.time|date:"n月j日 l" }}
+                        </a>
+                    {% endwith %}
+                    {% endfor %}
+<!--                    <a class="item" href="#">更多</a>-->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% for day in day_list %}
+    {% with show=day|first %}
+    {% if forloop.first %}
+    <div class="ui tab active" data-tab="{{ show.time.date }}">
+    {% else %}
+        <div class="ui tab" data-tab="{{ show.time.date }}">
+    {% endif %}
+    {% endwith %}
+    <table class="ui pink striped celled unstackable compact table">
+    <thead>
+        <tr>
+            <th class="center aligned">城市</th>
+            <th class="center aligned">时间</th>
+            <th class="center aligned">音乐剧</th>
+            <th class="center aligned">卡司</th>
+            <th class="center aligned">剧院</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for show in day %}
+        <tr>
+            <td class="center aligned single line">
+                {% ifchanged show.schedule.stage.theatre.city %}
+                <a href="{{ show.schedule.stage.theatre.city.get_absolute_url }}">
+                    {{ show.schedule.stage.theatre.city.name }}
+                </a>
+                {% endifchanged %}
+            </td>
+            <td class="center aligned">
+                {% ifchanged show.schedule.stage.theatre.city show.time %}{{ show.time|time }}{% endifchanged %}
+            </td>
+            <td class="center aligned">
+                <h4 class="ui header"><a href="{{ show.schedule.tour.get_absolute_url }}">{{ show.schedule.tour.musical.name }}</a></h4>
+            </td>
+            <td>
+                {% for show_cast in show.cast_list %}
+                <a href="{{ show_cast.artist.get_absolute_url }}">{{ show_cast.artist.name }}</a>
+                {% endfor %}
+            </td>
+            <td class="center aligned">
+                <a href="{{ show.schedule.stage.get_absolute_url }}">
+                    {{ show.schedule.stage.theatre.name }}{{ show.schedule.stage.name|default_if_none:"" }}
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    </table>
+    </div>
+{% endfor %}
+{% endif %}
+{% if schedule_list %}
+<div class="ui basic segment">
+    <h3 class="ui pink header">本月演出<i class="calendar alternate outline icon"></i></h3>
+</div>
+<table class="ui pink unstackable compact table">
+    <thead><tr><th class="center aligned">音乐剧</th><th>排期</th></tr></thead>
+    <tbody>
+    {% for schedule in schedule_list %}
+    {% ifchanged schedule.tour.musical %}
+    {% if not forloop.first %}</td></tr>{% endif %}
+    <tr>
+        <td class="center aligned">
+            <a href="{{ schedule.tour.get_absolute_url }}">
+                <h4>{{ schedule.tour.musical.name }}</h4>
+            </a>
+        </td>
+        <td>
+            {% endifchanged %}
+            {{ schedule.begin_date|date:"n月j日" }}-{{ schedule.end_date|date:"n月j日" }}
+            <a href="{{ schedule.stage.theatre.city.get_absolute_url }}">
+                {{ schedule.stage.theatre.city.name }}
+            </a>
+            <a href="{{ schedule.stage.get_absolute_url }}">
+                {{ schedule.stage.theatre.name }}{{ schedule.stage.name|default_if_none:"" }}
+            </a><br>
+    {% endfor %}</td></tr>
+    </tbody>
+</table>
+{% endif %}
+{% if long_term_schedule_list %}
+<div class="ui basic segment">
+    <h3 class="ui pink header">长期驻演<i class="map marker alternate icon"></i></h3>
+</div>
+<table class="ui pink unstackable compact table">
+    <thead><tr><th>城市</th><th>音乐剧</th><th>剧院</th></tr></thead>
+    <tbody>
+    {% for schedule in long_term_schedule_list %}
+    <tr>
+        <td class="single line collapsing">
+            {% ifchanged schedule.stage.theatre.city %}
+            <a href="{{ schedule.stage.theatre.city.get_absolute_url }}">
+                <h4>{{ schedule.stage.theatre.city.name }}</h4>
+            </a>
+            {% endifchanged %}
+        </td>
+        <td>
+            <a href="{{ schedule.tour.get_absolute_url }}">
+                <h4>{{ schedule.tour.musical.name }}</h4>
+            </a>
+        </td>
+        <td>
+            <a href="{{ schedule.stage.get_absolute_url }}">
+                {{ schedule.stage.theatre.name }}{{ schedule.stage.name|default_if_none:"" }}
+            </a>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+<script>
+$("[data-label='new']").attr("class","active item");
+$('.menu .item')
+  .tab()
+;
+$('.dropdown')
+  .dropdown()
+;
+</script>
+{% endblock %}
