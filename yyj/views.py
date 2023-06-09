@@ -15,7 +15,7 @@ def index(request):
         is_long_term=False, begin_date__lt=end, end_date__gte=today
     ).select_related(
         'tour', 'tour__musical', 'stage', 'stage__theatre', 'stage__theatre__city'
-    ).order_by('tour', 'begin_date')
+    ).order_by('stage__theatre__city__seq', 'end_date')
     long_term_schedule_list = Schedule.objects.filter(
         is_long_term=True
     ).select_related(

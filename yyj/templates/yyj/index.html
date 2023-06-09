@@ -103,27 +103,32 @@
     <h3 class="ui pink header">本月演出<i class="calendar alternate outline icon"></i></h3>
 </div>
 <table class="ui pink unstackable compact table">
-    <thead><tr><th class="center aligned">音乐剧</th><th>排期</th></tr></thead>
+    <thead><tr><th class="center aligned">城市</th><th>音乐剧</th><th>排期</th><th>剧院</th></tr></thead>
     <tbody>
     {% for schedule in schedule_list %}
-    {% ifchanged schedule.tour.musical %}
-    {% if not forloop.first %}</td></tr>{% endif %}
     <tr>
-        <td class="center aligned">
-            <a href="{{ schedule.tour.get_absolute_url }}">
+        <td class="single line collapsing">
+            {% ifchanged schedule.stage.theatre.city %}
+            <a href="{{ schedule.stage.theatre.city.get_absolute_url }}">
+                <h4>{{ schedule.stage.theatre.city.name }}</h4>
+            </a>
+            {% endifchanged %}
+        </td>
+        <td>
+            <a href="{{ schedule.get_absolute_url }}">
                 <h4>{{ schedule.tour.musical.name }}</h4>
             </a>
         </td>
         <td>
-            {% endifchanged %}
-            {{ schedule.begin_date|date:"n月j日" }}-{{ schedule.end_date|date:"n月j日" }}
-            <a href="{{ schedule.stage.theatre.city.get_absolute_url }}">
-                {{ schedule.stage.theatre.city.name }}
-            </a>
+            {{ schedule.begin_date|date:"n月j日" }}{% if schedule.end_date != schedule.begin_date %}-{{ schedule.end_date|date:"n月j日" }}{% endif %}
+        </td>
+        <td>
             <a href="{{ schedule.stage.get_absolute_url }}">
                 {{ schedule.stage.theatre.name }}{{ schedule.stage.name|default_if_none:"" }}
-            </a><br>
-    {% endfor %}</td></tr>
+            </a>
+        </td>
+    </tr>
+    {% endfor %}
     </tbody>
 </table>
 {% endif %}

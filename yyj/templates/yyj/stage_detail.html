@@ -23,7 +23,7 @@
                 <h4 class="ui header"><a href="{{ schedule.tour.musical.get_absolute_url }}">{{ schedule.tour.musical.name }}</a></h4>
                 <div class="description">
                     {% if schedule.is_long_term %}长期驻演{% else %}
-                    {{ schedule.begin_date|date:"n月j日" }}-{{ schedule.end_date|date:"n月j日" }}
+                    {{ schedule.begin_date|date:"n月j日" }}{% if schedule.end_date != schedule.begin_date %}-{{ schedule.end_date|date:"n月j日" }}{% endif %}
                     {% endif %}
                     {% if theatre.has_multiple_stages %}{{ schedule.stage.name }}{% endif %}
                 </div>
