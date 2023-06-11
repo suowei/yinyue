@@ -79,7 +79,7 @@
                 {% ifchanged show.schedule.stage.theatre.city show.time %}{{ show.time|time }}{% endifchanged %}
             </td>
             <td class="center aligned">
-                <h4 class="ui header"><a href="{{ show.schedule.tour.get_absolute_url }}">{{ show.schedule.tour.musical.name }}</a></h4>
+                <h4 class="ui header"><a href="{{ show.schedule.get_absolute_url }}">{{ show.schedule.tour.musical.name }}</a></h4>
             </td>
             <td>
                 {% for show_cast in show.cast_list %}
@@ -149,7 +149,7 @@
             {% endifchanged %}
         </td>
         <td>
-            <a href="{{ schedule.tour.get_absolute_url }}">
+            <a href="{{ schedule.get_absolute_url }}">
                 <h4>{{ schedule.tour.musical.name }}</h4>
             </a>
         </td>

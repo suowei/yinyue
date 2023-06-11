@@ -1,18 +1,22 @@
 {% extends "yyj/base.html" %}
 
 {% block title %}
-{{ schedule.tour.musical.name }}-{{ schedule.stage.theatre.city.name }}-{{ schedule.begin_date|date:"Y/n/j" }}-{{ schedule.end_date|date:"Y/n/j" }}
+{{ schedule.tour.musical.name }} {{ schedule.stage.theatre.city.name }}
+{{ schedule.begin_date|date:"Y/n/j" }}-{{ schedule.end_date|date:"Y/n/j" }}
 {% endblock %}
 
 {% block content %}
 <div class="ui basic segment">
-    <h2><a href="{{ schedule.tour.musical.get_absolute_url }}">{{ schedule.tour.musical.name }}</a></h2>
+    <h2 class="ui header">
+        <a href="{{ schedule.tour.musical.get_absolute_url }}">{{ schedule.tour.musical.name }}</a>
+        <div class="sub header">{{ schedule.tour.name|default_if_none:"" }}</div>
+    </h2>
     <i class="map marker alternate icon"></i>
-    <a href="{{ schedule.stage.theatre.city.get_absolute_url }}">{{ schedule.stage.theatre.city.name }}</a>
+    <strong><a href="{{ schedule.stage.theatre.city.get_absolute_url }}">{{ schedule.stage.theatre.city.name }}</a>
     ·
     <a href="{{ schedule.stage.get_absolute_url }}">
         {{ schedule.stage.theatre.name }}{{ schedule.stage.name|default_if_none:"" }}
-    </a><br>
+    </a></strong><br>
     <i class="calendar alternate icon"></i>
     <strong>
         {% if schedule.tour.musical.premiere_date_text %}
@@ -21,8 +25,7 @@
         {% endif %}
     </strong>
     {% if schedule.shows %}
-    <h3 class="ui pink header">演出排期</h3>
-        {% if schedule.has_cast_table %}
+    {% if schedule.has_cast_table %}
         <table class="ui collapsing single line unstackable striped compact table">
             <thead>
             <tr>
@@ -49,20 +52,31 @@
             </tbody>
         </table>
         {% else %}
+            <div>
             {% for show in schedule.shows %}
                 {% ifchanged show.time.date %}
                     {% if not forloop.first %}<br>{% endif %}{{ show.time|date:"n月j日" }}
                 {% endifchanged %}
                 {{ show.time|time }}
             {% endfor %}
+            </div>
         {% endif %}
     {% endif %}
     {% if schedule.show_list_done %}
-    <h5 class="ui header">
         <a href="{% url 'yyj:yyj.schedule_show_index' schedule.id %}">
-            查看过往演出<i class="angle double right icon"></i>
+            <strong>查看已完成>></strong>
         </a>
-    </h5>
+    {% endif %}
+    {% if other_schedule_list %}
+    <h3 class="ui pink header">其他日程</h3>
+    {% for schedule in other_schedule_list %}
+        <a href="{{ schedule.get_absolute_url }}">
+            {{ schedule.stage.theatre.city.name }}
+            {{ schedule.begin_date|date:"n.j" }}-{{ schedule.end_date|date:"n.j" }}
+            {{ schedule.stage.theatre.name }}{{ schedule.stage.name|default_if_none:"" }}
+        </a><br>
+    {% endfor %}
+    <a href="{{ schedule.tour.get_absolute_url }}">查看全部>></a><br>
     {% endif %}
 </div>
 {% endblock %}

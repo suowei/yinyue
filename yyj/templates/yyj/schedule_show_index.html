@@ -11,10 +11,14 @@
     <a href="{{ schedule.stage.get_absolute_url }}">
         {{ schedule.stage.theatre.name }}{{ schedule.stage.name|default_if_none:"" }}
     </a><br>
-</div>
+    <strong>
+        {% if schedule.tour.musical.premiere_date_text %}
+            {{ schedule.tour.musical.premiere_date_text }}{% else %}{{ schedule.begin_date|date:"Y-m-d" }}{% endif %}{% if schedule.is_long_term %}起长期驻演{% else %}
+            {% if schedule.end_date != schedule.begin_date%}{{ schedule.end_date|date:"Y-m-d" }}{% endif %}
+        {% endif %}
+    </strong>
 {% if show_list %}
-<div class="ui basic segment">
-    <h3 class="ui pink header">演出详情</h3>
+    <h3 class="ui pink header">已完成演出</h3>
     {% if schedule.has_cast_table %}
         <table class="ui collapsing single line unstackable striped compact table">
             <thead>
