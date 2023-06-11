@@ -22,12 +22,23 @@
     {% endfor %}
     {% endif %}
     {% if tour_list %}
+    <h3 class="ui pink header">最新演出</h3>
+    <div>
     {% for tour in tour_list %}
-        <h5>
-            {% if tour.name %}{{ tour.name }}{% endif %}{{ tour.info }}
-            <a href="{{ tour.get_absolute_url }}">演出排期<i class="angle double right icon"></i></a>
-        </h5>
+        <strong>
+            {{ tour.name|default_if_none:"" }}
+            <a href="{{ tour.get_absolute_url }}" class="item">演出排期>></a>
+        </strong><br><br>
     {% endfor %}
+    </div>
+    {% endif %}
+    {% if tour_list_history %}
+    <h3 class="ui pink header">过往演出</h3>
+    <div>
+    {% for tour in tour_list_history %}
+        <a href="{{ tour.get_absolute_url }}" class="item">{{ tour.name|default_if_none:"演出排期" }}</a><br>
+    {% endfor %}
+    </div>
     {% endif %}
 </div>
 {% endblock %}

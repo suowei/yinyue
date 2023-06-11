@@ -68,11 +68,13 @@ def musical_detail(request, pk):
     staff_list = MusicalStaff.objects.filter(musical=musical).select_related('artist').order_by('seq')
     today = datetime.datetime.now().date()
     tour_list = Tour.objects.filter(musical=musical, end_date__gte=today).order_by('-end_date')
+    tour_list_history = Tour.objects.filter(musical=musical, end_date__lt=today).order_by('-end_date')
     context = {
         'musical': musical,
         'produces': produces,
         'staff_list': staff_list,
-        'tour_list': tour_list
+        'tour_list': tour_list,
+        'tour_list_history': tour_list_history,
     }
     return render(request, 'yyj/musical_detail.html', context)
 
@@ -85,7 +87,8 @@ def tour_detail(request, pk):
     schedule_list_coming = Schedule.objects.filter(tour=tour, end_date__gte=today).select_related(
         'stage', 'stage__theatre', 'stage__theatre__city').order_by('begin_date')
     for schedule in schedule_list_coming:
-        # schedule.show_list_done = Show.objects.filter(schedule=schedule, time__lt=now)[:1]
+        if schedule.is_long_term:
+            schedule.show_list_done = Show.objects.filter(schedule=schedule, time__lt=now)[:1]
         schedule.shows = schedule.show_set.filter(time__gte=now).order_by('time')
         for show in schedule.shows:
             show_cast_list = show.cast.select_related('role', 'artist').order_by('seq')
@@ -98,29 +101,28 @@ def tour_detail(request, pk):
                     show.cast_table[show_cast.role.seq - 1].append(show_cast)
                 else:
                     show.cast_table[show_cast.role.seq - 1] = [show_cast]
-    # schedule_list_done = Schedule.objects.filter(tour=tour, begin_date__lt=today).select_related(
-    #     'stage', 'stage__theatre', 'stage__theatre__city').order_by('begin_date')
-    # for schedule in schedule_list_done:
-    #     if schedule.is_long_term:
-    #         schedule.show_list_done = Show.objects.filter(schedule=schedule, time__lt=now)[:1]
-    #     else:
-    #         schedule.shows = schedule.show_set.order_by('time')
-    #     for show in schedule.shows:
-    #         show_cast_list = show.cast.select_related('role', 'artist').order_by('seq')
-    #         if not show_cast_list:
-    #             continue
-    #         schedule.has_cast_table = True
-    #         show.cast_table = [None] * len(role_list)
-    #         for show_cast in show_cast_list:
-    #             if show.cast_table[show_cast.role.seq - 1]:
-    #                 show.cast_table[show_cast.role.seq - 1].append(show_cast)
-    #             else:
-    #                 show.cast_table[show_cast.role.seq - 1] = [show_cast]
+    schedule_list_done = Schedule.objects.filter(is_long_term=False, tour=tour, begin_date__lte=today).select_related(
+        'stage', 'stage__theatre', 'stage__theatre__city').order_by('begin_date')
+    for schedule in schedule_list_done:
+        schedule.shows = schedule.show_set.filter(time__lt=now).order_by('time')[:30]
+        if schedule.show_set.filter(time__lt=now).count() > 30:
+            schedule.show_list_more = True
+        for show in schedule.shows:
+            show_cast_list = show.cast.select_related('role', 'artist').order_by('seq')
+            if not show_cast_list:
+                continue
+            schedule.has_cast_table = True
+            show.cast_table = [None] * len(role_list)
+            for show_cast in show_cast_list:
+                if show.cast_table[show_cast.role.seq - 1]:
+                    show.cast_table[show_cast.role.seq - 1].append(show_cast)
+                else:
+                    show.cast_table[show_cast.role.seq - 1] = [show_cast]
     context = {
         'tour': tour,
         'role_list': role_list,
         'schedule_list_coming': schedule_list_coming,
-        # 'schedule_list_done': schedule_list_done
+        'schedule_list_done': schedule_list_done,
     }
     return render(request, 'yyj/tour_detail.html', context)
 
@@ -179,7 +181,11 @@ def schedule_show_index(request, pk):
     schedule = Schedule.objects.get(pk=pk)
     role_list = Role.objects.filter(musical=schedule.tour.musical).order_by('seq')
     now = datetime.datetime.now()
-    show_list_done = Show.objects.filter(schedule=schedule, time__lt=now).order_by('-time')
+    order = request.GET.get('order')
+    if order == 'asc':
+        show_list_done = Show.objects.filter(schedule=schedule, time__lt=now).order_by('time')
+    else:
+        show_list_done = Show.objects.filter(schedule=schedule, time__lt=now).order_by('-time')
     paginator = Paginator(show_list_done, 30)
     page = request.GET.get('page')
     show_list = paginator.get_page(page)
@@ -192,6 +198,7 @@ def schedule_show_index(request, pk):
         for show_cast in show_cast_list:
             show.cast_table[show_cast.role.seq - 1] = show_cast
     context = {
+        'order': order,
         'schedule': schedule,
         'show_list': show_list,
         'role_list': role_list,

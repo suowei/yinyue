@@ -57,13 +57,13 @@
 {% if show_list.paginator.num_pages > 1 %}
 <div class="ui pagination menu">
     {% if show_list.has_previous %}
-        <a href="?page=1" class="item"><i class="step backward icon"></i></a>
-        <a href="?page={{ show_list.previous_page_number }}" class="item"><i class="chevron left icon"></i></a>
+        <a href="?page=1{% if order %}&order=asc{% endif %}" class="item"><i class="step backward icon"></i></a>
+        <a href="?page={{ show_list.previous_page_number }}{% if order %}&order=asc{% endif %}" class="item"><i class="chevron left icon"></i></a>
     {% endif %}
     <a href="?page={{ show_list.number }}" class="active item">{{ show_list.number }}</a>
     {% if show_list.has_next %}
-        <a href="?page={{ show_list.next_page_number }}" class="item"><i class="chevron right icon"></i></a>
-        <a href="?page={{ show_list.paginator.num_pages }}" class="item"><i class="step forward icon"></i></a>
+        <a href="?page={{ show_list.next_page_number }}{% if order %}&order=asc{% endif %}" class="item"><i class="chevron right icon"></i></a>
+        <a href="?page={{ show_list.paginator.num_pages }}{% if order %}&order=asc{% endif %}" class="item"><i class="step forward icon"></i></a>
     {% endif %}
 </div>
 {% endif %}

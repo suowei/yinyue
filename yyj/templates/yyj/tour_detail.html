@@ -21,13 +21,13 @@
                 <a href="{{ schedule.stage.theatre.city.get_absolute_url }}">
                     {{ schedule.stage.theatre.city.name }}
                 </a>
-                <a href="{{ schedule.stage.get_absolute_url }}">
-                    {{ schedule.stage.theatre.name }}{{ schedule.stage.name|default_if_none:"" }}
-                </a>
                 {% if not schedule.is_long_term %}
                 {{ schedule.begin_date|date:"Y-m-d" }}
                 {% if schedule.end_date != schedule.begin_date %}{{ schedule.end_date|date:"Y-m-d" }}{% endif %}
                 {% endif %}
+                <a href="{{ schedule.stage.get_absolute_url }}">
+                    {{ schedule.stage.theatre.name }}{{ schedule.stage.name|default_if_none:"" }}
+                </a>
             </div>
         </h4>
         {% if schedule.has_cast_table %}
@@ -127,10 +127,10 @@
                 {{ show.time|time }}
             {% endfor %}
         {% endif %}
-        {% if schedule.show_list_done %}
+        {% if schedule.show_list_more %}
             <h5 class="ui header">
-                <a href="{% url 'yyj:yyj.schedule_show_index' schedule.id %}">
-                    查看演出详情<i class="angle double right icon"></i>
+                <a href="{% url 'yyj:yyj.schedule_show_index' schedule.id %}?page=2&order=asc">
+                    更多演出详情<i class="angle double right icon"></i>
                 </a>
             </h5>
         {% endif %}
