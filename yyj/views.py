@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.core.paginator import Paginator
 import datetime
-from .models import Role, Tour, Schedule, Musical, Produce, MusicalProduces, MusicalStaff, Artist, Show, City, Theatre, Stage
+from .models import Role, Tour, Schedule, Musical, Produce, MusicalProduces, MusicalStaff, MusicalCast, Artist, Show, City, Theatre, Stage
 
 
 def index(request):
@@ -219,7 +219,7 @@ def artist_detail(request, pk):
     musical_cast_list = artist.musicalcast_set.select_related('role', 'role__musical').order_by('role__musical')
     now = datetime.datetime.now()
     show_list_coming = Show.objects.filter(cast__artist=artist, time__gte=now).select_related(
-        'schedule', 'schedule__tour', 'schedule__stage', 'schedule__stage__theatre', 'schedule__stage__theatre__city'
+        'schedule', 'schedule__stage', 'schedule__stage__theatre', 'schedule__stage__theatre__city'
     ).extra(
         select={"cast_id": "`yyj_musicalcast`.`id`"}
     ).order_by('time')
@@ -228,13 +228,13 @@ def artist_detail(request, pk):
             if musical_cast.id == show.cast_id:
                 show.role = musical_cast.role
                 break
-    # show_list_done = Show.objects.filter(cast__artist=artist, time__lt=now)[:1]
+    show_list_done = Show.objects.filter(cast__artist=artist, time__lt=now)[:1]
     context = {
         'artist': artist,
         'musical_staff_list': musical_staff_list,
         # 'musical_cast_list': musical_cast_list,
         'show_list_coming': show_list_coming,
-        # 'show_list_done': show_list_done
+        'show_list_done': show_list_done,
     }
     return render(request, 'yyj/artist_detail.html', context)
 
@@ -242,12 +242,20 @@ def artist_detail(request, pk):
 def artist_show_index(request, pk):
     artist = Artist.objects.get(pk=pk)
     now = datetime.datetime.now()
-    show_list_done = Show.objects.filter(cast__artist=artist, time__lt=now).order_by('-time').select_related(
-        'schedule', 'schedule__tour', 'schedule__tour__musical',
-        'schedule__stage', 'schedule__stage__theatre', 'schedule__stage__theatre__city')
-    paginator = Paginator(show_list_done, 100)
+    show_list_done = Show.objects.filter(cast__artist=artist, time__lt=now).select_related(
+        'schedule', 'schedule__stage', 'schedule__stage__theatre', 'schedule__stage__theatre__city'
+    ).extra(
+        select={"cast_id": "`yyj_musicalcast`.`id`"}
+    ).order_by('-time')
+    paginator = Paginator(show_list_done, 50)
     page = request.GET.get('page')
     show_list = paginator.get_page(page)
+    musical_cast_list = artist.musicalcast_set.select_related('role', 'role__musical')
+    for show in show_list:
+        for musical_cast in musical_cast_list:
+            if musical_cast.id == show.cast_id:
+                show.role = musical_cast.role
+                break
     context = {'artist': artist, 'show_list': show_list}
     return render(request, 'yyj/artist_show_index.html', context)
 

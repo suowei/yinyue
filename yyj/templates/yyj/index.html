@@ -71,7 +71,7 @@
             <td class="center aligned single line">
                 {% ifchanged show.schedule.stage.theatre.city %}
                 <a href="{{ show.schedule.stage.theatre.city.get_absolute_url }}">
-                    {{ show.schedule.stage.theatre.city.name }}
+                    <h4>{{ show.schedule.stage.theatre.city.name }}</h4>
                 </a>
                 {% endifchanged %}
             </td>

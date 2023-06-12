@@ -46,7 +46,7 @@
                 {{ show.time|time }}
             </td>
             <td class="center aligned">
-                <h4 class="ui header"><a href="{{ show.schedule.tour.musical.get_absolute_url }}">{{ show.schedule.tour.musical.name }}</a></h4>
+                <h4 class="ui header"><a href="{{ show.role.musical.get_absolute_url }}">{{ show.role.musical.name }}</a></h4>
             </td>
             <td class="center aligned">
                 {{ show.role.name }}
@@ -68,7 +68,7 @@
 <div class="ui basic segment">
     <h5 class="ui header">
         <a href="{% url 'yyj:yyj.artist_show_index' artist.id %}">
-            查看过往演出<i class="angle double right icon"></i>
+            过往演出<i class="angle double right icon"></i>
         </a>
     </h5>
     {% endif %}
