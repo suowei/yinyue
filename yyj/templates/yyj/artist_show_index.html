@@ -7,9 +7,8 @@
     <h2 class="ui header"><a href="{{ artist.get_absolute_url }}">{{ artist.name }}</a></h2>
 </div>
 {% if show_list %}
-<div class="ui basic segment">
-    <h3 class="ui pink header">过往演出</h3>
-    <table class="ui striped celled pink unstackable compact table">
+<div class="ui basic segment"><h3 class="ui pink header">过往演出</h3></div>
+<table class="ui striped celled pink unstackable compact table">
     <thead>
         <tr>
             <th class="center aligned">时间</th>
@@ -43,7 +42,6 @@
         {% endfor %}
     </tbody>
 </table>
-</div>
 {% if show_list.paginator.num_pages > 1 %}
 <div class="ui pagination menu">
     {% if show_list.has_previous %}
