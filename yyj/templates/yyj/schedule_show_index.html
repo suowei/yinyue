@@ -13,7 +13,13 @@
     </a><br>
     <strong>
         {% if schedule.tour.musical.premiere_date_text %}
-            {{ schedule.tour.musical.premiere_date_text }}{% else %}{{ schedule.begin_date|date:"Y-m-d" }}{% endif %}{% if schedule.is_long_term %}起长期驻演{% else %}
+            {{ schedule.tour.musical.premiere_date_text }}
+        {% else %}
+            {{ schedule.begin_date|date:"Y-m-d" }}
+        {% endif %}
+        {% if schedule.is_long_term %}
+            起
+        {% else %}
             {% if schedule.end_date != schedule.begin_date%}{{ schedule.end_date|date:"Y-m-d" }}{% endif %}
         {% endif %}
     </strong>

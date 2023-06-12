@@ -8,7 +8,7 @@
         <a href="{{ tour.musical.get_absolute_url }}">{{ tour.musical.name }}</a>{% if tour.name %}{{ tour.name }}{% else %}演出排期{% endif %}
         <div class="sub header">
             {% if tour.is_long_term %}
-                {% if tour.musical.premiere_date_text %}{{ tour.musical.premiere_date_text }}{% else %}{{ tour.begin_date }}{% endif %}起长期驻演
+                {% if tour.musical.premiere_date_text %}{{ tour.musical.premiere_date_text }}{% else %}{{ tour.begin_date }}{% endif %}起
             {% endif %}
         </div>
     </h2>

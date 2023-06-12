@@ -24,8 +24,7 @@
             <div class="content">
                 <h4 class="ui header"><a href="{{ schedule.tour.musical.get_absolute_url }}">{{ schedule.tour.musical.name }}</a></h4>
                 <div class="description">
-                    {% if schedule.is_long_term %}长期驻演{% else %}
-                    {{ schedule.begin_date|date:"n月j日" }}{% if schedule.end_date != schedule.begin_date %}-{{ schedule.end_date|date:"n月j日" }}{% endif %}
+                    {{ schedule.begin_date|date:"n月j日" }}{% if schedule.is_long_term %}起{% else %}{% if schedule.end_date != schedule.begin_date %}-{{ schedule.end_date|date:"n月j日" }}{% endif %}
                     {% endif %}
                     {% if theatre.has_multiple_stages %}<a href="{{ schedule.stage.get_absolute_url }}">{{ schedule.stage.name }}</a>{% endif %}
                 </div>
