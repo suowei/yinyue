@@ -4,6 +4,7 @@
 
 {% block content %}
 {% if day_list %}
+<div id="show">
 <div class="ui one column grid">
     <div class="computer tablet large screen only column">
         <div class="ui pink secondary pointing menu">
@@ -97,12 +98,56 @@
     </table>
     </div>
 {% endfor %}
-{% endif %}
-{% if schedule_list %}
-<div class="ui basic segment">
-    <h3 class="ui pink header">本月演出<i class="calendar alternate outline icon"></i></h3>
 </div>
-<table class="ui pink unstackable compact table">
+{% endif %}
+{% if month_list %}
+<div id="schedule">
+<div class="ui one column grid">
+    <div class="computer tablet large screen only column">
+        <div class="ui segment">
+            <div class="ui pink secondary menu">
+            {% for month in month_list.keys %}
+                {% if forloop.first %}
+                <div class="active item" data-tab="{{ month }}月">
+                {% else %}
+                <div class="item" data-tab="{{ month }}月">
+                {% endif %}
+                {{ month }}月
+                </div>
+            {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+<div class="ui one column grid">
+    <div class="mobile only column">
+        <div class="ui one item pink menu">
+            <div class="ui dropdown item">
+                    {% for month in month_list.keys %}
+                        {% if forloop.first %}
+                <div class="text">
+                    {{ month }}月
+                </div><i class="dropdown icon"></i>
+                <div class="menu">
+                        <a class="active item" data-tab="{{ month }}月" data-text="{{ month }}月" data-value="default">
+                        {% else %}
+                        <a class="item" data-tab="{{ month }}月" data-text="{{ month }}月">
+                        {% endif %}
+                            {{ month }}月
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% for month, schedule_list in month_list.items %}
+    {% if forloop.first %}
+    <div class="ui tab active" data-tab="{{ month }}月">
+    {% else %}
+        <div class="ui tab" data-tab="{{ month }}月">
+    {% endif %}
+    <table class="ui pink unstackable compact table">
     <thead><tr><th class="center aligned">城市</th><th>音乐剧</th><th>排期</th><th>剧院</th></tr></thead>
     <tbody>
     {% for schedule in schedule_list %}
@@ -130,7 +175,10 @@
     </tr>
     {% endfor %}
     </tbody>
-</table>
+    </table>
+    </div>
+{% endfor %}
+</div>
 {% endif %}
 {% if long_term_schedule_list %}
 <div class="ui basic segment">
@@ -165,8 +213,15 @@
 {% endif %}
 <script>
 $("[data-label='new']").attr("class","active item");
-$('.menu .item')
-  .tab()
+$('#show .menu .item')
+  .tab({
+    context: $('#show')
+  })
+;
+$('#schedule .menu .item')
+  .tab({
+    context: $('#schedule')
+  })
 ;
 $('.dropdown')
   .dropdown()

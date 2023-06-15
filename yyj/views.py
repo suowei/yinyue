@@ -1,21 +1,27 @@
 from django.shortcuts import render
 from django.core.paginator import Paginator
 import datetime
-from .models import Role, Tour, Schedule, Musical, Produce, MusicalProduces, MusicalStaff, MusicalCast, Artist, Show, City, Theatre, Stage
+from .models import Role, Tour, Schedule, Musical, Produce, MusicalProduces, MusicalStaff, Artist, Show, City, Theatre, Stage
 
 
 def index(request):
     now = datetime.datetime.now()
     today = now.date()
-    if today.month != 12:
-        end = datetime.date(today.year, today.month + 1, 1)
-    else:
-        end = datetime.date(today.year + 1, 1, 1)
-    schedule_list = Schedule.objects.filter(
-        is_long_term=False, begin_date__lt=end, end_date__gte=today
-    ).select_related(
-        'tour', 'tour__musical', 'stage', 'stage__theatre', 'stage__theatre__city'
-    ).order_by('stage__theatre__city__seq', 'end_date')
+    begin = today
+    month_list = {}
+    for i in range(12):
+        if begin.month != 12:
+            end = datetime.date(begin.year, begin.month + 1, 1)
+        else:
+            end = datetime.date(begin.year + 1, 1, 1)
+        schedule_list = Schedule.objects.filter(
+            is_long_term=False, begin_date__lt=end, end_date__gte=begin
+        ).select_related(
+            'tour', 'tour__musical', 'stage', 'stage__theatre', 'stage__theatre__city'
+        ).order_by('stage__theatre__city__seq', 'end_date')
+        if schedule_list:
+            month_list[begin.month] = schedule_list
+        begin = end
     long_term_schedule_list = Schedule.objects.filter(
         is_long_term=True
     ).select_related(
@@ -43,9 +49,9 @@ def index(request):
         day.append(show)
         show.cast_list = show.cast.select_related('role', 'artist').order_by('role__seq')
     context = {
-        'schedule_list': schedule_list,
         'long_term_schedule_list': long_term_schedule_list,
-        'day_list': day_list
+        'day_list': day_list,
+        'month_list': month_list,
     }
     return render(request, 'yyj/index.html', context)
 
