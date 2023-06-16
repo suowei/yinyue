@@ -94,63 +94,82 @@
 {% if schedule_list %}
 <div class="ui basic segment">
     <h3 class="ui pink header">正在演出<i class="microphone icon"></i></h3>
-    <div class="ui relaxed list">
-        {% for schedule in schedule_list %}
-        <div class="item">
-            <div class="content">
-                <h4 class="ui header"><a href="{{ schedule.get_absolute_url }}">{{ schedule.tour.musical.name }}</a></h4>
-                <div class="description">
-                    至{{ schedule.end_date|date:"n月j日l" }}
-                    <a href="{{ schedule.stage.get_absolute_url }}">
-                        {{ schedule.stage.theatre.name }}{{ schedule.stage.name|default_if_none:"" }}
-                    </a>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
 </div>
+<table class="ui pink unstackable compact table">
+    <thead><tr><th>音乐剧</th><th>结束日期</th><th>剧院</th></tr></thead>
+    <tbody>
+    {% for schedule in schedule_list %}
+    <tr>
+        <td>
+            <a href="{{ schedule.get_absolute_url }}">
+                <h4>{{ schedule.tour.musical.name }}</h4>
+            </a>
+        </td>
+        <td>
+            {{ schedule.end_date|date:"n月j日 l" }}
+        </td>
+        <td>
+            <a href="{{ schedule.stage.get_absolute_url }}">
+                {{ schedule.stage.theatre.name }}{{ schedule.stage.name|default_if_none:"" }}
+            </a>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
 {% endif %}
 {% if schedule_list_coming %}
 <div class="ui basic segment">
     <h3 class="ui pink header">即将上演 <i class="stopwatch icon"></i></h3>
-    <div class="ui relaxed list">
-        {% for schedule in schedule_list_coming %}
-        <div class="item">
-            <div class="content">
-                <h4 class="ui header"><a href="{{ schedule.get_absolute_url }}">{{ schedule.tour.musical.name }}</a></h4>
-                <div class="description">
-                    {% if schedule.tour.musical.premiere_date_text %}
-                    {{ schedule.begin_date|date:"n月" }}{% else %}{{ schedule.begin_date|date:"n月j日" }}{% endif %}{% if schedule.is_long_term %}起{% else %}{% if schedule.end_date != schedule.begin_date%}-{{ schedule.end_date|date:"n月j日" }}{% endif %}
-                    {% endif %}
-                    <a href="{{ schedule.stage.get_absolute_url }}">
-                        {{ schedule.stage.theatre.name }}{{ schedule.stage.name|default_if_none:"" }}
-                    </a>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
 </div>
+<table class="ui pink unstackable compact table">
+    <thead><tr><th>音乐剧</th><th>排期</th><th>剧院</th></tr></thead>
+    <tbody>
+    {% for schedule in schedule_list_coming %}
+    <tr>
+        <td>
+            <a href="{{ schedule.get_absolute_url }}">
+                <h4>{{ schedule.tour.musical.name }}</h4>
+            </a>
+        </td>
+        <td>
+            {% if schedule.tour.musical.premiere_date_text %}
+            {{ schedule.begin_date|date:"n月" }}{% else %}{{ schedule.begin_date|date:"n月j日" }}{% endif %}{% if schedule.is_long_term %}起{% else %}{% if schedule.end_date != schedule.begin_date%}-{{ schedule.end_date|date:"n月j日" }}{% endif %}
+            {% endif %}
+        </td>
+        <td>
+            <a href="{{ schedule.stage.get_absolute_url }}">
+                {{ schedule.stage.theatre.name }}{{ schedule.stage.name|default_if_none:"" }}
+            </a>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
 {% endif %}
 {% if long_term_schedule_list %}
 <div class="ui basic segment">
     <h3 class="ui pink header">驻场演出<i class="map marker alternate icon"></i></h3>
-    <div class="ui relaxed list">
-        {% for schedule in long_term_schedule_list %}
-        <div class="item">
-            <div class="content">
-                <h4 class="ui header"><a href="{{ schedule.get_absolute_url }}">{{ schedule.tour.musical.name }}</a></h4>
-                <div class="description">
-                    <a href="{{ schedule.stage.get_absolute_url }}">
-                        {{ schedule.stage.theatre.name }}{{ schedule.stage.name|default_if_none:"" }}
-                    </a>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
 </div>
+<table class="ui pink unstackable compact table">
+    <thead><tr><th>音乐剧</th><th>剧院</th></tr></thead>
+    <tbody>
+    {% for schedule in long_term_schedule_list %}
+    <tr>
+        <td>
+            <a href="{{ schedule.get_absolute_url }}">
+                <h4>{{ schedule.tour.musical.name }}</h4>
+            </a>
+        </td>
+        <td>
+            <a href="{{ schedule.stage.get_absolute_url }}">
+                {{ schedule.stage.theatre.name }}{{ schedule.stage.name|default_if_none:"" }}
+            </a>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
 {% endif %}
 <script>
 $('.menu .item')
