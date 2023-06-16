@@ -62,4 +62,13 @@
         </tbody>
     </table>
 {% endif %}
+{% if show_list_done %}
+<div class="ui basic segment">
+    <h5 class="ui header">
+        <a href="{% url 'yyj:yyj.stage_show_index' stage.id %}">
+            过往演出<i class="angle double right icon"></i>
+        </a>
+    </h5>
+</div>
+{% endif %}
 {% endblock %}

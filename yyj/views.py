@@ -318,19 +318,40 @@ def theatre_detail(request, pk):
     for schedule in schedule_list:
         if schedule.begin_date <= today:
             schedule.on_show = True
-    # todo 增加过往演出链接
     show_list = Show.objects.filter(schedule__stage__theatre=theatre, time__gte=now).select_related(
         'schedule', 'schedule__tour', 'schedule__tour__musical', 'schedule__stage',
     ).order_by('time')
     for show in show_list:
         show.cast_list = show.cast.select_related('role', 'artist').order_by('role__seq')
+    show_list_done = Show.objects.filter(schedule__stage__theatre=theatre, time__lt=now)[:1]
     context = {
         'theatre': theatre,
         'stage_list': stage_list,
         'schedule_list': schedule_list,
         'show_list': show_list,
+        'show_list_done': show_list_done,
     }
     return render(request, 'yyj/theatre_detail.html', context)
+
+
+def theatre_show_index(request, pk):
+    theatre = Theatre.objects.get(pk=pk)
+    stage_list = theatre.stage_set.all()
+    if len(stage_list) > 1:
+        theatre.has_multiple_stages = True
+    else:
+        theatre.has_multiple_stages = False
+    now = datetime.datetime.now()
+    show_list_done = Show.objects.filter(schedule__stage__theatre=theatre, time__lt=now).select_related(
+        'schedule', 'schedule__stage', 'schedule__tour', 'schedule__tour__musical'
+    ).order_by('-time')
+    paginator = Paginator(show_list_done, 50)
+    page = request.GET.get('page')
+    show_list = paginator.get_page(page)
+    for show in show_list:
+        show.cast_list = show.cast.select_related('role', 'artist').order_by('role__seq')
+    context = {'theatre': theatre, 'show_list': show_list}
+    return render(request, 'yyj/theatre_show_index.html', context)
 
 
 def stage_index(request):
@@ -354,18 +375,34 @@ def stage_detail(request, pk):
     for schedule in schedule_list:
         if schedule.begin_date <= today:
             schedule.on_show = True
-    # todo 增加过往演出链接
     show_list = Show.objects.filter(schedule__stage=stage, time__gte=now).select_related(
         'schedule', 'schedule__tour', 'schedule__tour__musical',
     ).order_by('time')
     for show in show_list:
         show.cast_list = show.cast.select_related('role', 'artist').order_by('role__seq')
+    show_list_done = Show.objects.filter(schedule__stage=stage, time__lt=now)[:1]
     context = {
         'stage': stage,
         'schedule_list': schedule_list,
         'show_list': show_list,
+        'show_list_done': show_list_done,
     }
     return render(request, 'yyj/stage_detail.html', context)
+
+
+def stage_show_index(request, pk):
+    stage = Stage.objects.get(pk=pk)
+    now = datetime.datetime.now()
+    show_list_done = Show.objects.filter(schedule__stage=stage, time__lt=now).select_related(
+        'schedule', 'schedule__tour', 'schedule__tour__musical'
+    ).order_by('-time')
+    paginator = Paginator(show_list_done, 50)
+    page = request.GET.get('page')
+    show_list = paginator.get_page(page)
+    for show in show_list:
+        show.cast_list = show.cast.select_related('role', 'artist').order_by('role__seq')
+    context = {'stage': stage, 'show_list': show_list}
+    return render(request, 'yyj/stage_show_index.html', context)
 
 
 def search(request):

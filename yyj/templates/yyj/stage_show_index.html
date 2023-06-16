@@ -1,42 +1,35 @@
 {% extends "yyj/base.html" %}
 
-{% block title %}{{ artist.name }}过往演出{% endblock %}
+{% block title %}{{ stage.theatre.name }}{{ stage.name|default_if_none:"" }}过往演出{% endblock %}
 
 {% block content %}
 <div class="ui basic segment">
-    <h2 class="ui header"><a href="{{ artist.get_absolute_url }}">{{ artist.name }}</a></h2>
+    <h2 class="ui header">{{ stage.theatre.name }}{{ stage.name|default_if_none:"" }}</h2>
 </div>
 {% if show_list %}
 <div class="ui basic segment"><h3 class="ui pink header">过往演出</h3></div>
-<table class="ui striped celled pink unstackable compact table">
+<table class="ui celled pink single line unstackable collapsing compact table">
     <thead>
         <tr>
-            <th class="center aligned">时间</th>
-            <th class="center aligned">音乐剧</th>
-            <th class="center aligned">角色</th>
-            <th class="center aligned">剧院</th>
+            <th class="center aligned">演出时间</th>
+            <th class="center aligned">剧目</th>
+            <th class="center aligned">卡司</th>
         </tr>
     </thead>
     <tbody>
         {% for show in show_list %}
         <tr>
-            <td class="center aligned">
-                {% ifchanged show.time.date %}{{ show.time|date }} {{ show.time|date:"l" }}{% endifchanged %}
+            <td class="right aligned">
+                {% ifchanged show.time.date %}{{ show.time|date }}{% endifchanged %}
                 {{ show.time|time }}
             </td>
             <td class="center aligned">
-                <h4 class="ui header"><a href="{{ show.role.musical.get_absolute_url }}">{{ show.role.musical.name }}</a></h4>
+                <strong><a href="{{ show.schedule.tour.musical.get_absolute_url }}">{{ show.schedule.tour.musical.name }}</a></strong>
             </td>
-            <td class="center aligned">
-                {{ show.role.name }}
-            </td>
-            <td class="center aligned">
-                <a href="{{ show.schedule.stage.theatre.city.get_absolute_url }}">
-                    {{ show.schedule.stage.theatre.city.name }}
-                </a>
-                <a href="{{ show.schedule.stage.get_absolute_url }}">
-                    {{ show.schedule.stage.theatre.name }}{{ show.schedule.stage.name|default_if_none:"" }}
-                </a>
+            <td>
+                {% for show_cast in show.cast_list %}
+                <a href="{{ show_cast.artist.get_absolute_url }}">{{ show_cast.artist.name }}</a>
+                {% endfor %}
             </td>
         </tr>
         {% endfor %}

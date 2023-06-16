@@ -15,7 +15,9 @@ urlpatterns = [
     path('schedule/<int:pk>/show', views.schedule_show_index, name='yyj.schedule_show_index'),
     path('city/<int:pk>/', views.city_detail, name='yyj.city_detail'),
     path('theatre/<int:pk>/', views.theatre_detail, name='yyj.theatre_detail'),
+    path('theatre/<int:pk>/show', views.theatre_show_index, name='yyj.theatre_show_index'),
     path('stage/', views.stage_index, name='yyj.stage_index'),
     path('stage/<int:pk>/', views.stage_detail, name='yyj.stage_detail'),
+    path('stage/<int:pk>/show', views.stage_show_index, name='yyj.stage_show_index'),
     path('search/', views.search, name='yyj.search'),
 ]
