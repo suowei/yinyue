@@ -142,13 +142,16 @@ def schedule_detail(request, pk):
     schedule.shows = schedule.show_set.filter(time__gte=now).order_by('time')
     schedule.show_list_done = Show.objects.filter(schedule=schedule, time__lt=now)[:1]
     for show in schedule.shows:
-        show_cast_list = show.cast.select_related('role', 'artist').order_by('role__seq')
+        show_cast_list = show.cast.select_related('role', 'artist').order_by('seq')
         if not show_cast_list:
             continue
         schedule.has_cast_table = True
         show.cast_table = [None] * len(role_list)
         for show_cast in show_cast_list:
-            show.cast_table[show_cast.role.seq - 1] = show_cast
+            if show.cast_table[show_cast.role.seq - 1]:
+                show.cast_table[show_cast.role.seq - 1].append(show_cast)
+            else:
+                show.cast_table[show_cast.role.seq - 1] = [show_cast]
     other_schedule_list = Schedule.objects.filter(tour=tour, end_date__gte=now.date()).exclude(pk=pk).select_related(
         'stage', 'stage__theatre', 'stage__theatre__city').order_by('begin_date')
     # today = datetime.datetime.now().date()
@@ -197,13 +200,16 @@ def schedule_show_index(request, pk):
     page = request.GET.get('page')
     show_list = paginator.get_page(page)
     for show in show_list:
-        show_cast_list = show.cast.select_related('role', 'artist').order_by('role__seq')
+        show_cast_list = show.cast.select_related('role', 'artist').order_by('seq')
         if not show_cast_list:
             continue
         schedule.has_cast_table = True
         show.cast_table = [None] * len(role_list)
         for show_cast in show_cast_list:
-            show.cast_table[show_cast.role.seq - 1] = show_cast
+            if show.cast_table[show_cast.role.seq - 1]:
+                show.cast_table[show_cast.role.seq - 1].append(show_cast)
+            else:
+                show.cast_table[show_cast.role.seq - 1] = [show_cast]
     context = {
         'order': order,
         'schedule': schedule,
