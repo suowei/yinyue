@@ -19,5 +19,6 @@ urlpatterns = [
     path('stage/', views.stage_index, name='yyj.stage_index'),
     path('stage/<int:pk>/', views.stage_detail, name='yyj.stage_detail'),
     path('stage/<int:pk>/show', views.stage_show_index, name='yyj.stage_show_index'),
+    path('year/<int:year>/', views.show_year_index, name='yyj.show_year_index'),
     path('search/', views.search, name='yyj.search'),
 ]

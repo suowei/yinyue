@@ -1,0 +1,37 @@
+{% extends "yyj/base.html" %}
+
+{% block title %}{{ year }}年演出{% endblock %}
+
+{% block content %}
+<p>&nbsp;&nbsp;&nbsp;&nbsp;总场次：{{ count }}</p>
+<table class="ui pink unstackable table">
+    <thead>
+    <tr>
+        <th>音乐剧</th>
+        <th>场次</th>
+        <th>详情</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for musical in musical_list %}
+    <tr class="top aligned">
+        <td><h4 class="ui header"><a href="{{ musical.get_absolute_url }}">{{ musical.name }}</a></h4></td>
+        <td>{{ musical.num_show }}</td>
+        <td>
+            {% for schedule in musical.schedule_list %}
+                {{ schedule.tour.name|default_if_none:"" }}
+                {{ schedule.begin_date|date:"Y-m-d" }}
+                {% if schedule.is_long_term %}起{% else %}
+                {% if schedule.end_date != schedule.begin_date %}{{ schedule.end_date|date:"Y-m-d" }}{% endif %}
+                {% endif %}
+                <a href="{{ schedule.stage.theatre.city.get_absolute_url }}">{{ schedule.stage.theatre.city.name }}</a>
+                <a href="{{ schedule.stage.get_absolute_url }}">{{ schedule.stage.theatre.name }}{{ schedule.stage.name|default_if_none:"" }}</a>
+                {{ schedule.num_show }}场
+                <br>
+            {% endfor %}
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

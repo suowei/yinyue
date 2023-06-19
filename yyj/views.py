@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.core.paginator import Paginator
+from django.db.models import Count, Q
 import datetime
 from .models import Role, Tour, Schedule, Musical, Produce, MusicalProduces, MusicalStaff, Artist, Show, City, Theatre, Stage
 
@@ -403,6 +404,41 @@ def stage_show_index(request, pk):
         show.cast_list = show.cast.select_related('role', 'artist').order_by('role__seq')
     context = {'stage': stage, 'show_list': show_list}
     return render(request, 'yyj/stage_show_index.html', context)
+
+
+def show_year_index(request, year):
+    now = datetime.datetime.now()
+    if year == now.year:
+        num_show = Count('show', filter=Q(show__time__year=year) & Q(show__time__lte=now))
+        schedule_list = Schedule.objects.filter(begin_date__year__lte=year, end_date__year__gte=year).annotate(
+            num_show=num_show).select_related(
+            'tour', 'tour__musical', 'stage', 'stage__theatre', 'stage__theatre__city'
+        ).order_by('begin_date')
+    else:
+        num_show = Count('show', filter=Q(show__time__year=year))
+        schedule_list = Schedule.objects.filter(begin_date__year__lte=year, end_date__year__gte=year).annotate(
+            num_show=num_show).select_related(
+            'tour', 'tour__musical', 'stage', 'stage__theatre', 'stage__theatre__city'
+        ).order_by('begin_date')
+    musical_list = []
+    count = 0
+    for schedule in schedule_list:
+        if schedule.num_show <= 0:
+            continue
+        for musical in musical_list:
+            if musical.id == schedule.tour.musical_id:
+                break
+        else:
+            musical = schedule.tour.musical
+            musical.num_show = 0
+            musical.schedule_list = []
+            musical_list.append(musical)
+        musical.num_show += schedule.num_show
+        musical.schedule_list.append(schedule)
+        count += schedule.num_show
+    musical_list.sort(key=lambda x: x.num_show, reverse=True)
+    context = {'year': year, 'count': count, 'musical_list': musical_list}
+    return render(request, 'yyj/show_year_index.html', context)
 
 
 def search(request):
