@@ -45,7 +45,7 @@
                 {% for show_cast in show.cast_table %}
                 <td class="center aligned">
                     {% for cast in show_cast %}
-                    <a href="{{ show_cast.artist.get_absolute_url }}">{{ cast.artist.name }}</a>
+                    <a href="{{ cast.artist.get_absolute_url }}">{{ cast.artist.name }}</a>
                     {% endfor %}
                 </td>
                 {% endfor %}
