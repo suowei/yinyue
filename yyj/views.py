@@ -24,7 +24,7 @@ def index(request):
             month_list.append({'month': begin, 'schedule_list': schedule_list})
         begin = end
     long_term_schedule_list = Schedule.objects.filter(
-        is_long_term=True
+        is_long_term=True, begin_date__lte=today
     ).select_related(
         'tour', 'tour__musical', 'stage', 'stage__theatre', 'stage__theatre__city'
     ).order_by('stage__theatre__city__seq', 'begin_date')
@@ -49,10 +49,16 @@ def index(request):
             day_list.insert(i, day)
         day.append(show)
         show.cast_list = show.cast.select_related('role', 'artist').order_by('role__seq')
+    musical_list_dd = Musical.objects.filter(progress=Musical.PROMOTE).order_by('premiere_date')
+    schedule_list_new = Schedule.objects.filter(begin_date__gt=today).select_related(
+        'tour', 'tour__musical', 'stage', 'stage__theatre', 'stage__theatre__city'
+    ).order_by('-id')[:20]
     context = {
         'long_term_schedule_list': long_term_schedule_list,
         'day_list': day_list,
         'month_list': month_list,
+        'musical_list_dd': musical_list_dd,
+        'schedule_list_new': schedule_list_new,
     }
     return render(request, 'yyj/index.html', context)
 

@@ -211,6 +211,59 @@
     </tbody>
 </table>
 {% endif %}
+{% if schedule_list_new %}
+<div class="ui basic segment">
+    <h3 class="ui pink header">新增演出 <i class="calendar plus outline icon"></i></h3>
+</div>
+<table class="ui pink unstackable compact table">
+    <thead><tr><th>城市</th><th>音乐剧</th><th>排期</th><th>剧院</th></tr></thead>
+    <tbody>
+    {% for schedule in schedule_list_new %}
+    <tr>
+        <td class="single line collapsing">
+            <a href="{{ schedule.stage.theatre.city.get_absolute_url }}" target="_blank">
+                <h4>{{ schedule.stage.theatre.city.name }}</h4>
+            </a>
+        </td>
+        <td>
+            <a href="{{ schedule.get_absolute_url }}" target="_blank">
+                <h4>{{ schedule.tour.musical.name }}</h4>
+            </a>
+        </td>
+        <td>
+            {% if schedule.tour.musical.premiere_date_text %}
+            {{ schedule.begin_date|date:"Y年n月" }}{% else %}{{ schedule.begin_date }}{% endif %}{% if schedule.is_long_term %}起{% else %}{% if schedule.end_date != schedule.begin_date%}-{{ schedule.end_date }}{% endif %}
+            {% endif %}
+        </td>
+        <td>
+            <a href="{{ schedule.stage.get_absolute_url }}" target="_blank">
+                {{ schedule.stage.theatre.name }}{{ schedule.stage.name|default_if_none:"" }}
+            </a>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+{% if musical_list_dd %}
+<div class="ui basic segment">
+    <h3 class="ui pink header">新剧定档<i class="stopwatch icon"></i></h3>
+</div>
+<table class="ui pink unstackable compact table">
+    <thead>
+    <tr><th>音乐剧</th><th>原创性</th><th>首演日期</th></tr>
+    </thead>
+    <tbody>
+    {% for musical in musical_list_dd %}
+    <tr>
+        <td><a href="{{ musical.get_absolute_url }}" target="_blank"><h4>{{ musical.name }}</h4></a></td>
+        <td>{% if musical.is_original %}原创{% else %}引进{% endif %}</td>
+        <td>{{ musical.premiere_date }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endif %}
 <script>
 $("[data-label='new']").attr("class","active item");
 $('#show .menu .item')
