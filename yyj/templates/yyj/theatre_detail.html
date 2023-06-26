@@ -24,7 +24,7 @@
             <div class="content">
                 <h4 class="ui header"><a href="{{ schedule.tour.musical.get_absolute_url }}">{{ schedule.tour.musical.name }}</a></h4>
                 <div class="description">
-                    {{ schedule.begin_date|date:"n月j日" }}{% if schedule.is_long_term %}起{% else %}{% if schedule.end_date != schedule.begin_date %}-{{ schedule.end_date|date:"n月j日" }}{% endif %}
+                    {% if schedule.is_long_term %}{{ schedule.begin_date }}起{% else %}{{ schedule.begin_date|date:"n月j日" }}{% if schedule.end_date != schedule.begin_date %}-{{ schedule.end_date|date:"n月j日" }}{% endif %}
                     {% endif %}
                     {% if theatre.has_multiple_stages %}<a href="{{ schedule.stage.get_absolute_url }}">{{ schedule.stage.name }}</a>{% endif %}
                 </div>
@@ -70,13 +70,15 @@
         </tbody>
     </table>
 {% endif %}
-{% if show_list_done %}
+{% if schedule_list_done %}
 <div class="ui basic segment">
-    <h5 class="ui header">
-        <a href="{% url 'yyj:yyj.theatre_show_index' theatre.id %}">
-            过往演出<i class="angle double right icon"></i>
-        </a>
-    </h5>
+    <h3 class="ui pink header">过往演出</h3>
+    {% for schedule in schedule_list_done %}
+    {{ schedule.begin_date|date:"Y.m.d" }}-{{ schedule.end_date|date:"Y.m.d" }}
+    <a href="{{ schedule.tour.musical.get_absolute_url }}">{{ schedule.tour.musical.name }}</a>
+    {% if theatre.has_multiple_stages %}- <a href="{{ schedule.stage.get_absolute_url }}">{{ schedule.stage.name }}</a>{% endif %}
+    <br>
+    {% endfor %}
 </div>
 {% endif %}
 {% endblock %}

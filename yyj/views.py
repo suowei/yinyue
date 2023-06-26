@@ -286,7 +286,6 @@ def city_detail(request, pk):
     schedule_list_coming = Schedule.objects.filter(
         begin_date__gt=today, stage__theatre__city=city).select_related(
         'tour', 'tour__musical', 'stage', 'stage__theatre').order_by('begin_date', 'end_date')
-    # todo 增加过往演出链接
     end = today + datetime.timedelta(7)
     show_list = Show.objects.filter(schedule__stage__theatre__city=city, time__range=(now, end)).select_related(
         'schedule', 'schedule__tour', 'schedule__tour__musical', 'schedule__stage', 'schedule__stage__theatre'
@@ -330,13 +329,14 @@ def theatre_detail(request, pk):
     ).order_by('time')
     for show in show_list:
         show.cast_list = show.cast.select_related('role', 'artist').order_by('role__seq')
-    show_list_done = Show.objects.filter(schedule__stage__theatre=theatre, time__lt=now)[:1]
+    schedule_list_done = Schedule.objects.filter(stage__theatre=theatre, end_date__lt=today).select_related(
+        'tour', 'tour__musical', 'stage').order_by('-end_date')
     context = {
         'theatre': theatre,
         'stage_list': stage_list,
         'schedule_list': schedule_list,
         'show_list': show_list,
-        'show_list_done': show_list_done,
+        'schedule_list_done': schedule_list_done,
     }
     return render(request, 'yyj/theatre_detail.html', context)
 
@@ -387,12 +387,13 @@ def stage_detail(request, pk):
     ).order_by('time')
     for show in show_list:
         show.cast_list = show.cast.select_related('role', 'artist').order_by('role__seq')
-    show_list_done = Show.objects.filter(schedule__stage=stage, time__lt=now)[:1]
+    schedule_list_done = Schedule.objects.filter(stage=stage, end_date__lt=today).select_related(
+        'tour', 'tour__musical').order_by('-end_date')
     context = {
         'stage': stage,
         'schedule_list': schedule_list,
         'show_list': show_list,
-        'show_list_done': show_list_done,
+        'schedule_list_done': schedule_list_done,
     }
     return render(request, 'yyj/stage_detail.html', context)
 
