@@ -69,18 +69,18 @@
         {% for show in day %}
         <tr>
             <td class="center aligned">
-                {% ifchanged show.time  %}{{ show.time|time }}{% endifchanged %}
+                {% ifchanged show.time %}{{ show.time|time }}{% endifchanged %}
             </td>
             <td class="center aligned">
-                <h4 class="ui header"><a href="{{ show.schedule.get_absolute_url }}">{{ show.schedule.tour.musical.name }}</a></h4>
+                <h4 class="ui header"><a href="{{ show.schedule.get_absolute_url }}" target="_blank">{{ show.schedule.tour.musical.name }}</a></h4>
             </td>
             <td>
                 {% for show_cast in show.cast_list %}
-                <a href="{{ show_cast.artist.get_absolute_url }}">{{ show_cast.artist.name }}</a>
+                <a href="{{ show_cast.artist.get_absolute_url }}" target="_blank">{{ show_cast.artist.name }}</a>
                 {% endfor %}
             </td>
             <td class="center aligned">
-                <a href="{{ show.schedule.stage.get_absolute_url }}">
+                <a href="{{ show.schedule.stage.get_absolute_url }}" target="_blank">
                     {{ show.schedule.stage.theatre.name }}{{ show.schedule.stage.name|default_if_none:"" }}
                 </a>
             </td>
@@ -101,7 +101,7 @@
     {% for schedule in schedule_list %}
     <tr>
         <td>
-            <a href="{{ schedule.get_absolute_url }}">
+            <a href="{{ schedule.get_absolute_url }}" target="_blank">
                 <h4>{{ schedule.tour.musical.name }}</h4>
             </a>
         </td>
@@ -109,7 +109,7 @@
             {{ schedule.end_date|date:"n月j日 l" }}
         </td>
         <td>
-            <a href="{{ schedule.stage.get_absolute_url }}">
+            <a href="{{ schedule.stage.get_absolute_url }}" target="_blank">
                 {{ schedule.stage.theatre.name }}{{ schedule.stage.name|default_if_none:"" }}
             </a>
         </td>
@@ -128,7 +128,7 @@
     {% for schedule in schedule_list_coming %}
     <tr>
         <td>
-            <a href="{{ schedule.get_absolute_url }}">
+            <a href="{{ schedule.get_absolute_url }}" target="_blank">
                 <h4>{{ schedule.tour.musical.name }}</h4>
             </a>
         </td>
@@ -138,7 +138,7 @@
             {% endif %}
         </td>
         <td>
-            <a href="{{ schedule.stage.get_absolute_url }}">
+            <a href="{{ schedule.stage.get_absolute_url }}" target="_blank">
                 {{ schedule.stage.theatre.name }}{{ schedule.stage.name|default_if_none:"" }}
             </a>
         </td>
@@ -157,12 +157,12 @@
     {% for schedule in long_term_schedule_list %}
     <tr>
         <td>
-            <a href="{{ schedule.get_absolute_url }}">
+            <a href="{{ schedule.get_absolute_url }}" target="_blank">
                 <h4>{{ schedule.tour.musical.name }}</h4>
             </a>
         </td>
         <td>
-            <a href="{{ schedule.stage.get_absolute_url }}">
+            <a href="{{ schedule.stage.get_absolute_url }}" target="_blank">
                 {{ schedule.stage.theatre.name }}{{ schedule.stage.name|default_if_none:"" }}
             </a>
         </td>

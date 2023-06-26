@@ -71,7 +71,7 @@
         <tr>
             <td class="center aligned single line">
                 {% ifchanged show.schedule.stage.theatre.city %}
-                <a href="{{ show.schedule.stage.theatre.city.get_absolute_url }}">
+                <a href="{{ show.schedule.stage.theatre.city.get_absolute_url }}" target="_blank">
                     <h4>{{ show.schedule.stage.theatre.city.name }}</h4>
                 </a>
                 {% endifchanged %}
@@ -80,15 +80,15 @@
                 {% ifchanged show.schedule.stage.theatre.city show.time %}{{ show.time|time }}{% endifchanged %}
             </td>
             <td class="center aligned">
-                <h4 class="ui header"><a href="{{ show.schedule.get_absolute_url }}">{{ show.schedule.tour.musical.name }}</a></h4>
+                <h4 class="ui header"><a href="{{ show.schedule.get_absolute_url }}" target="_blank">{{ show.schedule.tour.musical.name }}</a></h4>
             </td>
             <td>
                 {% for show_cast in show.cast_list %}
-                <a href="{{ show_cast.artist.get_absolute_url }}">{{ show_cast.artist.name }}</a>
+                <a href="{{ show_cast.artist.get_absolute_url }}" target="_blank">{{ show_cast.artist.name }}</a>
                 {% endfor %}
             </td>
             <td class="center aligned">
-                <a href="{{ show.schedule.stage.get_absolute_url }}">
+                <a href="{{ show.schedule.stage.get_absolute_url }}" target="_blank">
                     {{ show.schedule.stage.theatre.name }}{{ show.schedule.stage.name|default_if_none:"" }}
                 </a>
             </td>
@@ -106,13 +106,13 @@
     <div class="computer tablet large screen only column">
         <div class="ui segment">
             <div class="ui pink secondary menu">
-            {% for month in month_list.keys %}
+            {% for month in month_list %}
                 {% if forloop.first %}
-                <div class="active item" data-tab="{{ month }}月">
+                <div class="active item" data-tab="{{ month.month|date:'Y年n月' }}">
                 {% else %}
-                <div class="item" data-tab="{{ month }}月">
+                <div class="item" data-tab="{{ month.month|date:'Y年n月' }}">
                 {% endif %}
-                {{ month }}月
+                {{ month.month|date:'Y年n月' }}
                 </div>
             {% endfor %}
             </div>
@@ -123,17 +123,17 @@
     <div class="mobile only column">
         <div class="ui one item pink menu">
             <div class="ui dropdown item">
-                    {% for month in month_list.keys %}
+                    {% for month in month_list %}
                         {% if forloop.first %}
                 <div class="text">
-                    {{ month }}月
+                    {{ month.month|date:'Y年n月' }}
                 </div><i class="dropdown icon"></i>
                 <div class="menu">
-                        <a class="active item" data-tab="{{ month }}月" data-text="{{ month }}月" data-value="default">
+                        <a class="active item" data-tab="{{ month.month|date:'Y年n月' }}" data-text="{{ month.month|date:'Y年n月' }}" data-value="default">
                         {% else %}
-                        <a class="item" data-tab="{{ month }}月" data-text="{{ month }}月">
+                        <a class="item" data-tab="{{ month.month|date:'Y年n月' }}" data-text="{{ month.month|date:'Y年n月' }}">
                         {% endif %}
-                            {{ month }}月
+                            {{ month.month|date:'Y年n月' }}
                         </a>
                     {% endfor %}
                 </div>
@@ -141,26 +141,26 @@
         </div>
     </div>
 </div>
-{% for month, schedule_list in month_list.items %}
+{% for month in month_list %}
     {% if forloop.first %}
-    <div class="ui tab active" data-tab="{{ month }}月">
+    <div class="ui tab active" data-tab="{{ month.month|date:'Y年n月' }}">
     {% else %}
-        <div class="ui tab" data-tab="{{ month }}月">
+        <div class="ui tab" data-tab="{{ month.month|date:'Y年n月' }}">
     {% endif %}
     <table class="ui pink unstackable compact table">
     <thead><tr><th class="center aligned">城市</th><th>音乐剧</th><th>排期</th><th>剧院</th></tr></thead>
     <tbody>
-    {% for schedule in schedule_list %}
+    {% for schedule in month.schedule_list %}
     <tr>
         <td class="single line collapsing">
             {% ifchanged schedule.stage.theatre.city %}
-            <a href="{{ schedule.stage.theatre.city.get_absolute_url }}">
+            <a href="{{ schedule.stage.theatre.city.get_absolute_url }}" target="_blank">
                 <h4>{{ schedule.stage.theatre.city.name }}</h4>
             </a>
             {% endifchanged %}
         </td>
         <td>
-            <a href="{{ schedule.get_absolute_url }}">
+            <a href="{{ schedule.get_absolute_url }}" target="_blank">
                 <h4>{{ schedule.tour.musical.name }}</h4>
             </a>
         </td>
@@ -168,7 +168,7 @@
             {{ schedule.begin_date|date:"n月j日" }}{% if schedule.end_date != schedule.begin_date %}-{{ schedule.end_date|date:"n月j日" }}{% endif %}
         </td>
         <td>
-            <a href="{{ schedule.stage.get_absolute_url }}">
+            <a href="{{ schedule.stage.get_absolute_url }}" target="_blank">
                 {{ schedule.stage.theatre.name }}{{ schedule.stage.name|default_if_none:"" }}
             </a>
         </td>
@@ -191,18 +191,18 @@
     <tr>
         <td class="single line collapsing">
             {% ifchanged schedule.stage.theatre.city %}
-            <a href="{{ schedule.stage.theatre.city.get_absolute_url }}">
+            <a href="{{ schedule.stage.theatre.city.get_absolute_url }}" target="_blank">
                 <h4>{{ schedule.stage.theatre.city.name }}</h4>
             </a>
             {% endifchanged %}
         </td>
         <td>
-            <a href="{{ schedule.get_absolute_url }}">
+            <a href="{{ schedule.get_absolute_url }}" target="_blank">
                 <h4>{{ schedule.tour.musical.name }}</h4>
             </a>
         </td>
         <td>
-            <a href="{{ schedule.stage.get_absolute_url }}">
+            <a href="{{ schedule.stage.get_absolute_url }}" target="_blank">
                 {{ schedule.stage.theatre.name }}{{ schedule.stage.name|default_if_none:"" }}
             </a>
         </td>

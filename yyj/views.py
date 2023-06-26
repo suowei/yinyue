@@ -9,7 +9,7 @@ def index(request):
     now = datetime.datetime.now()
     today = now.date()
     begin = today
-    month_list = {}
+    month_list = []
     for i in range(12):
         if begin.month != 12:
             end = datetime.date(begin.year, begin.month + 1, 1)
@@ -21,7 +21,7 @@ def index(request):
             'tour', 'tour__musical', 'stage', 'stage__theatre', 'stage__theatre__city'
         ).order_by('stage__theatre__city__seq', 'end_date')
         if schedule_list:
-            month_list[begin.month] = schedule_list
+            month_list.append({'month': begin, 'schedule_list': schedule_list})
         begin = end
     long_term_schedule_list = Schedule.objects.filter(
         is_long_term=True
