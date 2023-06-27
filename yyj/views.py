@@ -3,6 +3,7 @@ from django.core.paginator import Paginator
 from django.db.models import Count, Q
 import datetime
 from .models import Role, Tour, Schedule, Musical, Produce, MusicalProduces, MusicalStaff, Artist, Show, City, Theatre, Stage
+from .forms import ShowForm
 
 
 def index(request):
@@ -460,3 +461,36 @@ def search(request):
     musical_list = Musical.objects.filter(name__icontains=q)
     context = {'artist_list': artist_list, 'musical_list': musical_list}
     return render(request, 'yyj/search.html', context)
+
+
+def show_day_index(request):
+    form = ShowForm(request.GET)
+    if form.is_valid():
+        date = form.cleaned_data['date']
+        city = form.cleaned_data['city']
+        if city:
+            show_list = Show.objects.filter(
+                schedule__stage__theatre__city=city, time__range=(date, date + datetime.timedelta(1))
+            ).select_related(
+                'schedule', 'schedule__tour', 'schedule__tour__musical', 'schedule__stage',
+                'schedule__stage__theatre'
+            ).order_by('time')
+        else:
+            show_list = Show.objects.filter(
+                time__range=(date, date + datetime.timedelta(1))
+            ).select_related(
+                'schedule', 'schedule__tour', 'schedule__tour__musical', 'schedule__stage',
+                'schedule__stage__theatre', 'schedule__stage__theatre__city'
+            ).order_by('schedule__stage__theatre__city__seq', 'time')
+        for show in show_list:
+            show.cast_list = show.cast.select_related('role', 'artist').order_by('role__seq')
+        context = {
+            'form': form,
+            'city': city,
+            'show_list': show_list,
+        }
+        return render(request, 'yyj/show_day_index.html', context)
+    else:
+        form = ShowForm()
+        return render(request, 'yyj/show_day_index.html', {'form': form})
+

@@ -1,0 +1,60 @@
+{% extends "yyj/base.html" %}
+
+{% block title %}搜索日期{% endblock %}
+
+{% block content %}
+<div class="ui basic segment">
+<form class="ui form" action="{% url 'yyj:yyj.show_day_index' %}" method="get">
+    <div class="inline fields">
+        <label>选择日期：</label>
+        <div class="field"><input type="date" name="date" id="id_date" value="{{ form.cleaned_data.date|date:'Y-m-d' }}" required></div>
+        <label>选择城市：</label>
+        <div class="field">{{ form.city }}</div>
+        <input class="ui pink button" type="submit" value="搜索演出">
+    </div>
+</form>
+    <h3 class="ui pink header">{{ form.cleaned_data.date }} {{ form.cleaned_data.city|default_if_none:"" }}</h3>
+</div>
+{% if show_list %}
+<table class="ui pink striped celled unstackable compact table">
+    <thead>
+        <tr>
+            {% if not city %}<th class="center aligned">城市</th>{% endif %}
+            <th class="center aligned">时间</th>
+            <th class="center aligned">音乐剧</th>
+            <th class="center aligned">卡司</th>
+            <th class="center aligned">剧院</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for show in show_list %}
+        <tr>
+            {% if not city %}<td class="center aligned single line">
+                {% ifchanged show.schedule.stage.theatre.city %}
+                <a href="{{ show.schedule.stage.theatre.city.get_absolute_url }}" target="_blank">
+                    <h4>{{ show.schedule.stage.theatre.city.name }}</h4>
+                </a>
+                {% endifchanged %}
+            </td>{% endif %}
+            <td class="center aligned">
+                {% ifchanged show.schedule.stage.theatre.city show.time %}{{ show.time|time }}{% endifchanged %}
+            </td>
+            <td class="center aligned">
+                <h4 class="ui header"><a href="{{ show.schedule.get_absolute_url }}" target="_blank">{{ show.schedule.tour.musical.name }}</a></h4>
+            </td>
+            <td>
+                {% for show_cast in show.cast_list %}
+                <a href="{{ show_cast.artist.get_absolute_url }}" target="_blank">{{ show_cast.artist.name }}</a>
+                {% endfor %}
+            </td>
+            <td class="center aligned">
+                <a href="{{ show.schedule.stage.get_absolute_url }}" target="_blank">
+                    {{ show.schedule.stage.theatre.name }}{{ show.schedule.stage.name|default_if_none:"" }}
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+{% endblock %}
