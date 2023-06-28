@@ -491,6 +491,10 @@ def show_day_index(request):
         }
         return render(request, 'yyj/show_day_index.html', context)
     else:
-        form = ShowForm()
+        city = request.GET['city']
+        if city:
+            form = ShowForm(initial={'city': city})
+        else:
+            form = ShowForm()
         return render(request, 'yyj/show_day_index.html', {'form': form})
 
