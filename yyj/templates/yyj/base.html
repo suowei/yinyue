@@ -32,9 +32,9 @@
         </form>
     </div>
 </div>
-<div class="ui secondary two item pink inverted menu">
+<div class="ui secondary three item pink inverted menu">
     <a href="{% url 'yyj:yyj.index' %}" class="item" data-label="new"><i class="bullhorn icon"></i> 最新演出</a>
-<!--    <a href="{% url 'yyj:yyj.musical_index' %}" class="item" data-label="musical"><i class="music icon"></i> 音乐剧列表</a>-->
+    <a href="{% url 'yyj:yyj.show_year_index' 2023 %}" class="item" data-label="year"><i class="calendar check outline icon"></i> 2023年</a>
     <a href="{% url 'yyj:yyj.stage_index' %}" class="item" data-label="stage"><i class="building icon"></i> 剧院列表</a>
 </div>
 {% block content %}{% endblock %}

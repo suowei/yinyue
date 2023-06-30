@@ -15,18 +15,12 @@
     <tbody>
     {% for musical in musical_list %}
     <tr class="top aligned">
-        <td><h4 class="ui header"><a href="{{ musical.get_absolute_url }}">{{ musical.name }}</a></h4></td>
+        <td><h4 class="ui header"><a href="{{ musical.get_absolute_url }}" target="_blank">{{ musical.name }}</a></h4></td>
         <td>{{ musical.num_show }}</td>
         <td>
-            {% for schedule in musical.schedule_list %}
-                {{ schedule.tour.name|default_if_none:"" }}
-                {{ schedule.begin_date|date:"Y-m-d" }}
-                {% if schedule.is_long_term %}起{% else %}
-                {% if schedule.end_date != schedule.begin_date %}{{ schedule.end_date|date:"Y-m-d" }}{% endif %}
-                {% endif %}
-                <a href="{{ schedule.stage.theatre.city.get_absolute_url }}">{{ schedule.stage.theatre.city.name }}</a>
-                <a href="{{ schedule.stage.get_absolute_url }}">{{ schedule.stage.theatre.name }}{{ schedule.stage.name|default_if_none:"" }}</a>
-                {{ schedule.num_show }}场
+            {% for tour in musical.tour_list %}
+                <a href="{{ tour.get_absolute_url }}" target="_blank">{{ tour.name|default_if_none:"演出" }}</a>
+                {{ tour.num_show }}场
                 <br>
             {% endfor %}
         </td>
@@ -34,4 +28,7 @@
     {% endfor %}
     </tbody>
 </table>
+<script>
+$("[data-label='year']").attr("class","active item");
+</script>
 {% endblock %}
