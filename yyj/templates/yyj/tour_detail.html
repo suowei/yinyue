@@ -85,7 +85,7 @@
                 {{ schedule.stage.theatre.city.name }}
             </a>
             {{ schedule.begin_date|date:"Y-m-d" }}
-            {{ schedule.end_date|date:"Y-m-d" }}
+            {% if schedule.end_date != schedule.begin_date %}{{ schedule.end_date|date:"Y-m-d" }}{% endif %}
             <a href="{{ schedule.stage.get_absolute_url }}">
                 {{ schedule.stage.theatre.name }}{{ schedule.stage.name|default_if_none:"" }}
             </a>
