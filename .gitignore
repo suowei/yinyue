@@ -5,6 +5,7 @@ szzj/migrations/*
 yyj/migrations/*
 
 *.pyc
+*.DS_Store
 
 db.sqlite3
 

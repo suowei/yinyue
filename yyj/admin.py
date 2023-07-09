@@ -81,6 +81,7 @@ class ShowInline(admin.TabularInline):
 
 class ScheduleAdmin(admin.ModelAdmin):
     save_as = True
+    ordering = ['-id']
     search_fields = ['tour__musical__name']
     autocomplete_fields = ['tour', 'stage']
     inlines = [
