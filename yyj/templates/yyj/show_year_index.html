@@ -3,12 +3,17 @@
 {% block title %}{{ year }}年演出{% endblock %}
 
 {% block content %}
-<p>&nbsp;&nbsp;&nbsp;&nbsp;音乐剧：{{ musical_list|length }}部&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;总场次：{{ count }}场</p>
+<p>
+    <a href="{% url 'yyj:yyj.show_year_index_artist' 2023 %}" class="ui right floated pink basic button">
+        &nbsp;&nbsp;&nbsp;&nbsp;按演员查询<i class="long arrow alternate right icon"></i>
+    </a>
+    &nbsp;&nbsp;&nbsp;&nbsp;音乐剧：{{ musical_list|length }}部<br>&nbsp;&nbsp;&nbsp;&nbsp;总场次：{{ count }}场
+</p>
 <table class="ui pink unstackable table">
     <thead>
     <tr>
         <th>音乐剧</th>
-        <th>场次</th>
+        <th class="single line">场次</th>
         <th>详情</th>
     </tr>
     </thead>

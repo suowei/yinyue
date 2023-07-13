@@ -2,7 +2,8 @@ from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.db.models import Count, Q
 import datetime
-from .models import Role, Tour, Schedule, Musical, Produce, MusicalProduces, MusicalStaff, Artist, Show, City, Theatre, Stage
+from .models import Role, Tour, Schedule, Musical, Produce, Artist, Show, City, Theatre, Stage
+from .models import MusicalProduces, MusicalStaff, MusicalCast
 from .forms import ShowForm
 
 
@@ -423,7 +424,8 @@ def stage_show_index(request, pk):
 def show_year_index(request, year):
     now = datetime.datetime.now()
     if year == now.year:
-        num_show = Count('schedule__show', filter=Q(schedule__show__time__year=year) & Q(schedule__show__time__lte=now))
+        begin_time = datetime.datetime(year, 1, 1, 0, 0, 0)
+        num_show = Count('schedule__show', filter=Q(schedule__show__time__gte=begin_time) & Q(schedule__show__time__lte=now))
         tour_list = Tour.objects.filter(begin_date__year__lte=year, end_date__year__gte=year).annotate(
             num_show=num_show).select_related('musical').order_by('begin_date')
     else:
@@ -449,6 +451,43 @@ def show_year_index(request, year):
     musical_list.sort(key=lambda x: x.num_show, reverse=True)
     context = {'year': year, 'count': count, 'musical_list': musical_list}
     return render(request, 'yyj/show_year_index.html', context)
+
+
+def show_year_index_artist(request, year):
+    now = datetime.datetime.now()
+    if year == now.year:
+        begin_time = datetime.datetime(year, 1, 1, 0, 0, 0)
+        show_count = Count(
+            'musicalcast__show', distinct=True,
+            filter=Q(musicalcast__show__time__gte=begin_time) & Q(musicalcast__show__time__lte=now)
+        )
+        artists = Artist.objects.annotate(show_count=show_count).filter(show_count__gt=0).order_by('-show_count')
+        paginator = Paginator(artists, 100)
+        page = request.GET.get('page')
+        artist_list = paginator.get_page(page)
+        num_show = Count('show', filter=Q(show__time__gte=begin_time) & Q(show__time__lte=now))
+        cast_list = MusicalCast.objects.filter(artist__in=artist_list).annotate(
+            num_show=num_show).select_related('role', 'role__musical', 'artist').order_by('-num_show')
+    else:
+        show_count = Count('musicalcast__show', distinct=True, filter=Q(musicalcast__show__time__year=year))
+        artists = Artist.objects.annotate(show_count=show_count).filter(show_count__gt=0).order_by('-show_count')
+        paginator = Paginator(artists, 100)
+        page = request.GET.get('page')
+        artist_list = paginator.get_page(page)
+        num_show = Count('show', filter=Q(show__time__year=year))
+        cast_list = MusicalCast.objects.filter(artist__in=artist_list).annotate(
+            num_show=num_show).select_related('role', 'role__musical', 'artist').order_by('-num_show')
+    for artist in artist_list:
+        artist.cast_list = []
+    for cast in cast_list:
+        if cast.num_show == 0:
+            continue
+        for artist in artist_list:
+            if artist.id == cast.artist_id:
+                artist.cast_list.append(cast)
+                break
+    context = {'year': year, 'artist_list': artist_list}
+    return render(request, 'yyj/show_year_index_artist.html', context)
 
 
 def search(request):

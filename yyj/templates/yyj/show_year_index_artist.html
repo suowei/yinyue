@@ -1,0 +1,53 @@
+{% extends "yyj/base.html" %}
+
+{% block title %}{{ year }}年演出{% endblock %}
+
+{% block content %}
+<p>
+    <a href="{% url 'yyj:yyj.show_year_index' 2023 %}" class="ui right floated pink basic button">
+        &nbsp;&nbsp;&nbsp;&nbsp;按音乐剧查询<i class="long arrow alternate right icon"></i>
+    </a>
+    <br>&nbsp;&nbsp;&nbsp;&nbsp;演员：{{ artist_list.paginator.count }}人
+</p>
+<table class="ui pink unstackable table">
+    <thead>
+    <tr>
+        <th>演员</th>
+        <th class="single line">场次</th>
+        <th>详情</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for artist in artist_list %}
+    <tr class="top aligned">
+        <td><h4 class="ui header"><a href="{{ artist.get_absolute_url }}" target="_blank">{{ artist.name }}</a></h4></td>
+        <td>{{ artist.show_count }}</td>
+        <td>
+            {% for cast in artist.cast_list %}
+                <a href="{{ cast.role.musical.get_absolute_url }}" target="_blank">{{ cast.role.musical.name }}</a>
+                {{ cast.role.name }}
+                {{ cast.num_show }}场
+                <br>
+            {% endfor %}
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% if artist_list.paginator.num_pages > 1 %}
+<div class="ui pagination menu">
+    {% if artist_list.has_previous %}
+        <a href="?page=1" class="item"><i class="step backward icon"></i></a>
+        <a href="?page={{ artist_list.previous_page_number }}" class="item"><i class="chevron left icon"></i></a>
+    {% endif %}
+    <a href="?page={{ artist_list.number }}" class="active item">{{ artist_list.number }}</a>
+    {% if artist_list.has_next %}
+        <a href="?page={{ artist_list.next_page_number }}" class="item"><i class="chevron right icon"></i></a>
+        <a href="?page={{ artist_list.paginator.num_pages }}" class="item"><i class="step forward icon"></i></a>
+    {% endif %}
+</div>
+{% endif %}
+<script>
+$("[data-label='year']").attr("class","active item");
+</script>
+{% endblock %}
