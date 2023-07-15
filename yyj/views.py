@@ -453,6 +453,55 @@ def show_year_index(request, year):
     return render(request, 'yyj/show_year_index.html', context)
 
 
+def show_year_index_city(request, year):
+    now = datetime.datetime.now()
+    if year == now.year:
+        begin_time = datetime.datetime(year, 1, 1, 0, 0, 0)
+        num_show = Count('show', filter=Q(show__time__gte=begin_time) & Q(show__time__lte=now))
+        schedule_list = Schedule.objects.filter(
+            begin_date__year__lte=year, end_date__year__gte=year
+        ).annotate(num_show=num_show).select_related(
+            'tour', 'tour__musical', 'stage', 'stage__theatre', 'stage__theatre__city'
+        ).order_by('begin_date')
+    else:
+        num_show = Count('show', filter=Q(show__time__year=year))
+        schedule_list = Schedule.objects.filter(
+            begin_date__year__lte=year, end_date__year__gte=year
+        ).annotate(num_show=num_show).select_related(
+            'tour', 'tour__musical', 'stage', 'stage__theatre', 'stage__theatre__city'
+        ).order_by('begin_date')
+    city_list = []
+    count = 0
+    for schedule in schedule_list:
+        if schedule.num_show == 0:
+            continue
+        for city in city_list:
+            if city.id == schedule.stage.theatre.city_id:
+                break
+        else:
+            city = schedule.stage.theatre.city
+            city.num_show = 0
+            city.musical_list = []
+            city_list.append(city)
+        for musical in city.musical_list:
+            if musical.id == schedule.tour.musical_id:
+                break
+        else:
+            musical = schedule.tour.musical
+            musical.num_show = 0
+            musical.schedule_list = []
+            city.musical_list.append(musical)
+        city.num_show += schedule.num_show
+        musical.num_show += schedule.num_show
+        musical.schedule_list.append(schedule)
+        count += schedule.num_show
+    city_list.sort(key=lambda x: x.num_show, reverse=True)
+    for city in city_list:
+        city.musical_list.sort(key=lambda  x: x.num_show, reverse=True)
+    context = {'year': year, 'count': count, 'city_list': city_list}
+    return render(request, 'yyj/show_year_index_city.html', context)
+
+
 def show_year_index_artist(request, year):
     now = datetime.datetime.now()
     if year == now.year:

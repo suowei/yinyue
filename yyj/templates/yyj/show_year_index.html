@@ -4,9 +4,14 @@
 
 {% block content %}
 <p>
-    <a href="{% url 'yyj:yyj.show_year_index_artist' 2023 %}" class="ui right floated pink basic button">
-        &nbsp;&nbsp;&nbsp;&nbsp;按演员查询<i class="long arrow alternate right icon"></i>
+    <div class="ui right floated buttons">
+    <a href="{% url 'yyj:yyj.show_year_index_city' 2023 %}" class="ui pink basic button">
+       按城市查询
     </a>
+    <a href="{% url 'yyj:yyj.show_year_index_artist' 2023 %}" class="ui pink basic button">
+       按演员查询
+    </a>
+</div>
     &nbsp;&nbsp;&nbsp;&nbsp;音乐剧：{{ musical_list|length }}部<br>&nbsp;&nbsp;&nbsp;&nbsp;总场次：{{ count }}场
 </p>
 <table class="ui pink unstackable table">

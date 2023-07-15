@@ -1,0 +1,69 @@
+{% extends "yyj/base.html" %}
+
+{% block title %}{{ year }}年演出{% endblock %}
+
+{% block content %}
+<p>
+<div class="ui right floated buttons">
+    <a href="{% url 'yyj:yyj.show_year_index' 2023 %}" class="ui pink basic button">
+       按音乐剧查询
+    </a>
+    <a href="{% url 'yyj:yyj.show_year_index_artist' 2023 %}" class="ui pink basic button">
+       按演员查询
+    </a>
+</div>
+    &nbsp;&nbsp;&nbsp;&nbsp;城市：{{ city_list|length }}<br>&nbsp;&nbsp;&nbsp;&nbsp;总场次：{{ count }}场
+</p>
+<table class="ui pink unstackable table">
+    <thead>
+    <tr>
+        <th>城市</th>
+        <th class="single line">场次</th>
+        <th>详情</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for city in city_list %}
+    <tr class="top aligned">
+        <td><h4 class="ui header"><a href="{{ city.get_absolute_url }}" target="_blank">{{ city.name }}</a></h4></td>
+        <td><h4>{{ city.num_show }}</h4></td>
+        <td>
+            <div class="ui list">
+            {% for musical in city.musical_list %}
+                <div class="item">
+                    <div class="header">
+                        <h4>
+                        <a href="{{ musical.get_absolute_url }}" target="_blank">
+                            {{ musical.name }}
+                        </a>
+                        {{ musical.num_show }}场
+                        </h4>
+                    </div>
+                    <div class="description">
+                        {% if musical.schedule_list|length <= 1 %}
+                            {% with schedule=musical.schedule_list|first %}
+                            {{ schedule.tour.name|default_if_none:"" }}
+                            {{ schedule.begin_date|date:"Y.n.j" }}{% if schedule.is_long_term %}起{% else %}{% if schedule.end_date != schedule.begin_date%}-{{ schedule.end_date|date:"Y.n.j" }}{% endif %}{% endif %}
+                            <a href="{{ schedule.stage.get_absolute_url }}" target="_blank">{{ schedule.stage.theatre.name }}{{ schedule.stage.name|default_if_none:"" }}</a>
+                            {% endwith %}
+                        {% else %}
+                            {% for schedule in musical.schedule_list %}
+                                {{ schedule.tour.name|default_if_none:"" }}
+                                {{ schedule.begin_date|date:"Y.n.j" }}{% if schedule.is_long_term %}起{% else %}{% if schedule.end_date != schedule.begin_date%}-{{ schedule.end_date|date:"Y.n.j" }}{% endif %}{% endif %}
+                                <a href="{{ schedule.stage.get_absolute_url }}" target="_blank">{{ schedule.stage.theatre.name }}{{ schedule.stage.name|default_if_none:"" }}</a>
+                                {{ schedule.num_show }}场<br>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+            </div>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<script>
+$("[data-label='year']").attr("class","active item");
+</script>
+{% endblock %}

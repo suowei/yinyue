@@ -20,6 +20,7 @@ urlpatterns = [
     path('stage/<int:pk>/', views.stage_detail, name='yyj.stage_detail'),
     path('stage/<int:pk>/show', views.stage_show_index, name='yyj.stage_show_index'),
     path('year/<int:year>/', views.show_year_index, name='yyj.show_year_index'),
+    path('year/<int:year>/city', views.show_year_index_city, name='yyj.show_year_index_city'),
     path('year/<int:year>/artist', views.show_year_index_artist, name='yyj.show_year_index_artist'),
     path('search/', views.search, name='yyj.search'),
     path('search_day/', views.show_day_index, name='yyj.show_day_index'),
