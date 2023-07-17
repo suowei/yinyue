@@ -13,7 +13,10 @@
         <input class="ui pink button" type="submit" value="搜索演出">
     </div>
 </form>
-    <h3 class="ui pink header">{{ form.cleaned_data.date }} {{ form.cleaned_data.city|default_if_none:"" }}</h3>
+    <h3 class="ui pink header">
+        {{ form.cleaned_data.date|date:"Y年n月j日 l" }}
+        {{ form.cleaned_data.city|default_if_none:"" }}
+    </h3>
 </div>
 {% if show_list %}
 <table class="ui pink striped celled unstackable compact table">
