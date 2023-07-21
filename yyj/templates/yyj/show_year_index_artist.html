@@ -41,15 +41,13 @@
 </table>
 {% if artist_list.paginator.num_pages > 1 %}
 <div class="ui pagination menu">
-    {% if artist_list.has_previous %}
-        <a href="?page=1" class="item"><i class="step backward icon"></i></a>
-        <a href="?page={{ artist_list.previous_page_number }}" class="item"><i class="chevron left icon"></i></a>
-    {% endif %}
-    <a href="?page={{ artist_list.number }}" class="active item">{{ artist_list.number }}</a>
-    {% if artist_list.has_next %}
-        <a href="?page={{ artist_list.next_page_number }}" class="item"><i class="chevron right icon"></i></a>
-        <a href="?page={{ artist_list.paginator.num_pages }}" class="item"><i class="step forward icon"></i></a>
-    {% endif %}
+    {% for page in artist_list.paginator.page_range %}
+        {% if artist_list.number == page %}
+            <a href="?page={{ page }}" class="active item">{{ page }}</a>
+        {% else %}
+            <a href="?page={{ page }}" class="item">{{ page }}</a>
+        {% endif %}
+    {% endfor %}
 </div>
 {% endif %}
 <script>
