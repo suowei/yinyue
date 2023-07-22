@@ -2,9 +2,11 @@ from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.db.models import Count, Q
 import datetime
+import csv
 from .models import Role, Tour, Schedule, Musical, Produce, Artist, Show, City, Theatre, Stage
 from .models import MusicalProduces, MusicalStaff, MusicalCast
 from .forms import ShowForm
+from django.http import HttpResponse, FileResponse
 
 
 def index(request):
@@ -590,3 +592,20 @@ def show_day_index(request):
             form = ShowForm()
         return render(request, 'yyj/show_day_index.html', {'form': form})
 
+
+def download(request):
+    file_list = []
+    with open('download/filename.csv', newline='') as f:
+        reader = csv.reader(f)
+        for row in reader:
+            file_list.append({'display': row[0], 'name': row[1]})
+    return render(request, 'yyj/download.html', {'file_list': file_list})
+
+
+def download_file(request, file):
+    filename = 'download/' + file
+    with open(filename, 'rb') as csvfile:
+        response = HttpResponse(csvfile)
+        response['Content-Type'] = 'text/csv'
+        response['Content-Disposition'] = 'attachment;filename=' + file
+        return response

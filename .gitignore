@@ -3,6 +3,7 @@
 
 szzj/migrations/*
 yyj/migrations/*
+download/
 
 *.pyc
 *.DS_Store

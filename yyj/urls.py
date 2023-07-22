@@ -24,4 +24,6 @@ urlpatterns = [
     path('year/<int:year>/artist', views.show_year_index_artist, name='yyj.show_year_index_artist'),
     path('search/', views.search, name='yyj.search'),
     path('search_day/', views.show_day_index, name='yyj.show_day_index'),
+    path('download/', views.download, name='yyj.download'),
+    path('download/<str:file>', views.download_file, name='yyj.download_file'),
 ]

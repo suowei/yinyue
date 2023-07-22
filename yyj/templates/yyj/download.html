@@ -1,0 +1,14 @@
+{% extends "yyj/base.html" %}
+
+{% block title %}数据下载{% endblock %}
+
+{% block content %}
+<div class="ui basic segment">
+    <h2 class="ui pink header">数据下载</h2>
+    csv格式演出详情（时间、城市、音乐剧、卡司、剧院）<br>
+    例：2023-07-01 14:00,上海,XXX剧,A演员，B演员，C演员,XX剧场<br>
+    {% for file in file_list %}
+    <a href="{% url 'yyj:yyj.download_file' file.name %}">{{ file.display }}</a><br>
+    {% endfor %}
+</div>
+{% endblock %}
