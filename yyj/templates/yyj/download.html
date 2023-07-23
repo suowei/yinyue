@@ -8,7 +8,8 @@
     csv格式演出详情（时间、城市、音乐剧、卡司、剧院）<br>
     例：2023-07-01 14:00,上海,XXX剧,A演员，B演员，C演员,XX剧场<br>
     {% for file in file_list %}
-    <a href="{% url 'yyj:yyj.download_file' file.name %}">{{ file.display }}</a><br>
+    <a href="{% url 'yyj:yyj.download_file' file.name %}">{{ file.description }}</a>
+    {{ file.count }}场<br>
     {% endfor %}
 </div>
 {% endblock %}
