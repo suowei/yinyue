@@ -5,11 +5,15 @@
 {% block content %}
 <div class="ui basic segment">
     <h2 class="ui pink header">数据下载</h2>
-    csv格式演出详情（时间、城市、音乐剧、卡司、剧院）<br>
-    例：2023-07-01 14:00,上海,XXX剧,A演员，B演员，C演员,XX剧场<br>
+    1. csv格式演出详情（时间、城市、音乐剧、卡司、剧院）<br>
+    例：2023-07-01 14:00,上海,XXX剧,A演员 B演员 C演员,XX剧场<br>
     {% for file in file_list %}
     <a href="{% url 'yyj:yyj.download_file' file.name %}">{{ file.description }}</a>
     {{ file.count }}场<br>
     {% endfor %}
+    2. csv格式音乐剧信息（音乐剧、原创性、进度、其他信息、制作公司、主创信息）<br>
+    例：XXX剧,原创,上演,根据XXX文学作品改编,出品：XXX公司,编剧作词：AAA 作曲：BBB<br>
+    <a href="{% url 'yyj:yyj.download_file' 'musical.csv' %}">音乐剧信息</a>
+    {{ count }}部<br>
 </div>
 {% endblock %}

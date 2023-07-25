@@ -598,8 +598,15 @@ def download(request):
     with open('download/filename.csv', newline='') as f:
         reader = csv.reader(f)
         for row in reader:
-            file_list.append({'description': row[0], 'count': row[1], 'name': row[2]})
-    return render(request, 'yyj/download.html', {'file_list': file_list})
+            if row[0] == '1':
+                file_list.append({'description': row[1], 'count': row[2], 'name': row[3]})
+            else:
+                count = row[2]
+    context = {
+        'file_list': file_list,
+        'count': count,
+    }
+    return render(request, 'yyj/download.html', context)
 
 
 def download_file(request, file):

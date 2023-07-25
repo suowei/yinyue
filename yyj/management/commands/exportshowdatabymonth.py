@@ -30,7 +30,7 @@ class Command(BaseCommand):
             for show in show_list:
                 value_list = show.cast.select_related('role', 'artist').values_list(
                     'artist__name', flat=True).order_by('role__seq')
-                cast_string = '，'.join(value_list)
+                cast_string = ' '.join(value_list)
                 writer.writerow([
                     timezone.localtime(show.time).strftime("%Y-%m-%d %H:%M"),
                     show.schedule.stage.theatre.city.name,
