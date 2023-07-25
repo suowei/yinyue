@@ -1,0 +1,55 @@
+{% extends "yyj/base.html" %}
+
+{% block title %}数据接口{% endblock %}
+
+{% block content %}
+<div class="ui basic segment">
+    <h2 class="ui pink header">数据接口</h2>
+    1. 查询某日演出<br>
+    接口格式：http://y.saoju.net/yyj/api/search_day/?date={}<br>
+    例：http://y.saoju.net/yyj/api/search_day/?date=2023-07-25<br>
+    返回json数据：<br>
+    <div class="ui bulleted list">
+        <div class="item">"date": "2023-07-25"</div>
+        <div class="item">
+            <div>"show_list":</div>
+            <div class="list">
+                <div class="item">"city": "X城市"</div>
+                <div class="item">"musical": "XX音乐剧"</div>
+                <div class="item">"theatre": "XX剧院"</div>
+                <div class="item">"time": "19:30"</div>
+                <div class="item">
+                    <div>"cast":</div>
+                    <div class="list">
+                        <div class="item">{"role": "A角色", "artist": "X演员"}</div>
+                        <div class="item">{"role": "B角色", "artist": "Y演员"}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    2. 查询某日某城市演出<br>
+    接口格式：http://y.saoju.net/yyj/api/search_day/?date={}&city={}<br>
+    例：http://y.saoju.net/yyj/api/search_day/?date=2023-07-25&city=上海<br>
+    返回json数据：<br>
+    <div class="ui bulleted list">
+        <div class="item">"date": "2023-07-25"</div>
+        <div class="item">"city": "上海"</div>
+        <div class="item">
+            <div>"show_list":</div>
+            <div class="list">
+                <div class="item">"musical": "XX音乐剧"</div>
+                <div class="item">"theatre": "XX剧院"</div>
+                <div class="item">"time": "19:30"</div>
+                <div class="item">
+                    <div>"cast":</div>
+                    <div class="list">
+                        <div class="item">{"role": "A角色", "artist": "X演员"}</div>
+                        <div class="item">{"role": "B角色", "artist": "Y演员"}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

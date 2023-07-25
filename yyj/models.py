@@ -20,7 +20,7 @@ class Theatre(models.Model):
         return "/yyj/theatre/%i/" % self.id
 
     def __str__(self):
-        return self.city.name + self.name
+        return self.name
 
 
 class Stage(models.Model):

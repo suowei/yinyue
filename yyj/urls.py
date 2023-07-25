@@ -26,4 +26,6 @@ urlpatterns = [
     path('search_day/', views.show_day_index, name='yyj.show_day_index'),
     path('download/', views.download, name='yyj.download'),
     path('download/<str:file>', views.download_file, name='yyj.download_file'),
+    path('api/', views.api, name='yyj.api'),
+    path('api/search_day/', views.api_show_day_index, name='yyj.api_show_day_index'),
 ]

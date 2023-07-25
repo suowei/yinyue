@@ -1,12 +1,14 @@
 from django.shortcuts import render
 from django.core.paginator import Paginator
+from django.core import serializers
 from django.db.models import Count, Q
 import datetime
 import csv
 from .models import Role, Tour, Schedule, Musical, Produce, Artist, Show, City, Theatre, Stage
 from .models import MusicalProduces, MusicalStaff, MusicalCast
-from .forms import ShowForm
-from django.http import HttpResponse, FileResponse
+from .forms import ShowForm, ApiShowDayForm
+from django.http import HttpResponse, JsonResponse
+from django.utils import timezone
 
 
 def index(request):
@@ -567,7 +569,7 @@ def show_day_index(request):
                 schedule__stage__theatre__city=city, time__range=(date, date + datetime.timedelta(1))
             ).select_related(
                 'schedule', 'schedule__tour', 'schedule__tour__musical', 'schedule__stage',
-                'schedule__stage__theatre'
+                'schedule__stage__theatre', 'schedule__stage__theatre__city'
             ).order_by('time')
         else:
             show_list = Show.objects.filter(
@@ -616,3 +618,66 @@ def download_file(request, file):
         response['Content-Type'] = 'text/csv'
         response['Content-Disposition'] = 'attachment;filename=' + file
         return response
+
+
+def api(request):
+    return render(request, 'yyj/api.html')
+
+
+def api_show_day_index(request):
+    form = ApiShowDayForm(request.GET)
+    if form.is_valid():
+        date = form.cleaned_data['date']
+        city = form.cleaned_data['city']
+        if city:
+            city_list = City.objects.filter(name=city)[:1]
+            if city_list:
+                city = city_list[0]
+                show_list = Show.objects.filter(
+                    schedule__stage__theatre__city=city, time__range=(date, date + datetime.timedelta(1))
+                ).select_related(
+                    'schedule', 'schedule__tour', 'schedule__tour__musical', 'schedule__stage',
+                    'schedule__stage__theatre', 'schedule__stage__theatre__city'
+                ).order_by('time')
+                show_list_info = []
+                for show in show_list:
+                    show.cast_list = show.cast.select_related('role', 'artist').order_by('role__seq')
+                    cast_list = []
+                    for cast in show.cast_list:
+                        cast_list.append({'role': cast.role.name, 'artist': cast.artist.name})
+                    item = {
+                        'time': timezone.localtime(show.time).strftime("%H:%M"),
+                        'musical': show.schedule.tour.musical.name,
+                        'cast': cast_list,
+                        'theatre': show.schedule.stage.__str__(),
+                    }
+                    show_list_info.append(item)
+                data = {'date': date, 'city': city.name, 'show_list': show_list_info}
+            else:
+                data = {'error': '未找到该城市'}
+        else:
+            show_list = Show.objects.filter(
+                time__range=(date, date + datetime.timedelta(1))
+            ).select_related(
+                'schedule', 'schedule__tour', 'schedule__tour__musical', 'schedule__stage',
+                'schedule__stage__theatre', 'schedule__stage__theatre__city'
+            ).order_by('schedule__stage__theatre__city__seq', 'time')
+            show_list_info = []
+            for show in show_list:
+                show.cast_list = show.cast.select_related('role', 'artist').order_by('role__seq')
+                cast_list = []
+                for cast in show.cast_list:
+                    cast_list.append({'role': cast.role.name, 'artist': cast.artist.name})
+                item = {
+                    'city': show.schedule.stage.theatre.city.name,
+                    'time': timezone.localtime(show.time).strftime("%H:%M"),
+                    'musical': show.schedule.tour.musical.name,
+                    'cast': cast_list,
+                    'theatre': show.schedule.stage.__str__(),
+                }
+                show_list_info.append(item)
+            data = {'date': date, 'show_list': show_list_info}
+    else:
+        data = {'error': '请检查输入'}
+    response = JsonResponse(data)
+    return response
