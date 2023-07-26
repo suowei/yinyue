@@ -301,7 +301,7 @@ def artist_show_download(request, pk):
     response['Content-Disposition'] = 'attachment; filename="{}.csv"'.format(escape_uri_path(artist.name))
     response.write(codecs.BOM_UTF8)
     writer = csv.writer(response)
-    writer.writerow(['时间', '城市', '音乐剧', '角色', '同场演员', '剧院'])
+    writer.writerow(['时间', '城市', '音乐剧', '角色', '剧院'])
     show_list = Show.objects.filter(cast__artist=artist).select_related(
         'schedule', 'schedule__stage', 'schedule__stage__theatre', 'schedule__stage__theatre__city'
     ).extra(
@@ -309,8 +309,6 @@ def artist_show_download(request, pk):
     ).order_by('time')
     musical_cast_list = artist.musicalcast_set.select_related('role', 'role__musical')
     for show in show_list:
-        show.other_cast = show.cast.exclude(pk=show.cast_id).select_related(
-            'role', 'artist').values_list('artist__name', flat=True).order_by('role__seq')
         for musical_cast in musical_cast_list:
             if musical_cast.id == show.cast_id:
                 show.role = musical_cast.role
@@ -320,7 +318,6 @@ def artist_show_download(request, pk):
             show.schedule.stage.theatre.city.name,
             show.role.musical.name,
             show.role.name,
-            ' '.join(show.other_cast),
             show.schedule.stage.__str__()
         ])
     return response
