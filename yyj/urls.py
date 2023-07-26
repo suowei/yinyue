@@ -8,6 +8,7 @@ urlpatterns = [
     path('musical/', views.musical_index, name='yyj.musical_index'),
     path('artist/<int:pk>/', views.artist_detail, name='yyj.artist_detail'),
     path('artist/<int:pk>/show', views.artist_show_index, name='yyj.artist_show_index'),
+    path('artist/<int:pk>/download', views.artist_show_download, name='yyj.artist_show_download'),
     path('musical/<int:pk>/', views.musical_detail, name='yyj.musical_detail'),
     path('produce/<int:pk>/', views.produce_detail, name='yyj.produce_detail'),
     path('tour/<int:pk>/', views.tour_detail, name='yyj.tour_detail'),

@@ -4,11 +4,13 @@ from django.core import serializers
 from django.db.models import Count, Q
 import datetime
 import csv
+import codecs
 from .models import Role, Tour, Schedule, Musical, Produce, Artist, Show, City, Theatre, Stage
 from .models import MusicalProduces, MusicalStaff, MusicalCast
 from .forms import ShowForm, ApiShowDayForm
 from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
+from django.utils.encoding import escape_uri_path
 
 
 def index(request):
@@ -291,6 +293,37 @@ def artist_show_index(request, pk):
                 break
     context = {'artist': artist, 'show_list': show_list}
     return render(request, 'yyj/artist_show_index.html', context)
+
+
+def artist_show_download(request, pk):
+    artist = Artist.objects.get(pk=pk)
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="{}.csv"'.format(escape_uri_path(artist.name))
+    response.write(codecs.BOM_UTF8)
+    writer = csv.writer(response)
+    writer.writerow(['时间', '城市', '音乐剧', '角色', '同场演员', '剧院'])
+    show_list = Show.objects.filter(cast__artist=artist).select_related(
+        'schedule', 'schedule__stage', 'schedule__stage__theatre', 'schedule__stage__theatre__city'
+    ).extra(
+        select={"cast_id": "`yyj_musicalcast`.`id`"}
+    ).order_by('time')
+    musical_cast_list = artist.musicalcast_set.select_related('role', 'role__musical')
+    for show in show_list:
+        show.other_cast = show.cast.exclude(pk=show.cast_id).select_related(
+            'role', 'artist').values_list('artist__name', flat=True).order_by('role__seq')
+        for musical_cast in musical_cast_list:
+            if musical_cast.id == show.cast_id:
+                show.role = musical_cast.role
+                break
+        writer.writerow([
+            timezone.localtime(show.time).strftime("%Y-%m-%d %H:%M"),
+            show.schedule.stage.theatre.city.name,
+            show.role.musical.name,
+            show.role.name,
+            ' '.join(show.other_cast),
+            show.schedule.stage.__str__()
+        ])
+    return response
 
 
 def city_detail(request, pk):

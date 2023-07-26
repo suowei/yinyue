@@ -85,6 +85,9 @@
         <a href="{% url 'yyj:yyj.artist_show_index' artist.id %}">
             过往演出<i class="angle double right icon"></i>
         </a>
+        <a href="{% url 'yyj:yyj.artist_show_download' artist.id %}">
+            下载全部 <i class="download icon"></i>
+        </a>
     </h5>
 </div>
 {% endif %}
