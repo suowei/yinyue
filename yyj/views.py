@@ -650,6 +650,10 @@ def download_file(request, file):
         return response
 
 
+def data(request):
+    return render(request, 'yyj/data.html')
+
+
 def api(request):
     return render(request, 'yyj/api.html')
 
