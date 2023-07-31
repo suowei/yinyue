@@ -44,7 +44,7 @@
             {% for show in schedule.shows %}
             <tr>
                 <td class="right aligned">
-                    {% ifchanged show.time.date %}{{ show.time|date:"n月j日" }}{% endifchanged %}
+                    {% ifchanged show.time.date %}{{ show.time|date:"n月j日 D" }}{% endifchanged %}
                     {{ show.time|time }}
                 </td>
                 {% for show_cast in show.cast_table %}
@@ -62,7 +62,7 @@
             <div>
             {% for show in schedule.shows %}
                 {% ifchanged show.time.date %}
-                    {% if not forloop.first %}<br>{% endif %}{{ show.time|date:"n月j日" }}
+                    {% if not forloop.first %}<br>{% endif %}{{ show.time|date:"n月j日 D" }}
                 {% endifchanged %}
                 {{ show.time|time }}
             {% endfor %}
