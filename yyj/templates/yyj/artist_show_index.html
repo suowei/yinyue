@@ -7,13 +7,23 @@
     <h2 class="ui header"><a href="{{ artist.get_absolute_url }}">{{ artist.name }}</a></h2>
 </div>
 {% if show_list %}
-<div class="ui basic segment"><h3 class="ui pink header">过往演出</h3></div>
+<div class="ui basic segment">
+    <h3 class="ui pink header">
+        过往演出
+        {% if other %}
+        <a href="?other=0" class="ui pink right floated basic button">不显示同场演员</a>
+        {% else %}
+        <a href="?other=1" class="ui pink right floated basic button">显示同场演员</a>
+        {% endif %}
+    </h3>
+</div>
 <table class="ui striped celled pink unstackable compact table">
     <thead>
         <tr>
             <th class="center aligned">时间</th>
             <th class="center aligned">音乐剧</th>
             <th class="center aligned">角色</th>
+            {% if other %}<th class="center aligned">同场演员</th>{% endif %}
             <th class="center aligned">剧院</th>
         </tr>
     </thead>
@@ -30,6 +40,13 @@
             <td class="center aligned">
                 {{ show.role.name }}
             </td>
+            {% if other %}
+            <td>
+                {% for cast in show.other_cast %}
+                <a href="{{ cast.artist.get_absolute_url }}">{{ cast.artist.name }}</a>
+                {% endfor %}
+            </td>
+            {% endif %}
             <td class="center aligned">
                 <a href="{{ show.schedule.stage.theatre.city.get_absolute_url }}">
                     {{ show.schedule.stage.theatre.city.name }}

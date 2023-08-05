@@ -259,7 +259,7 @@ def artist_detail(request, pk):
     if other == '1':
         other = True
         for show in show_list_coming:
-            show.other_cast = show.cast.exclude(pk=show.cast_id).select_related('role', 'artist').order_by('role__seq')
+            show.other_cast = show.cast.exclude(artist=artist).select_related('role', 'artist').order_by('role__seq')
     else:
         other = False
     show_list_done = Show.objects.filter(cast__artist=artist, time__lt=now)[:1]
@@ -291,7 +291,14 @@ def artist_show_index(request, pk):
             if musical_cast.id == show.cast_id:
                 show.role = musical_cast.role
                 break
-    context = {'artist': artist, 'show_list': show_list}
+    other = request.GET.get('other', False)
+    if other == '1':
+        other = True
+        for show in show_list:
+            show.other_cast = show.cast.exclude(artist=artist).select_related('role', 'artist').order_by('role__seq')
+    else:
+        other = False
+    context = {'artist': artist, 'show_list': show_list, 'other': other}
     return render(request, 'yyj/artist_show_index.html', context)
 
 
