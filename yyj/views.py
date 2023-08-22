@@ -90,12 +90,18 @@ def musical_detail(request, pk):
     today = datetime.datetime.now().date()
     tour_list = Tour.objects.filter(musical=musical, end_date__gte=today).order_by('-end_date')
     tour_list_history = Tour.objects.filter(musical=musical, end_date__lt=today).order_by('-end_date')
+    now = datetime.datetime.now()
+    begin_time = datetime.datetime(now.year, 1, 1, 0, 0, 0)
+    num_show = Count('show', filter=Q(show__time__gte=begin_time) & Q(show__time__lte=now))
+    cast_list = MusicalCast.objects.filter(role__musical=musical).annotate(show_count=num_show).filter(
+        show_count__gt=0).select_related('role', 'artist').order_by('role__seq', '-show_count', 'seq')
     context = {
         'musical': musical,
         'produces': produces,
         'staff_list': staff_list,
         'tour_list': tour_list,
         'tour_list_history': tour_list_history,
+        'cast_list': cast_list,
     }
     return render(request, 'yyj/musical_detail.html', context)
 
@@ -655,14 +661,6 @@ def download_file(request, file):
         response['Content-Type'] = 'text/csv'
         response['Content-Disposition'] = 'attachment;filename=' + file
         return response
-
-
-def data(request):
-    return render(request, 'yyj/data.html')
-
-
-def api(request):
-    return render(request, 'yyj/api.html')
 
 
 def api_show_day_index(request):

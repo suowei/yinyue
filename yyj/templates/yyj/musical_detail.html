@@ -21,6 +21,13 @@
     <a href="{{ staff.artist.get_absolute_url }}">{{ staff.artist.name }}</a>
     {% endfor %}
     {% endif %}
+    {% if cast_list %}<p><br>
+    <strong>当年演出卡司（按已演出场次）</strong>
+    {% for cast in cast_list %}
+        {% ifchanged cast.role %}<br>{{ cast.role.name }}：{% else %} {% endifchanged %}
+        <a href="{{ cast.artist.get_absolute_url }}">{{ cast.artist.name }}</a> {{ cast.show_count }}
+    {% endfor %}</p>
+    {% endif %}
     {% if tour_list %}
     <h3 class="ui pink header">最新演出</h3>
     <div>
