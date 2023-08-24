@@ -249,8 +249,11 @@ def produce_detail(request, pk):
 def artist_detail(request, pk):
     artist = Artist.objects.get(pk=pk)
     musical_staff_list = artist.musicalstaff_set.select_related('musical').order_by('-musical__premiere_date')
-    musical_cast_list = artist.musicalcast_set.select_related('role', 'role__musical').order_by('role__musical')
     now = datetime.datetime.now()
+    begin_time = datetime.datetime(now.year, 1, 1, 0, 0, 0)
+    num_show = Count('show', filter=Q(show__time__gte=begin_time) & Q(show__time__lte=now))
+    musical_cast_list = artist.musicalcast_set.annotate(num_show=num_show).select_related(
+        'role', 'role__musical').order_by('-num_show')
     show_list_coming = Show.objects.filter(cast__artist=artist, time__gte=now).select_related(
         'schedule', 'schedule__stage', 'schedule__stage__theatre', 'schedule__stage__theatre__city'
     ).extra(
@@ -272,7 +275,7 @@ def artist_detail(request, pk):
     context = {
         'artist': artist,
         'musical_staff_list': musical_staff_list,
-        # 'musical_cast_list': musical_cast_list,
+        'musical_cast_list': musical_cast_list,
         'show_list_coming': show_list_coming,
         'show_list_done': show_list_done,
         'other': other,

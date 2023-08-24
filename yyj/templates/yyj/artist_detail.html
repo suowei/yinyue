@@ -15,15 +15,15 @@
     {% endfor %}
     {% endif %}
     {% if musical_cast_list %}
-    <h3 class="ui pink header">出演剧目</h3>
+    <h3 class="ui pink header">当年出演角色（按已演出场次）</h3>
     {% for musical_cast in musical_cast_list %}
-        {% ifchanged musical_cast.role.musical %}
+        {% if musical_cast.num_show > 0 %}
             {% if not forloop.first %}<br>{% endif %}
             <a href="{{ musical_cast.role.musical.get_absolute_url }}">
                 {{ musical_cast.role.musical.name }}
             </a>
-        {% else %} {% endifchanged %}
-        {{ musical_cast.role.name }}
+            {{ musical_cast.role.name }} {{ musical_cast.num_show }}场
+        {% endif %}
     {% endfor %}
     {% endif %}
     {% if show_list_coming %}
