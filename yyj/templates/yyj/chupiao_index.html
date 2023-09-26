@@ -41,7 +41,7 @@
     <h3 class="ui pink header">出票信息</h3>
     {% for chupiao in recent_show_chupiao_list %}
         <h5 class="ui header">
-            <a href="{{ chupiao.get_absolute_url }}">
+            <a href="{{ chupiao.get_absolute_url }}" target="_blank">
                 {{ chupiao.show.time|date:"n月j日 l H:i" }}
                 {{ chupiao.show.schedule.stage.theatre.city.name }}
                 {{ chupiao.show.schedule.tour.musical.name }}
@@ -63,7 +63,7 @@
     <h3 class="ui pink header">新增出票信息</h3>
     {% for chupiao in new_chupiao_list %}
         <h5 class="ui header">
-            <a href="{{ chupiao.get_absolute_url }}">
+            <a href="{{ chupiao.get_absolute_url }}" target="_blank">
                 {{ chupiao.show.time }}
                 {{ chupiao.show.schedule.stage.theatre.city.name }}
                 {{ chupiao.show.schedule.tour.musical.name }}
