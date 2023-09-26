@@ -18,7 +18,7 @@
     <p>座位：{{ chupiao.seat }}</p>
     <p>票面价格：{{ chupiao.par_value|floatformat }}元</p>
     <p>出票价格：{{ chupiao.price|floatformat }}元</p>
-    <p>{{ chupiao.note }}</p>
+    <p>{{ chupiao.note|default_if_none:"" }}</p>
 </div>
 <script>
 $("[data-label='chupiao']").attr("class","active item");

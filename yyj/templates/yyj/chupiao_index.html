@@ -49,7 +49,7 @@
                 {{ chupiao.seat }}
                 票面{{ chupiao.par_value|floatformat }}
                 售价{{ chupiao.price|floatformat }}
-                {{ chupiao.note }}
+                {{ chupiao.note|default_if_none:"" }}
             </a>
             <div class="sub header">
                 {% for show_cast in chupiao.show.cast_list %}
@@ -71,7 +71,7 @@
                 {{ chupiao.seat }}
                 票面{{ chupiao.par_value|floatformat }}
                 售价{{ chupiao.price|floatformat }}
-                {{ chupiao.note }}
+                {{ chupiao.note|default_if_none:"" }}
             </a>
             <div class="sub header">
                 {% for show_cast in chupiao.show.cast_list %}
