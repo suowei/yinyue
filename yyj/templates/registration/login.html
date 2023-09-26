@@ -1,0 +1,25 @@
+{% extends "yyj/base.html" %}
+
+{% block title %}登录{% endblock %}
+
+{% block content %}
+<div class="ui basic segment">
+    {% if form.errors %}
+    <div class="ui negative message">用户名和密码不匹配，请再次尝试。</div>
+    {% endif %}
+    <form class="ui form" method="post" action="{% url 'yyj:login' %}">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="inline field">
+            {{ field.label_tag }} {{ field }}
+        </div>
+        {% if field.help_text %}
+            <p>{{ field.help_text|safe }}</p>
+        {% endif %}
+        {% endfor %}
+        <input class="ui button" type="submit" value="登录">
+        <a href="{% url 'yyj:register' %}">注册</a>
+        <input type="hidden" name="next" value="{% url 'yyj:yyj.chupiao_index' %}">
+    </form>
+</div>
+{% endblock %}

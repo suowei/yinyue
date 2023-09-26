@@ -50,7 +50,7 @@
         {% for show in show_list_coming %}
         <tr>
             <td class="center aligned">
-                {% ifchanged show.time.date %}{{ show.time|date:"n月j日" }} {{ show.time|date:"l" }}{% endifchanged %}
+                {% ifchanged show.time.date %}{{ show.time|date:"n月j日 l" }}{% endifchanged %}
                 {{ show.time|time }}
             </td>
             <td class="center aligned">

@@ -1,0 +1,43 @@
+{% extends "yyj/base.html" %}
+
+{% block title %}搜索演出信息{% endblock %}
+
+{% block content %}
+<div class="ui basic segment">
+  <h3 class="ui pink header">搜索演出信息</h3>
+  <form class="ui form" action="{% url 'yyj:yyj.chupiao_search' %}" method="get">
+    <div class="inline fields">
+        <label>音乐剧：</label>
+        <div class="field">{{ form.keyword }}</div>
+        <label>日期：</label>
+        <div class="field"><input type="date" name="date" id="id_date" value="{{ form.cleaned_data.date|date:'Y-m-d' }}" required></div>
+        <input class="ui pink button" type="submit" value="搜索">
+    </div>
+  </form>
+    {% if show_list %}
+        {% for show in show_list %}
+            <div class="ui card">
+                <div class="content">
+                    <div class="header">
+                        <a href="{{ show.schedule.tour.musical.get_absolute_url }}" target="_blank">{{ show.schedule.tour.musical.name }}</a>
+                    </div>
+                    <div class="description">
+                        <a href="{{ show.schedule.stage.theatre.city.get_absolute_url }}" target="_blank">{{ show.schedule.stage.theatre.city.name }}</a>
+                        <a href="{{ show.schedule.stage.get_absolute_url }}" target="_blank">
+                            {{ show.schedule.stage.theatre.name }}{{ show.schedule.stage.name|default_if_none:"" }}
+                        </a><br>
+                        {{ show.time|date:"n月j日 l H:i" }}<br>
+                        {% for show_cast in show.cast_list %}
+                        <a href="{{ show_cast.artist.get_absolute_url }}" target="_blank">{{ show_cast.artist.name }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+                <a class="ui bottom attached button" href="{% url 'yyj:yyj.chupiao_add' %}?show={{ show.id }}"><i class="add icon"></i> 出票 </a>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+<script>
+$("[data-label='chupiao']").attr("class","active item");
+</script>
+{% endblock %}

@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from django.views.generic import TemplateView
 
 from . import views
@@ -31,4 +31,12 @@ urlpatterns = [
     path('data/', TemplateView.as_view(template_name="yyj/data.html"), name='yyj.data'),
     path('api/', TemplateView.as_view(template_name="yyj/api.html"), name='yyj.api'),
     path('api/search_day/', views.api_show_day_index, name='yyj.api_show_day_index'),
+    path('accounts/', include('django.contrib.auth.urls')),
+    path('accounts/register', views.register, name='register'),
+    path('chupiao/', views.chupiao_index, name='yyj.chupiao_index'),
+    path('chupiao/<int:pk>/', views.chupiao_detail, name='yyj.chupiao_detail'),
+    path('chupiao/search', views.chupiao_search, name='yyj.chupiao_search'),
+    path('chupiao/add/', views.chupiao_create, name='yyj.chupiao_add'),
+    path('chupiao/<int:pk>/edit/', views.chupiao_edit, name='yyj.chupiao_edit'),
+    path('chupiao/<int:pk>/delete/', views.chupiao_delete, name='yyj.chupiao_delete'),
 ]

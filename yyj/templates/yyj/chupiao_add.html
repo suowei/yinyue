@@ -1,0 +1,43 @@
+{% extends "yyj/base.html" %}
+
+{% block title %}添加出票信息{% endblock %}
+
+{% block content %}
+<div class="ui basic segment">
+    <h3 class="ui pink header">添加出票信息</h3>
+    {% for field in form %}
+        {% if field.errors %}
+            <div class="ui negative message">{{ field.errors }}</div>
+        {% endif %}
+    {% endfor %}
+    <form class="ui form" action="{% url 'yyj:yyj.chupiao_add' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="show" value="{{ show.id }}">
+        <h5>音乐剧：{{ show.schedule.tour.musical.name }}</h5>
+        <h5>时间：{{ show.time }}</h5>
+        <h5>剧院：{{ show.schedule.stage.theatre.city.name }} {{ show.schedule.stage.theatre.name }}{{ show.schedule.stage.name|default_if_none:"" }}</h5>
+        <h5>卡司：{% for show_cast in show.cast_list %}{{ show_cast.artist.name }} {% endfor %}</h5>
+        <div class="inline field">
+            <label>票面价格（元）：</label>
+            <input type="number" name="par_value" step="1" id="id_par_value" placeholder="0.00" value="{{ form.cleaned_data.par_value|default_if_none:'' }}" required>
+        </div>
+        <div class="inline field">
+            <label>出票价格（元）：</label>
+            <input type="number" name="price" step="1" id="id_price" placeholder="0.00" value="{{ form.cleaned_data.price|default_if_none:'' }}" required>
+        </div>
+        <div class="field">
+            <label>座位信息：</label>
+            {{ form.seat }}
+        </div>
+        <div class="field">
+            <label>闲鱼链接：</label>
+            <textarea rows="4" name="xianyu" maxlength="250" required id="id_xianyu">{{ form.cleaned_data.xianyu|default_if_none:"" }}</textarea>
+        </div>
+        <div class="field">
+            <label>其他信息：</label>
+            {{ form.note }}
+        </div>
+        <input class="ui pink button" type="submit" value="提交">
+    </form>
+</div>
+{% endblock %}

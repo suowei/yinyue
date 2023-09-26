@@ -1,0 +1,29 @@
+{% extends "yyj/base.html" %}
+
+{% block title %}注册{% endblock %}
+
+{% block content %}
+<div class="ui basic segment">
+    {% for field in form %}
+        {% if field.errors %}
+            <div class="ui negative message">{{ field.errors }}</div>
+        {% endif %}
+    {% endfor %}
+    <p>
+        <strong>注册说明：请在添加出票信息时填入闲鱼链接。</strong>
+    </p>
+    <form class="ui form" method="post" action="{% url 'yyj:register' %}">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="inline field">
+            {{ field.label_tag }} {{ field }}
+        </div>
+        {% if field.help_text %}
+            <p>{{ field.help_text|safe }}</p>
+        {% endif %}
+        {% endfor %}
+        <p>注册成功后会跳转到登录页面。</p>
+        <input class="ui button" type="submit" value="注册">
+    </form>
+</div>
+{% endblock %}

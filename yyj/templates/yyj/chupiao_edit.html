@@ -1,0 +1,43 @@
+{% extends "yyj/base.html" %}
+
+{% block title %}修改出票信息{% endblock %}
+
+{% block content %}
+<div class="ui basic segment">
+    <h3 class="ui pink header">修改出票信息</h3>
+    {% for field in form %}
+        {% if field.errors %}
+            <div class="ui negative message">{{ field.errors }}</div>
+        {% endif %}
+    {% endfor %}
+    <form class="ui form" action="{% url 'yyj:yyj.chupiao_edit' chupiao.id %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="show" value="{{ chupiao.show_id }}">
+        <h5>音乐剧：{{ chupiao.show.schedule.tour.musical.name }}</h5>
+        <h5>时间：{{ chupiao.show.time }}</h5>
+        <h5>剧院：{{ chupiao.show.schedule.stage.theatre.city.name }} {{ chupiao.show.schedule.stage.theatre.name }}{{ chupiao.show.schedule.stage.name|default_if_none:"" }}</h5>
+        <h5>卡司：{% for show_cast in chupiao.show.cast_list %}{{ show_cast.artist.name }} {% endfor %}</h5>
+        <div class="inline field">
+            <label>票面价格（元）：</label>
+            <input type="number" name="par_value" step="1" id="id_par_value" placeholder="0.00" value="{{ chupiao.par_value|floatformat }}" required>
+        </div>
+        <div class="inline field">
+            <label>出票价格（元）：</label>
+            <input type="number" name="price" step="1" id="id_price" placeholder="0.00" value="{{ chupiao.price|floatformat }}" required>
+        </div>
+        <div class="field">
+            <label>座位信息：</label>
+            {{ form.seat }}
+        </div>
+        <div class="field">
+            <label>闲鱼链接：</label>
+            <textarea rows="4" name="xianyu" maxlength="250" required id="id_xianyu">{{ chupiao.xianyu }}</textarea>
+        </div>
+        <div class="field">
+            <label>其他信息：</label>
+            {{ form.note }}
+        </div>
+        <input class="ui pink button" type="submit" value="提交">
+    </form>
+</div>
+{% endblock %}

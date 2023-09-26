@@ -1,16 +1,18 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
 from django.core import serializers
 from django.db.models import Count, Q
 import datetime
 import csv
 import codecs
-from .models import Role, Tour, Schedule, Musical, Produce, Artist, Show, City, Theatre, Stage
+from .models import Role, Tour, Schedule, Musical, Produce, Artist, Show, City, Theatre, Stage, Chupiao
 from .models import MusicalProduces, MusicalStaff, MusicalCast
-from .forms import ShowForm, ApiShowDayForm
+from .forms import ShowForm, ApiShowDayForm, ChupiaoSearchForm, ChupiaoForm
 from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
 from django.utils.encoding import escape_uri_path
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.decorators import login_required
 
 
 def index(request):
@@ -723,3 +725,147 @@ def api_show_day_index(request):
         data = {'error': '请检查输入'}
     response = JsonResponse(data)
     return response
+
+
+def register(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('/yyj/accounts/login/')
+    else:
+        form = UserCreationForm()
+    return render(request, 'registration/register.html', {'form': form})
+
+
+@login_required(login_url='/yyj/accounts/login/')
+def chupiao_create(request):
+    if request.method == 'POST':
+        form = ChupiaoForm(request.POST)
+        if form.is_valid():
+            new_chupiao = form.save(commit=False)
+            new_chupiao.user = request.user
+            new_chupiao.save()
+            return redirect('/yyj/chupiao/')
+        else:
+            show_id = form.cleaned_data['show'].id
+    else:
+        form = ChupiaoForm()
+        show_id = request.GET['show']
+        if not show_id:
+            return HttpResponse('请先选择演出')
+    show = Show.objects.filter(pk=show_id).select_related(
+        'schedule', 'schedule__tour', 'schedule__tour__musical', 'schedule__stage',
+        'schedule__stage__theatre', 'schedule__stage__theatre__city'
+    )[:1]
+    if not show:
+        return HttpResponse('未找到该演出，请重新选择')
+    else:
+        show = show[0]
+    show.cast_list = show.cast.select_related('role', 'artist').order_by('role__seq')
+    context = {
+        'show': show,
+        'form': form,
+    }
+    return render(request, 'yyj/chupiao_add.html', context)
+
+
+@login_required(login_url='/yyj/accounts/login/')
+def chupiao_edit(request, pk):
+    chupiao = Chupiao.objects.get(pk=pk)
+    if not chupiao.user == request.user:
+        return HttpResponse('非创建用户')
+    if request.method == 'POST':
+        form = ChupiaoForm(request.POST, instance=chupiao)
+        if form.is_valid():
+            form.save()
+            return redirect(chupiao.get_absolute_url())
+    else:
+        form = ChupiaoForm(instance=chupiao)
+    show = Show.objects.filter(pk=chupiao.show_id).select_related(
+        'schedule', 'schedule__tour', 'schedule__tour__musical', 'schedule__stage',
+        'schedule__stage__theatre', 'schedule__stage__theatre__city'
+    )[:1]
+    chupiao.show = show[0]
+    chupiao.show.cast_list = chupiao.show.cast.select_related('role', 'artist').order_by('role__seq')
+    context = {
+        'chupiao': chupiao,
+        'form': form,
+    }
+    return render(request, 'yyj/chupiao_edit.html', context)
+
+
+@login_required(login_url='/yyj/accounts/login/')
+def chupiao_delete(request, pk):
+    chupiao = Chupiao.objects.get(pk=pk)
+    if not chupiao.user == request.user:
+        return HttpResponse('非创建用户')
+    chupiao.delete()
+    return redirect('/yyj/chupiao/')
+
+
+def chupiao_search(request):
+    form = ChupiaoSearchForm(request.GET)
+    if form.is_valid():
+        date = form.cleaned_data['date']
+        keyword = form.cleaned_data['keyword']
+        show_list = Show.objects.filter(
+            schedule__tour__musical__name__icontains=keyword, time__range=(date, date + datetime.timedelta(1))
+        ).select_related(
+            'schedule', 'schedule__tour', 'schedule__tour__musical', 'schedule__stage',
+            'schedule__stage__theatre', 'schedule__stage__theatre__city'
+        ).order_by('time')
+        for show in show_list:
+            show.cast_list = show.cast.select_related('role', 'artist').order_by('role__seq')
+        context = {
+            'form': form,
+            'show_list': show_list,
+        }
+        return render(request, 'yyj/chupiao_search.html', context)
+    return render(request, 'yyj/chupiao_search.html', {'form': form})
+
+
+def chupiao_index(request):
+    if request.user.is_authenticated:
+        my_chupiao_list = Chupiao.objects.filter(user=request.user).select_related(
+            'show__schedule', 'show__schedule__tour', 'show__schedule__tour__musical',
+            'show__schedule__stage', 'show__schedule__stage__theatre', 'show__schedule__stage__theatre__city'
+        ).order_by('show__time')
+        for chupiao in my_chupiao_list:
+            chupiao.show.cast_list = chupiao.show.cast.select_related('role', 'artist').order_by('role__seq')
+    else:
+        my_chupiao_list = None
+    now = datetime.datetime.now()
+    recent_show_chupiao_list = Chupiao.objects.filter(show__time__gte=now).select_related(
+        'show__schedule', 'show__schedule__tour', 'show__schedule__tour__musical',
+        'show__schedule__stage', 'show__schedule__stage__theatre', 'show__schedule__stage__theatre__city'
+    ).order_by('show__time')
+    for chupiao in recent_show_chupiao_list:
+        chupiao.show.cast_list = chupiao.show.cast.select_related('role', 'artist').order_by('role__seq')
+    # new_chupiao_list = Chupiao.objects.filter(show__time__gte=now).select_related(
+    #     'show__schedule', 'show__schedule__tour', 'show__schedule__tour__musical',
+    #     'show__schedule__stage', 'show__schedule__stage__theatre', 'show__schedule__stage__theatre__city'
+    # ).order_by('-id')[:20]
+    # for chupiao in new_chupiao_list:
+    #     chupiao.show.cast_list = chupiao.show.cast.select_related('role', 'artist').order_by('role__seq')
+    context = {
+        'my_chupiao_list': my_chupiao_list,
+        'recent_show_chupiao_list': recent_show_chupiao_list,
+        # 'new_chupiao_list': new_chupiao_list,
+    }
+    return render(request, 'yyj/chupiao_index.html', context)
+
+
+def chupiao_detail(request, pk):
+    chupiao = Chupiao.objects.get(pk=pk)
+    chupiao.xianyu = chupiao.xianyu.replace('】', '】 ')
+    show = Show.objects.filter(pk=chupiao.show_id).select_related(
+        'schedule', 'schedule__tour', 'schedule__tour__musical', 'schedule__stage',
+        'schedule__stage__theatre', 'schedule__stage__theatre__city'
+    )[:1]
+    chupiao.show = show[0]
+    chupiao.show.cast_list = chupiao.show.cast.select_related('role', 'artist').order_by('role__seq')
+    context = {
+        'chupiao': chupiao,
+    }
+    return render(request, 'yyj/chupiao_detail.html', context)

@@ -1,0 +1,88 @@
+{% extends "yyj/base.html" %}
+
+{% block title %}出票信息{% endblock %}
+
+{% block content %}
+<div class="ui basic segment">
+    {% if user.is_authenticated %}
+    <p>
+        <a href="{% url 'yyj:yyj.chupiao_search' %}">+ 添加出票信息</a>
+        <a class="ui right floated basic button" href="{% url 'yyj:logout' %}?next=/yyj/chupiao/">退出登录</a>
+    </p>
+    {% if my_chupiao_list %}
+    <h3 class="ui pink header">我的出票信息</h3>
+    {% for chupiao in my_chupiao_list %}
+        <h5 class="ui header">
+            {{ chupiao.show.schedule.stage.theatre.city.name }}
+                {{ chupiao.show.schedule.tour.musical.name }}
+                {{ chupiao.show.time }}
+                {{ chupiao.show.schedule.stage.theatre.name }}{{ chupiao.show.schedule.stage.name|default_if_none:"" }}
+                {{ chupiao.seat }}
+                票面{{ chupiao.par_value|floatformat }}
+                售价{{ chupiao.price|floatformat }}
+                {{ chupiao.note }}
+            <div class="sub header">
+                {% for show_cast in chupiao.show.cast_list %}
+                    {{ show_cast.artist.name }}
+                {% endfor %}
+                <p>
+                    {{ chupiao.xianyu }}<br>
+                    <a href="{% url 'yyj:yyj.chupiao_edit' chupiao.id %}">+ 修改</a>
+                    <a href="{% url 'yyj:yyj.chupiao_delete' chupiao.id %}">× 删除</a>
+                </p>
+            </div>
+        </h5>
+    {% endfor %}
+    {% endif %}
+    {% else %}
+    <p><a href="{% url 'yyj:login' %}">+ 添加出票信息</a></p>
+    {% endif %}
+    {% if recent_show_chupiao_list %}
+    <h3 class="ui pink header">出票信息</h3>
+    {% for chupiao in recent_show_chupiao_list %}
+        <h5 class="ui header">
+            <a href="{{ chupiao.get_absolute_url }}">
+                {{ chupiao.show.time|date:"n月j日 l H:i" }}
+                {{ chupiao.show.schedule.stage.theatre.city.name }}
+                {{ chupiao.show.schedule.tour.musical.name }}
+                {{ chupiao.show.schedule.stage.theatre.name }}{{ chupiao.show.schedule.stage.name|default_if_none:"" }}
+                {{ chupiao.seat }}
+                票面{{ chupiao.par_value|floatformat }}
+                售价{{ chupiao.price|floatformat }}
+                {{ chupiao.note }}
+            </a>
+            <div class="sub header">
+                {% for show_cast in chupiao.show.cast_list %}
+                    {{ show_cast.artist.name }}
+                {% endfor %}
+            </div>
+        </h5>
+    {% endfor %}
+    {% endif %}
+    {% if new_chupiao_list %}
+    <h3 class="ui pink header">新增出票信息</h3>
+    {% for chupiao in new_chupiao_list %}
+        <h5 class="ui header">
+            <a href="{{ chupiao.get_absolute_url }}">
+                {{ chupiao.show.time }}
+                {{ chupiao.show.schedule.stage.theatre.city.name }}
+                {{ chupiao.show.schedule.tour.musical.name }}
+                {{ chupiao.show.schedule.stage.theatre.name }}{{ chupiao.show.schedule.stage.name|default_if_none:"" }}
+                {{ chupiao.seat }}
+                票面{{ chupiao.par_value|floatformat }}
+                售价{{ chupiao.price|floatformat }}
+                {{ chupiao.note }}
+            </a>
+            <div class="sub header">
+                {% for show_cast in chupiao.show.cast_list %}
+                    {{ show_cast.artist.name }}
+                {% endfor %}
+            </div>
+        </h5>
+    {% endfor %}
+    {% endif %}
+</div>
+<script>
+$("[data-label='chupiao']").attr("class","active item");
+</script>
+{% endblock %}

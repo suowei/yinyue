@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class City(models.Model):
@@ -164,3 +165,19 @@ class Show(models.Model):
 
     def __str__(self):
         return self.schedule.__str__() + ' ' + self.time.__str__()
+
+
+class Chupiao(models.Model):
+    show = models.ForeignKey(Show, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    par_value = models.DecimalField(max_digits=6, decimal_places=2)
+    price = models.DecimalField(max_digits=6, decimal_places=2)
+    seat = models.CharField(max_length=100)
+    xianyu = models.TextField()
+    note = models.CharField(max_length=100, null=True, blank=True)
+
+    def get_absolute_url(self):
+        return "/yyj/chupiao/%i/" % self.id
+
+    def __str__(self):
+        return self.user.__str__() + ' ' + self.show.__str__()

@@ -1,0 +1,26 @@
+{% extends "yyj/base.html" %}
+
+{% block title %}出票详情{% endblock %}
+
+{% block content %}
+<div class="ui basic segment">
+    {% if user.is_authenticated and user == chupiao.user %}
+    <p>
+        <a href="{% url 'yyj:yyj.chupiao_edit' chupiao.id %}">+ 修改</a>
+        <a href="{% url 'yyj:yyj.chupiao_delete' chupiao.id %}">× 删除</a>
+    </p>
+    {% endif %}
+    <p>{{ chupiao.xianyu|urlize|linebreaks }}</p>
+    <p>{{ chupiao.show.schedule.tour.musical.name }}</p>
+    <p>{{ chupiao.show.time }}</p>
+    <p>{{ chupiao.show.schedule.stage.theatre.city.name }} {{ chupiao.show.schedule.stage.theatre.name }}{{ chupiao.show.schedule.stage.name|default_if_none:"" }}</p>
+    <p>卡司：{% for show_cast in chupiao.show.cast_list %}{{ show_cast.artist.name }} {% endfor %}</p>
+    <p>座位：{{ chupiao.seat }}</p>
+    <p>票面价格：{{ chupiao.par_value|floatformat }}元</p>
+    <p>出票价格：{{ chupiao.price|floatformat }}元</p>
+    <p>{{ chupiao.note }}</p>
+</div>
+<script>
+$("[data-label='chupiao']").attr("class","active item");
+</script>
+{% endblock %}

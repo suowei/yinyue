@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import City, Theatre, Stage, Produce, Musical, MusicalProduces, MusicalStaff, MusicalCast, Tour, Schedule, Role, Artist, Show
+from .models import City, Theatre, Stage, Produce, Musical, MusicalProduces, MusicalStaff, MusicalCast, Tour, Schedule, Role, Artist, Show, Chupiao
 
 
 class CityAdmin(admin.ModelAdmin):
@@ -141,6 +141,11 @@ class ShowAdmin(admin.ModelAdmin):
     ]
 
 
+class ChupiaoAdmin(admin.ModelAdmin):
+    model = Chupiao
+    autocomplete_fields = ['show', 'user']
+
+
 admin.site.register(City, CityAdmin)
 admin.site.register(Theatre, TheatreAdmin)
 admin.site.register(Stage, StageAdmin)
@@ -153,3 +158,4 @@ admin.site.register(Artist, ArtistAdmin)
 admin.site.register(Show, ShowAdmin)
 admin.site.register(MusicalStaff, MusicalStaffAdmin)
 admin.site.register(MusicalCast, MusicalCastAdmin)
+admin.site.register(Chupiao, ChupiaoAdmin)
