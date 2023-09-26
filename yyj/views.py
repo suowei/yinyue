@@ -256,6 +256,12 @@ def artist_detail(request, pk):
     num_show = Count('show', filter=Q(show__time__gte=begin_time) & Q(show__time__lte=now))
     musical_cast_list = artist.musicalcast_set.annotate(num_show=num_show).select_related(
         'role', 'role__musical').order_by('-num_show')
+    musical_cast_list_year = []
+    for musical_cast in musical_cast_list:
+        if musical_cast.num_show > 0:
+            musical_cast_list_year.append(musical_cast)
+        else:
+            break
     show_list_coming = Show.objects.filter(cast__artist=artist, time__gte=now).select_related(
         'schedule', 'schedule__stage', 'schedule__stage__theatre', 'schedule__stage__theatre__city'
     ).extra(
@@ -278,6 +284,7 @@ def artist_detail(request, pk):
         'artist': artist,
         'musical_staff_list': musical_staff_list,
         'musical_cast_list': musical_cast_list,
+        'musical_cast_list_year': musical_cast_list_year,
         'show_list_coming': show_list_coming,
         'show_list_done': show_list_done,
         'other': other,

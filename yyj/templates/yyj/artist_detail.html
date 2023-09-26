@@ -14,16 +14,14 @@
     {{ musical_staff.job }}
     {% endfor %}
     {% endif %}
-    {% if musical_cast_list %}
+    {% if musical_cast_list_year %}
     <h3 class="ui pink header">当年出演角色（按已演出场次）</h3>
-    {% for musical_cast in musical_cast_list %}
-        {% if musical_cast.num_show > 0 %}
-            {% if not forloop.first %}<br>{% endif %}
-            <a href="{{ musical_cast.role.musical.get_absolute_url }}">
-                {{ musical_cast.role.musical.name }}
-            </a>
-            {{ musical_cast.role.name }} {{ musical_cast.num_show }}场
-        {% endif %}
+    {% for musical_cast in musical_cast_list_year %}
+        {% if not forloop.first %}<br>{% endif %}
+        <a href="{{ musical_cast.role.musical.get_absolute_url }}">
+            {{ musical_cast.role.musical.name }}
+        </a>
+        {{ musical_cast.role.name }} {{ musical_cast.num_show }}场
     {% endfor %}
     {% endif %}
     {% if show_list_coming %}
