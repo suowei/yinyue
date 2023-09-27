@@ -17,6 +17,10 @@ class ChupiaoSearchForm(forms.Form):
     date = forms.DateField(label='日期')
 
 
+class ChupiaoFilterForm(forms.Form):
+    keyword = forms.CharField(required=False, label='音乐剧', max_length=100)
+
+
 class ChupiaoForm(forms.ModelForm):
     class Meta:
         model = Chupiao

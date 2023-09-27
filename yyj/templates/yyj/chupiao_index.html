@@ -37,12 +37,17 @@
     {% else %}
     <p><a href="{% url 'yyj:login' %}">+ 添加出票信息</a></p>
     {% endif %}
-    {% if recent_show_chupiao_list %}
     <h3 class="ui pink header">出票信息</h3>
+    <form class="ui form" action="{% url 'yyj:yyj.chupiao_index' %}" method="get">
+    <div class="inline fields">
+        <div class="field">{{ form.keyword }}</div>
+        <input class="ui pink button" type="submit" value="搜索音乐剧">
+    </div>
+  </form>
     {% for chupiao in recent_show_chupiao_list %}
         <h5 class="ui header">
             <a href="{{ chupiao.get_absolute_url }}" target="_blank">
-                {{ chupiao.show.time|date:"n月j日 l H:i" }}
+                {{ chupiao.show.time|date:"n月j日 D H:i" }}
                 {{ chupiao.show.schedule.stage.theatre.city.name }}
                 {{ chupiao.show.schedule.tour.musical.name }}
                 {{ chupiao.show.schedule.stage.theatre.name }}{{ chupiao.show.schedule.stage.name|default_if_none:"" }}
@@ -58,7 +63,6 @@
             </div>
         </h5>
     {% endfor %}
-    {% endif %}
     {% if new_chupiao_list %}
     <h3 class="ui pink header">新增出票信息</h3>
     {% for chupiao in new_chupiao_list %}
