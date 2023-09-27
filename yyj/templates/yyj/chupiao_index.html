@@ -47,13 +47,12 @@
     {% for chupiao in recent_show_chupiao_list %}
         <h5 class="ui header">
             <a href="{{ chupiao.get_absolute_url }}" target="_blank">
-                {{ chupiao.show.time|date:"n月j日 D H:i" }}
+                {{ chupiao.show.time|date:"n.j D H:i" }}
                 {{ chupiao.show.schedule.stage.theatre.city.name }}
                 {{ chupiao.show.schedule.tour.musical.name }}
-                {{ chupiao.show.schedule.stage.theatre.name }}{{ chupiao.show.schedule.stage.name|default_if_none:"" }}
-                {{ chupiao.seat }}
                 票面{{ chupiao.par_value|floatformat }}
                 售价{{ chupiao.price|floatformat }}
+                {{ chupiao.seat }}
                 {{ chupiao.note|default_if_none:"" }}
             </a>
             <div class="sub header">
