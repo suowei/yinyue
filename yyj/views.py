@@ -844,32 +844,47 @@ def chupiao_index(request):
         my_chupiao_list = None
     form = ChupiaoFilterForm(request.GET)
     now = datetime.datetime.now()
+    order = request.GET.get('order', False)
+    if order == '2':
+        order = 2
+    else:
+        order = None
     if form.is_valid():
         keyword = form.cleaned_data['keyword']
-        recent_show_chupiao_list = Chupiao.objects.filter(
-            show__schedule__tour__musical__name__icontains=keyword, show__time__gte=now
-        ).select_related(
-            'show__schedule', 'show__schedule__tour', 'show__schedule__tour__musical',
-            'show__schedule__stage', 'show__schedule__stage__theatre', 'show__schedule__stage__theatre__city'
-        ).order_by('show__time')
+        if order == 2:
+            chupiao_list = Chupiao.objects.filter(
+                show__schedule__tour__musical__name__icontains=keyword, show__time__gte=now
+            ).select_related(
+                'show__schedule', 'show__schedule__tour', 'show__schedule__tour__musical',
+                'show__schedule__stage', 'show__schedule__stage__theatre', 'show__schedule__stage__theatre__city'
+            ).order_by('-id')
+        else:
+            chupiao_list = Chupiao.objects.filter(
+                show__schedule__tour__musical__name__icontains=keyword, show__time__gte=now
+            ).select_related(
+                'show__schedule', 'show__schedule__tour', 'show__schedule__tour__musical',
+                'show__schedule__stage', 'show__schedule__stage__theatre', 'show__schedule__stage__theatre__city'
+            ).order_by('show__time')
     else:
-        recent_show_chupiao_list = Chupiao.objects.filter(show__time__gte=now).select_related(
-            'show__schedule', 'show__schedule__tour', 'show__schedule__tour__musical',
-            'show__schedule__stage', 'show__schedule__stage__theatre', 'show__schedule__stage__theatre__city'
-        ).order_by('show__time')
-    for chupiao in recent_show_chupiao_list:
+        keyword = None
+        if order == 2:
+            chupiao_list = Chupiao.objects.filter(show__time__gte=now).select_related(
+                'show__schedule', 'show__schedule__tour', 'show__schedule__tour__musical',
+                'show__schedule__stage', 'show__schedule__stage__theatre', 'show__schedule__stage__theatre__city'
+            ).order_by('-id')
+        else:
+            chupiao_list = Chupiao.objects.filter(show__time__gte=now).select_related(
+                'show__schedule', 'show__schedule__tour', 'show__schedule__tour__musical',
+                'show__schedule__stage', 'show__schedule__stage__theatre', 'show__schedule__stage__theatre__city'
+            ).order_by('show__time')
+    for chupiao in chupiao_list:
         chupiao.show.cast_list = chupiao.show.cast.select_related('role', 'artist').order_by('role__seq')
-    # new_chupiao_list = Chupiao.objects.filter(show__time__gte=now).select_related(
-    #     'show__schedule', 'show__schedule__tour', 'show__schedule__tour__musical',
-    #     'show__schedule__stage', 'show__schedule__stage__theatre', 'show__schedule__stage__theatre__city'
-    # ).order_by('-id')[:20]
-    # for chupiao in new_chupiao_list:
-    #     chupiao.show.cast_list = chupiao.show.cast.select_related('role', 'artist').order_by('role__seq')
     context = {
         'my_chupiao_list': my_chupiao_list,
         'form': form,
-        'recent_show_chupiao_list': recent_show_chupiao_list,
-        # 'new_chupiao_list': new_chupiao_list,
+        'keyword': keyword,
+        'order': order,
+        'chupiao_list': chupiao_list,
     }
     return render(request, 'yyj/chupiao_index.html', context)
 
