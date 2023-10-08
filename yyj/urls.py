@@ -1,5 +1,6 @@
-from django.urls import path, include
+from django.urls import path, include, reverse_lazy
 from django.views.generic import TemplateView
+from django.contrib.auth.views import PasswordChangeView
 
 from . import views
 
@@ -32,6 +33,7 @@ urlpatterns = [
     path('api/', TemplateView.as_view(template_name="yyj/api.html"), name='yyj.api'),
     path('api/search_day/', views.api_show_day_index, name='yyj.api_show_day_index'),
     path('accounts/', include('django.contrib.auth.urls')),
+    path('password_change/', PasswordChangeView.as_view(success_url=reverse_lazy('yyj:password_change_done')), name='password_change'),
     path('accounts/register', views.register, name='register'),
     path('chupiao/', views.chupiao_index, name='yyj.chupiao_index'),
     path('chupiao/<int:pk>/', views.chupiao_detail, name='yyj.chupiao_detail'),

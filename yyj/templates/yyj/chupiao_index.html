@@ -3,12 +3,20 @@
 {% block title %}出票信息{% endblock %}
 
 {% block content %}
-<div class="ui basic segment">
     {% if user.is_authenticated %}
-    <p>
-        <a href="{% url 'yyj:yyj.chupiao_search' %}">+ 添加出票信息</a>
-        <a class="ui right floated basic button" href="{% url 'yyj:logout' %}?next=/yyj/chupiao/">退出登录</a>
-    </p>
+    <div class="ui secondary menu">
+        <div class="ui item"><a href="{% url 'yyj:yyj.chupiao_search' %}">+ 添加出票信息</a></div>
+        <div class="right menu">
+             <div class="ui dropdown item">
+                 欢迎，{{ user.username }}！ <i class="dropdown icon"></i>
+                 <div class="menu">
+                     <a class="item" href="{% url 'yyj:password_change' %}">修改密码</a>
+                     <a class="item" href="{% url 'yyj:logout' %}?next=/yyj/chupiao/">退出登录</a>
+                 </div>
+             </div>
+        </div>
+    </div>
+<div class="ui basic segment">
     {% if my_chupiao_list %}
     <h3 class="ui pink header">我的出票信息</h3>
     {% for chupiao in my_chupiao_list %}
@@ -35,7 +43,11 @@
     {% endfor %}
     {% endif %}
     {% else %}
-    <p><a href="{% url 'yyj:login' %}">+ 添加出票信息</a></p>
+<div class="ui basic segment">
+    <p>
+        <a href="{% url 'yyj:yyj.chupiao_search' %}">+ 添加出票信息</a>
+        <a class="ui right floated button" href="{% url 'yyj:login' %}?next=/yyj/chupiao/">登录</a>
+    </p>
     {% endif %}
     <h3 class="ui pink header">出票信息</h3>
     <form class="ui form" action="{% url 'yyj:yyj.chupiao_index' %}" method="get">
@@ -74,5 +86,8 @@
 </div>
 <script>
 $("[data-label='chupiao']").attr("class","active item");
+$('.dropdown')
+  .dropdown()
+;
 </script>
 {% endblock %}
