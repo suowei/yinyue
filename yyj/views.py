@@ -1,6 +1,5 @@
 from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
-from django.core import serializers
 from django.db.models import Count, Q
 import datetime
 import csv
