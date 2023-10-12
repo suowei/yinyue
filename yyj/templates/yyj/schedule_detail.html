@@ -33,7 +33,7 @@
         {% if schedule.has_cast_table %}
         <p>
             <form action="{% url 'yyj:yyj.schedule_detail' schedule.id %}" class="ui action input">
-                <input type="search" name="artist" value="{{ search_cast }}" placeholder="搜索演员">
+                <input type="search" name="artist" value="{{ search_cast|default_if_none:'' }}" placeholder="搜索演员">
                 <button class="ui pink icon button" type="submit"><i class="search icon"></i></button>
             </form>
         </p>
