@@ -55,6 +55,7 @@
         <div class="field">{{ form.keyword }}</div>
         <input class="ui pink button" type="submit" value="搜索音乐剧">
     </div>
+    </form>
     <h5>
         {% if order and order == 2 %}
         <a href="?keyword={{ keyword }}&order=1">最近演出</a>
@@ -64,7 +65,6 @@
         | <a href="?keyword={{ keyword }}&order=2">最新发布</a>
         {% endif %}
     </h5>
-    </form>
     {% for chupiao in chupiao_list %}
         <h5 class="ui header">
             <a href="{{ chupiao.get_absolute_url }}" target="_blank">
