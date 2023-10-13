@@ -29,8 +29,8 @@
             {% if schedule.end_date != schedule.begin_date%}{{ schedule.end_date|date:"Y-m-d" }}{% endif %}
         {% endif %}
     </strong>
-    {% if schedule.shows %}
-        {% if schedule.has_cast_table %}
+    {% if schedule.shows or search_cast %}
+        {% if schedule.has_cast_table or search_cast %}
         <p>
             <form action="{% url 'yyj:yyj.schedule_detail' schedule.id %}" class="ui small action input">
                 <input type="search" name="artist" value="{{ search_cast|default_if_none:'' }}" placeholder="搜索演员">
