@@ -24,15 +24,20 @@
         {{ musical_cast.role.name }} {{ musical_cast.num_show }}场
     {% endfor %}
     {% endif %}
-    {% if show_list_coming %}
-    <h3 class="ui pink header">
-        演出日程
+    {% if show_list_coming or search_musical %}
+    <h3 class="ui pink header">演出日程</h3>
+    <p>
+        <form action="{% url 'yyj:yyj.artist_detail' artist.id %}" class="ui small action input">
+            <input type="search" name="musical" value="{{ search_musical|default_if_none:'' }}" placeholder="搜索音乐剧">
+            {% if other %}<input type="hidden" name="other" value="1">{% endif %}
+            <button class="ui pink icon button" type="submit"><i class="search icon"></i></button>
+        </form>
         {% if other %}
-        <a href="?other=0" class="ui pink right floated basic button">不显示同场演员</a>
+        <a href="?other=0&musical={{ search_musical }}" class="ui pink right floated basic button">不显示同场演员</a>
         {% else %}
-        <a href="?other=1" class="ui pink right floated basic button">显示同场演员</a>
+        <a href="?other=1&musical={{ search_musical }}" class="ui pink right floated basic button">显示同场演员</a>
         {% endif %}
-    </h3>
+    </p>
 </div>
 <table class="ui striped celled pink unstackable compact table">
     <thead>

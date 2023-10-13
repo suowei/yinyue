@@ -241,10 +241,19 @@ def artist_detail(request, pk):
             musical_cast_list_year.append(musical_cast)
         else:
             break
-    show_list_coming = Show.objects.filter(cast__artist=artist, time__gte=now).select_related(
+    cast_ids = []
+    search_musical = request.GET.get('musical', None)
+    if search_musical:
+        for musical_cast in musical_cast_list:
+            if search_musical in musical_cast.role.musical.name:
+                cast_ids.append(musical_cast.id)
+    else:
+        for musical_cast in musical_cast_list:
+            cast_ids.append(musical_cast.id)
+    show_list_coming = Show.objects.filter(cast__in=cast_ids, time__gte=now).select_related(
         'schedule', 'schedule__stage', 'schedule__stage__theatre', 'schedule__stage__theatre__city'
     ).extra(
-        select={"cast_id": "`yyj_musicalcast`.`id`"}
+        select={"cast_id": "`yyj_show_cast`.`musicalcast_id`"}
     ).order_by('time')
     for show in show_list_coming:
         for musical_cast in musical_cast_list:
@@ -267,6 +276,7 @@ def artist_detail(request, pk):
         'show_list_coming': show_list_coming,
         'show_list_done': show_list_done,
         'other': other,
+        'search_musical': search_musical,
     }
     return render(request, 'yyj/artist_detail.html', context)
 
