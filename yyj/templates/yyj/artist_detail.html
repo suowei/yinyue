@@ -33,9 +33,9 @@
             <button class="ui pink icon button" type="submit"><i class="search icon"></i></button>
         </form>
         {% if other %}
-        <a href="?other=0&musical={{ search_musical }}" class="ui pink right floated basic button">不显示同场演员</a>
+        <a href="?other=0&musical={{ search_musical|default_if_none:'' }}" class="ui pink right floated basic button">不显示同场演员</a>
         {% else %}
-        <a href="?other=1&musical={{ search_musical }}" class="ui pink right floated basic button">显示同场演员</a>
+        <a href="?other=1&musical={{ search_musical|default_if_none:'' }}" class="ui pink right floated basic button">显示同场演员</a>
         {% endif %}
     </p>
 </div>
