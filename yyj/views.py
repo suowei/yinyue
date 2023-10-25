@@ -12,6 +12,7 @@ from django.utils import timezone
 from django.utils.encoding import escape_uri_path
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
+from django.core import serializers
 
 
 def index(request):
@@ -721,6 +722,76 @@ def api_show_day_index(request):
         data = {'error': '请检查输入'}
     response = JsonResponse(data)
     return response
+
+
+def api_artist_index(request):
+    data = serializers.serialize("json", Artist.objects.all())
+    return HttpResponse(data)
+
+
+def api_city_index(request):
+    data = serializers.serialize("json", City.objects.all())
+    return HttpResponse(data)
+
+
+def api_musical_index(request):
+    data = serializers.serialize("json", Musical.objects.all())
+    return HttpResponse(data)
+
+
+def api_musicalproduces_index(request):
+    data = serializers.serialize("json", MusicalProduces.objects.all())
+    return HttpResponse(data)
+
+
+def api_musicalstaff_index(request):
+    data = serializers.serialize("json", MusicalStaff.objects.all())
+    return HttpResponse(data)
+
+
+def api_musicalcast_index(request):
+    data = serializers.serialize("json", MusicalCast.objects.all())
+    return HttpResponse(data)
+
+
+def api_produce_index(request):
+    data = serializers.serialize("json", Produce.objects.all())
+    return HttpResponse(data)
+
+
+def api_role_index(request):
+    data = serializers.serialize("json", Role.objects.all())
+    return HttpResponse(data)
+
+
+def api_schedule_index(request):
+    data = serializers.serialize("json", Schedule.objects.all())
+    return HttpResponse(data)
+
+
+def api_schedule_show_index(request, pk):
+    data = serializers.serialize("json", Show.objects.filter(schedule=pk).all(), fields=('time', ))
+    return HttpResponse(data)
+
+
+def api_show_cast_index(request, pk):
+    data = serializers.serialize("json", Show.objects.get(pk=pk).cast.all(), fields=())
+    return HttpResponse(data)
+
+
+def api_stage_index(request):
+    data = serializers.serialize("json", Stage.objects.all())
+    return HttpResponse(data)
+
+
+def api_theatre_index(request):
+    data = serializers.serialize("json", Theatre.objects.all())
+    return HttpResponse(data)
+
+
+def api_tour_index(request):
+    data = serializers.serialize("json", Tour.objects.all())
+    return HttpResponse(data)
 
 
 def register(request):
