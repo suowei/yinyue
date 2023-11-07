@@ -600,7 +600,14 @@ def search(request):
     q = request.GET['q']
     artist_list = Artist.objects.filter(name__icontains=q)
     musical_list = Musical.objects.filter(name__icontains=q)
-    context = {'artist_list': artist_list, 'musical_list': musical_list}
+    city_list = City.objects.filter(name__icontains=q)
+    theatre_list = Theatre.objects.filter(name__icontains=q)
+    context = {
+        'artist_list': artist_list,
+        'musical_list': musical_list,
+        'city_list': city_list,
+        'theatre_list': theatre_list,
+    }
     return render(request, 'yyj/search.html', context)
 
 
