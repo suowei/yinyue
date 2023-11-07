@@ -36,7 +36,15 @@
     {% endfor %}
     </div>
     {% endif %}
-    {% if not musical_list and not artist_list and not city_list and not theatre_list %}
+    {% if produce_list %}
+    <h2 class="ui pink header">制作公司</h2>
+    <div class="ui list">
+    {% for produce in produce_list %}
+    <div class="item"><a href="{{ produce.get_absolute_url }}">{{ produce.name }}</a></div>
+    {% endfor %}
+    </div>
+    {% endif %}
+    {% if not musical_list and not artist_list and not city_list and not theatre_list and not produce_list %}
     <p>抱歉，未找到结果。</p>
     {% endif %}
 </div>

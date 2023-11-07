@@ -602,11 +602,13 @@ def search(request):
     musical_list = Musical.objects.filter(name__icontains=q)
     city_list = City.objects.filter(name__icontains=q)
     theatre_list = Theatre.objects.filter(name__icontains=q)
+    produce_list = Produce.objects.filter(name__icontains=q)
     context = {
         'artist_list': artist_list,
         'musical_list': musical_list,
         'city_list': city_list,
         'theatre_list': theatre_list,
+        'produce_list': produce_list,
     }
     return render(request, 'yyj/search.html', context)
 
