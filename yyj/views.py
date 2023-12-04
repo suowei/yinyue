@@ -167,6 +167,11 @@ def schedule_detail(request, pk):
     else:
         schedule.shows = schedule.show_set.filter(time__gte=now).order_by('time')
     schedule.show_list_done = Show.objects.filter(schedule=schedule, time__lt=now)[:1]
+    search_chupiao = request.GET.get('chupiao', None)
+    if search_chupiao == '1':
+        search_chupiao = True
+    else:
+        search_chupiao = False
     for show in schedule.shows:
         show_cast_list = show.cast.select_related('role', 'artist').order_by('seq')
         if not show_cast_list:
@@ -178,13 +183,17 @@ def schedule_detail(request, pk):
                 show.cast_table[show_cast.role.seq - 1].append(show_cast)
             else:
                 show.cast_table[show_cast.role.seq - 1] = [show_cast]
+        if search_chupiao:
+            show.chupiao_list = Chupiao.objects.filter(show=show).order_by('price', 'id')
     other_schedule_list = Schedule.objects.filter(tour=tour, end_date__gte=now.date()).exclude(pk=pk).select_related(
         'stage', 'stage__theatre', 'stage__theatre__city').order_by('begin_date')
+    schedule.chupiao = Chupiao.objects.filter(show__schedule=schedule, show__time__gte=now)[:1]
     context = {
         'schedule': schedule,
         'role_list': role_list,
         'other_schedule_list': other_schedule_list,
         'search_cast': search_cast,
+        'search_chupiao': search_chupiao,
     }
     return render(request, 'yyj/schedule_detail.html', context)
 
