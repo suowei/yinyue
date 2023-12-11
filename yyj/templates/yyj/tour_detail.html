@@ -13,7 +13,14 @@
         </div>
     </h2>
     {% if schedule_list_coming %}
-    <h3 class="ui pink header">演出日程</h3>
+    <h3 class="ui pink header">
+        演出日程
+        {% if search_chupiao %}
+        <a href="?chupiao=0" class="ui teal label"><i class="ticket alternate icon"></i>隐藏出票信息</a>
+        {% elif tour.chupiao and not search_chupiao %}
+        <a href="?chupiao=1" class="ui teal label"><i class="ticket alternate icon"></i>查看出票信息</a>
+        {% endif %}
+    </h3>
     {% for schedule in schedule_list_coming %}
         <h4 class="ui header">
             <div class="content">
@@ -34,7 +41,10 @@
         <table class="ui collapsing single line unstackable striped compact table">
             <thead>
             <tr>
-                <th></th>
+                <th class="center aligned">演出时间</th>
+                {% if search_chupiao %}
+                <th class="center aligned">出票信息</th>
+                {% endif %}
                 {% for role in role_list %}
                 <th class="center aligned">{{ role.name }}</th>
                 {% endfor %}
@@ -47,6 +57,17 @@
                     {% ifchanged show.time.date %}{{ show.time|date:"n月j日 D" }}{% endifchanged %}
                     {{ show.time|time }}
                 </td>
+                {% if search_chupiao %}
+                <td>
+                    {% if show.chupiao_list %}
+                        {% for chupiao in show.chupiao_list %}
+                            <a href="{{ chupiao.get_absolute_url }}" target="_blank">
+                                {{ chupiao.price|floatformat }}/{{ chupiao.par_value|floatformat }} {{ chupiao.seat }}
+                            </a><br>
+                        {% endfor %}
+                    {% endif %}
+                </td>
+                {% endif %}
                 {% for show_cast in show.cast_table %}
                 <td class="center aligned">
                     {% for cast in show_cast %}
@@ -95,7 +116,7 @@
         <table class="ui collapsing single line unstackable striped compact table">
             <thead>
             <tr>
-                <th></th>
+                <th class="center aligned">演出时间</th>
                 {% for role in role_list %}
                 <th class="center aligned">{{ role.name }}</th>
                 {% endfor %}

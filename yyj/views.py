@@ -115,6 +115,11 @@ def tour_detail(request, pk):
     today = now.date()
     schedule_list_coming = Schedule.objects.filter(tour=tour, end_date__gte=today).select_related(
         'stage', 'stage__theatre', 'stage__theatre__city').order_by('begin_date')
+    search_chupiao = request.GET.get('chupiao', None)
+    if search_chupiao == '1':
+        search_chupiao = True
+    else:
+        search_chupiao = False
     for schedule in schedule_list_coming:
         if schedule.is_long_term:
             schedule.show_list_done = Show.objects.filter(schedule=schedule, time__lt=now)[:1]
@@ -130,6 +135,8 @@ def tour_detail(request, pk):
                     show.cast_table[show_cast.role.seq - 1].append(show_cast)
                 else:
                     show.cast_table[show_cast.role.seq - 1] = [show_cast]
+            if search_chupiao:
+                show.chupiao_list = Chupiao.objects.filter(show=show).order_by('price', 'id')
     schedule_list_done = Schedule.objects.filter(is_long_term=False, tour=tour, begin_date__lte=today).select_related(
         'stage', 'stage__theatre', 'stage__theatre__city').order_by('begin_date')
     for schedule in schedule_list_done:
@@ -147,11 +154,13 @@ def tour_detail(request, pk):
                     show.cast_table[show_cast.role.seq - 1].append(show_cast)
                 else:
                     show.cast_table[show_cast.role.seq - 1] = [show_cast]
+    tour.chupiao = Chupiao.objects.filter(show__schedule__tour=tour, show__time__gte=now)[:1]
     context = {
         'tour': tour,
         'role_list': role_list,
         'schedule_list_coming': schedule_list_coming,
         'schedule_list_done': schedule_list_done,
+        'search_chupiao': search_chupiao,
     }
     return render(request, 'yyj/tour_detail.html', context)
 

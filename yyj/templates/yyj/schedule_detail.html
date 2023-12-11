@@ -38,9 +38,9 @@
                 <button class="ui pink icon button" type="submit"><i class="search icon"></i></button>
             </form>
             {% if search_chupiao %}
-            &nbsp;&nbsp;&nbsp;&nbsp;<a href="?chupiao=0&artist={{ search_cast|default_if_none:'' }}" class="ui right floated">隐藏出票信息</a>
+            &nbsp;&nbsp;<a href="?chupiao=0&artist={{ search_cast|default_if_none:'' }}" class="ui teal label"><i class="ticket alternate icon"></i>隐藏出票信息</a>
             {% elif schedule.chupiao and not search_chupiao %}
-            &nbsp;&nbsp;&nbsp;&nbsp;<a href="?chupiao=1&artist={{ search_cast|default_if_none:'' }}" class="ui right floated">查看出票信息</a>
+            &nbsp;&nbsp;<a href="?chupiao=1&artist={{ search_cast|default_if_none:'' }}" class="ui teal label"><i class="ticket alternate icon"></i>查看出票信息</a>
             {% endif %}
         </p>
         <table class="ui collapsing single line unstackable striped compact table">
