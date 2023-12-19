@@ -51,10 +51,10 @@
     </thead>
     <tbody>
         {% for show in show_list_coming %}
-        <tr>
+        {% if show.warning %}<tr class="negative">{% else %}<tr>{% endif %}
             <td class="center aligned">
                 {% ifchanged show.time.date %}{{ show.time|date:"n月j日 l" }}{% endifchanged %}
-                {{ show.time|time }}
+                {{ show.time|time }}{% if show.warning %} *{% endif %}
             </td>
             <td class="center aligned">
                 <h4 class="ui header"><a href="{{ show.role.musical.get_absolute_url }}">{{ show.role.musical.name }}</a></h4>
@@ -81,6 +81,7 @@
         {% endfor %}
     </tbody>
 </table>
+{% if show_list_coming.warning %}<p>&nbsp;&nbsp;*演员行程冲突</p>{% endif %}
 {% endif %}
 {% if show_list_done %}
 <div class="ui basic segment">

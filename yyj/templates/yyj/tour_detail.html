@@ -71,7 +71,7 @@
                 {% for show_cast in show.cast_table %}
                 <td class="center aligned">
                     {% for cast in show_cast %}
-                    <a href="{{ cast.artist.get_absolute_url }}">{{ cast.artist.name }}</a>
+                    <a href="{{ cast.artist.get_absolute_url }}">{{ cast.artist.name }}</a>{% if cast.warning %}*{% endif %}
                     {% endfor %}
                 </td>
                 {% endfor %}
@@ -79,6 +79,7 @@
             {% endfor %}
             </tbody>
         </table>
+        {% if schedule.warning %}<p>&nbsp;&nbsp;*演员行程冲突</p>{% endif %}
         {% else %}
             {% for show in schedule.shows %}
                 {% ifchanged show.time.date %}

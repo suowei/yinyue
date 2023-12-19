@@ -4,7 +4,7 @@ from django.db.models import Count, Q
 import datetime
 import csv
 import codecs
-from .models import Role, Tour, Schedule, Musical, Produce, Artist, Show, City, Theatre, Stage, Chupiao
+from .models import Role, Tour, Schedule, Musical, Produce, Artist, Show, City, Theatre, Stage, Chupiao, Conflict
 from .models import MusicalProduces, MusicalStaff, MusicalCast
 from .forms import ShowForm, ApiShowDayForm, ChupiaoSearchForm, ChupiaoFilterForm, ChupiaoForm
 from django.http import HttpResponse, JsonResponse
@@ -135,7 +135,19 @@ def tour_detail(request, pk):
                     show.cast_table[show_cast.role.seq - 1].append(show_cast)
                 else:
                     show.cast_table[show_cast.role.seq - 1] = [show_cast]
-            if search_chupiao:
+        if schedule.has_cast_table:
+            conflicts = Conflict.objects.all()
+            for conflict in conflicts:
+                for show in schedule.shows:
+                    if show.time == conflict.time:
+                        for show_cast in show.cast_table:
+                            for cast in show_cast:
+                                if cast.artist == conflict.artist:
+                                    cast.warning = True
+                                    schedule.warning = True
+    if search_chupiao:
+        for schedule in schedule_list_coming:
+            for show in schedule.shows:
                 show.chupiao_list = Chupiao.objects.filter(show=show).order_by('price', 'id')
     schedule_list_done = Schedule.objects.filter(is_long_term=False, tour=tour, begin_date__lte=today).select_related(
         'stage', 'stage__theatre', 'stage__theatre__city').order_by('begin_date')
@@ -176,11 +188,6 @@ def schedule_detail(request, pk):
     else:
         schedule.shows = schedule.show_set.filter(time__gte=now).order_by('time')
     schedule.show_list_done = Show.objects.filter(schedule=schedule, time__lt=now)[:1]
-    search_chupiao = request.GET.get('chupiao', None)
-    if search_chupiao == '1':
-        search_chupiao = True
-    else:
-        search_chupiao = False
     for show in schedule.shows:
         show_cast_list = show.cast.select_related('role', 'artist').order_by('seq')
         if not show_cast_list:
@@ -192,8 +199,24 @@ def schedule_detail(request, pk):
                 show.cast_table[show_cast.role.seq - 1].append(show_cast)
             else:
                 show.cast_table[show_cast.role.seq - 1] = [show_cast]
-        if search_chupiao:
+    search_chupiao = request.GET.get('chupiao', None)
+    if search_chupiao == '1':
+        search_chupiao = True
+    else:
+        search_chupiao = False
+    if search_chupiao:
+        for show in schedule.shows:
             show.chupiao_list = Chupiao.objects.filter(show=show).order_by('price', 'id')
+    if schedule.has_cast_table:
+        conflicts = Conflict.objects.all()
+        for conflict in conflicts:
+            for show in schedule.shows:
+                if show.time == conflict.time:
+                    for show_cast in show.cast_table:
+                        for cast in show_cast:
+                            if cast.artist == conflict.artist:
+                                cast.warning = True
+                                schedule.warning = True
     other_schedule_list = Schedule.objects.filter(tour=tour, end_date__gte=now.date()).exclude(pk=pk).select_related(
         'stage', 'stage__theatre', 'stage__theatre__city').order_by('begin_date')
     schedule.chupiao = Chupiao.objects.filter(show__schedule=schedule, show__time__gte=now)[:1]
@@ -286,6 +309,13 @@ def artist_detail(request, pk):
             show.other_cast = show.cast.exclude(artist=artist).select_related('role', 'artist').order_by('role__seq')
     else:
         other = False
+    conflicts = Conflict.objects.all()
+    for conflict in conflicts:
+        if conflict.artist == artist:
+            for show in show_list_coming:
+                if show.time == conflict.time:
+                    show.warning = True
+                    show_list_coming.warning = True
     show_list_done = Show.objects.filter(cast__artist=artist, time__lt=now)[:1]
     context = {
         'artist': artist,
@@ -412,6 +442,14 @@ def theatre_detail(request, pk):
     ).order_by('time')
     for show in show_list:
         show.cast_list = show.cast.select_related('role', 'artist').order_by('role__seq')
+    conflicts = Conflict.objects.all()
+    for conflict in conflicts:
+        for show in show_list:
+            if show.time == conflict.time:
+                for cast in show.cast_list:
+                    if cast.artist == conflict.artist:
+                        cast.warning = True
+                        show_list.warning = True
     schedule_list_done = Schedule.objects.filter(stage__theatre=theatre, end_date__lt=today).select_related(
         'tour', 'tour__musical', 'stage').order_by('-end_date')
     context = {
@@ -470,6 +508,14 @@ def stage_detail(request, pk):
     ).order_by('time')
     for show in show_list:
         show.cast_list = show.cast.select_related('role', 'artist').order_by('role__seq')
+    conflicts = Conflict.objects.all()
+    for conflict in conflicts:
+        for show in show_list:
+            if show.time == conflict.time:
+                for cast in show.cast_list:
+                    if cast.artist == conflict.artist:
+                        cast.warning = True
+                        show_list.warning = True
     schedule_list_done = Schedule.objects.filter(stage=stage, end_date__lt=today).select_related(
         'tour', 'tour__musical').order_by('-end_date')
     context = {
@@ -652,6 +698,14 @@ def show_day_index(request):
             ).order_by('schedule__stage__theatre__city__seq', 'time')
         for show in show_list:
             show.cast_list = show.cast.select_related('role', 'artist').order_by('role__seq')
+        conflicts = Conflict.objects.all()
+        for conflict in conflicts:
+            for show in show_list:
+                if show.time == conflict.time:
+                    for cast in show.cast_list:
+                        if cast.artist == conflict.artist:
+                            cast.warning = True
+                            show_list.warning = True
         context = {
             'form': form,
             'city': city,

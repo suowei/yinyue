@@ -47,7 +47,7 @@
             </td>
             <td>
                 {% for show_cast in show.cast_list %}
-                <a href="{{ show_cast.artist.get_absolute_url }}" target="_blank">{{ show_cast.artist.name }}</a>
+                <a href="{{ show_cast.artist.get_absolute_url }}" target="_blank">{{ show_cast.artist.name }}</a>{% if show_cast.warning %}*{% endif %}
                 {% endfor %}
             </td>
             <td class="center aligned">
@@ -59,5 +59,6 @@
         {% endfor %}
     </tbody>
 </table>
+{% if show_list.warning %}<p>&nbsp;&nbsp;*演员行程冲突</p>{% endif %}
 {% endif %}
 {% endblock %}

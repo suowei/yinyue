@@ -167,6 +167,14 @@ class Show(models.Model):
         return self.schedule.__str__() + ' ' + self.time.__str__()
 
 
+class Conflict(models.Model):
+    time = models.DateTimeField()
+    artist = models.ForeignKey(Artist, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.time.__str__() + ' ' + self.artist.__str__()
+
+
 class Chupiao(models.Model):
     show = models.ForeignKey(Show, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
