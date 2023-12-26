@@ -5,6 +5,11 @@
 {% block content %}
 <div class="ui basic segment">
     <h2 class="ui pink header">数据下载</h2>
+    <p>
+        若Windows系统Excel打开csv格式文件时乱码，可采用以下两种方式解决：
+        <br>1. 打开Excel，工具栏“数据”→“从文本/CSV”，选择文件后，修改“文件原始格式”为“Unicode(UTF-8)”，加载。
+        <br>2. 右键csv文件→打开方式→记事本，“文件”→“另存为”，修改“编码”为“带有BOM的UTF-8”，保存。
+    </p>
     1. csv格式演出详情（时间、城市、音乐剧、卡司、剧院）<br>
     例：2023-07-01 14:00,上海,XXX剧,A演员 B演员 C演员,XX剧场<br>
     {% for file in file_list %}

@@ -9,9 +9,11 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('year', nargs='?')
+        parser.add_argument('role', nargs='?')
 
     def handle(self, *args, **options):
         year = int(options['year'])
+        role = int(options['role'])
         begin = datetime.date(year, 1, 1)
         end = datetime.date(year + 1, 1, 1)
         show_list = Show.objects.filter(time__range=(begin, end)).select_related(
@@ -23,9 +25,16 @@ class Command(BaseCommand):
             writer = csv.writer(csvfile)
             writer.writerow(['时间', '城市', '音乐剧', '卡司', '剧院'])
             for show in show_list:
-                value_list = show.cast.select_related('role', 'artist').values_list(
-                    'artist__name', flat=True).order_by('role__seq')
-                cast_string = ' '.join(value_list)
+                if role == 1:
+                    show_cast = show.cast.select_related('role', 'artist').order_by('role__seq')
+                    cast_list = []
+                    for cast in show_cast:
+                        cast_list.append(cast.role.name + ':' + cast.artist.name)
+                    cast_string = ' '.join(cast_list)
+                else:
+                    value_list = show.cast.select_related('role', 'artist').values_list(
+                        'artist__name', flat=True).order_by('role__seq')
+                    cast_string = ' '.join(value_list)
                 writer.writerow([
                     timezone.localtime(show.time).strftime("%Y-%m-%d %H:%M"),
                     show.schedule.stage.theatre.city.name,
