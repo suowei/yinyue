@@ -124,6 +124,7 @@ def tour_detail(request, pk):
         if schedule.is_long_term:
             schedule.show_list_done = Show.objects.filter(schedule=schedule, time__lt=now)[:1]
         schedule.shows = schedule.show_set.filter(time__gte=now).order_by('time')
+        schedule.has_cast_table = False
         for show in schedule.shows:
             show_cast_list = show.cast.select_related('role', 'artist').order_by('seq')
             if not show_cast_list:
@@ -188,6 +189,7 @@ def schedule_detail(request, pk):
     else:
         schedule.shows = schedule.show_set.filter(time__gte=now).order_by('time')
     schedule.show_list_done = Show.objects.filter(schedule=schedule, time__lt=now)[:1]
+    schedule.has_cast_table = False
     for show in schedule.shows:
         show_cast_list = show.cast.select_related('role', 'artist').order_by('seq')
         if not show_cast_list:
