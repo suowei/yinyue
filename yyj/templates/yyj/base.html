@@ -34,18 +34,29 @@
 </div>
 <div class="ui secondary four item pink inverted menu">
     <a href="{% url 'yyj:yyj.index' %}" class="item" data-label="new"><i class="bullhorn icon"></i> 最新演出</a>
-    <a href="{% url 'yyj:yyj.show_year_index' 2023 %}" class="item" data-label="year"><i class="calendar check outline icon"></i> 2023年</a>
+    <div class="ui dropdown item"><i class="calendar check outline icon"></i>
+        <div data-label="year">选择年份</div><i class="dropdown icon"></i>
+        <div class="menu">
+            <a href="{% url 'yyj:yyj.show_year_index' 2024 %}" class="item">2024年</a>
+            <a href="{% url 'yyj:yyj.show_year_index' 2023 %}" class="item">2023年</a>
+        </div>
+    </div>
     <a href="{% url 'yyj:yyj.stage_index' %}" class="item" data-label="stage"><i class="building icon"></i> 剧院列表</a>
     <a href="{% url 'yyj:yyj.chupiao_index' %}" class="item" data-label="chupiao"><i class="ticket icon"></i> 出票信息</a>
 </div>
 {% block content %}{% endblock %}
+<script>
+    $('.dropdown')
+        .dropdown()
+    ;
+</script>
 <div class="ui center aligned container">
     <p>
         <a href="{% url 'yyj:yyj.musical_index' %}" target="_blank">音乐剧列表</a>
         | <a href="{% url 'yyj:yyj.download' %}" target="_blank">数据下载</a>
         | <a href="{% url 'yyj:yyj.api' %}" target="_blank">数据接口</a>
         | <a href="{% url 'yyj:yyj.data' %}" target="_blank">数据获取方法</a>
-        <br>©2023 y.saoju.net&nbsp;&nbsp;&nbsp;&nbsp;邮箱：szzj@saoju.net
+        <br>©2023-2024 y.saoju.net&nbsp;&nbsp;&nbsp;&nbsp;邮箱：szzj@saoju.net
     </p>
 </div>
 </body>

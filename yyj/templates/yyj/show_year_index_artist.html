@@ -5,10 +5,10 @@
 {% block content %}
 <p>
 <div class="ui right floated buttons">
-    <a href="{% url 'yyj:yyj.show_year_index' 2023 %}" class="ui pink basic button">
+    <a href="{% url 'yyj:yyj.show_year_index' year %}" class="ui pink basic button">
        按音乐剧查询
     </a>
-    <a href="{% url 'yyj:yyj.show_year_index_city' 2023 %}" class="ui pink basic button">
+    <a href="{% url 'yyj:yyj.show_year_index_city' year %}" class="ui pink basic button">
        按城市查询
     </a>
 </div>
@@ -51,6 +51,10 @@
 </div>
 {% endif %}
 <script>
-$("[data-label='year']").attr("class","active item");
+{% if year %}
+    $("[data-label='year']").text("{{ year }}年");
+{% else %}
+    $("[data-label='all']").attr("class","active item");
+{% endif %}
 </script>
 {% endblock %}
