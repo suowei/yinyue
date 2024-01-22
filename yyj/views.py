@@ -142,10 +142,11 @@ def tour_detail(request, pk):
                 for show in schedule.shows:
                     if show.time == conflict.time:
                         for show_cast in show.cast_table:
-                            for cast in show_cast:
-                                if cast.artist == conflict.artist:
-                                    cast.warning = True
-                                    schedule.warning = True
+                            if show_cast:
+                                for cast in show_cast:
+                                    if cast.artist == conflict.artist:
+                                        cast.warning = True
+                                        schedule.warning = True
     if search_chupiao:
         for schedule in schedule_list_coming:
             for show in schedule.shows:
@@ -215,10 +216,11 @@ def schedule_detail(request, pk):
             for show in schedule.shows:
                 if show.time == conflict.time:
                     for show_cast in show.cast_table:
-                        for cast in show_cast:
-                            if cast.artist == conflict.artist:
-                                cast.warning = True
-                                schedule.warning = True
+                        if show_cast:
+                            for cast in show_cast:
+                                if cast.artist == conflict.artist:
+                                    cast.warning = True
+                                    schedule.warning = True
     other_schedule_list = Schedule.objects.filter(tour=tour, end_date__gte=now.date()).exclude(pk=pk).select_related(
         'stage', 'stage__theatre', 'stage__theatre__city').order_by('begin_date')
     schedule.chupiao = Chupiao.objects.filter(show__schedule=schedule, show__time__gte=now)[:1]
