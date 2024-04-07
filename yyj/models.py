@@ -122,6 +122,9 @@ class MusicalCast(models.Model):
     seq = models.PositiveSmallIntegerField(default=1)
     artist = models.ForeignKey(Artist, on_delete=models.CASCADE)
 
+    class Meta:
+        unique_together = ('role', 'artist')
+
     def __str__(self):
         return self.role.seq.__str__() + ' ' + self.role.name + ' ' + self.seq.__str__() + ' ' + self.artist.name
 
