@@ -16,7 +16,8 @@ class Command(BaseCommand):
         role_list = Role.objects.filter(musical=schedule.tour.musical).order_by('seq')
         musical_cast_list = MusicalCast.objects.filter(
             role__musical=schedule.tour.musical).select_related('role', 'artist')
-        with open('cast.txt', encoding="utf-8") as f:
+        filename = options['schedule_id'] + '.txt'
+        with open(filename, encoding="utf-8") as f:
             # 读取角色列表
             line = f.readline()
             row = line.split('\t')
