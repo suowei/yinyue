@@ -31,3 +31,4 @@ class Command(BaseCommand):
                         for musical_cast in musical_cast_list:
                             if musical_cast.role == role_id_list[i] and musical_cast.artist.name == s_artist:
                                 show.cast.add(musical_cast)
+                                break
