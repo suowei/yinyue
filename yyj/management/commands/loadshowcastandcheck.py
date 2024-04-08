@@ -33,11 +33,11 @@ class Command(BaseCommand):
             while line:
                 line = f.readline()
                 row = line.split('\t')
-                # 去除空格
+                # 去除空格和换行符
+                row = [s.strip() for s in row]
                 row = [s for s in row if s]
                 # 读取日期和时间并添加演出信息
                 for i, s in enumerate(row):
-                    row[i] = s.strip()
                     numbers = [int(num) for num in re.findall(r'\d+', row[i])]
                     l_numbers = len(numbers)
                     # 如果有冒号代表读取结束
@@ -79,7 +79,7 @@ class Command(BaseCommand):
                 index = i + 1
                 for i, s_artist in enumerate(row[index:]):
                     for musical_cast in musical_cast_list:
-                        if musical_cast.role == role_id_list[i] and musical_cast.artist.name == s_artist.strip():
+                        if musical_cast.role == role_id_list[i] and musical_cast.artist.name == s_artist:
                             show.cast.add(musical_cast)
                             show_count = Show.objects.filter(cast__artist=musical_cast.artist_id,
                                                              time=show.time).distinct().count()
