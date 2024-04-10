@@ -111,6 +111,8 @@ def musical_detail(request, pk):
 def tour_detail(request, pk):
     tour = Tour.objects.get(pk=pk)
     role_list = Role.objects.filter(musical=tour.musical).order_by('seq')
+    for role in role_list:
+        role.flag = False
     now = datetime.datetime.now()
     today = now.date()
     schedule_list_coming = Schedule.objects.filter(tour=tour, end_date__gte=today).select_related(
@@ -136,6 +138,7 @@ def tour_detail(request, pk):
                     show.cast_table[show_cast.role.seq - 1].append(show_cast)
                 else:
                     show.cast_table[show_cast.role.seq - 1] = [show_cast]
+                    role_list[show_cast.role.seq - 1].flag = True
         if schedule.has_cast_table:
             conflicts = Conflict.objects.all()
             for conflict in conflicts:
@@ -168,6 +171,18 @@ def tour_detail(request, pk):
                     show.cast_table[show_cast.role.seq - 1].append(show_cast)
                 else:
                     show.cast_table[show_cast.role.seq - 1] = [show_cast]
+                    role_list[show_cast.role.seq - 1].flag = True
+    for role in reversed(role_list):
+        if not role.flag:
+            for schedule in schedule_list_coming:
+                if schedule.has_cast_table:
+                    for show in schedule.shows:
+                        del show.cast_table[role.seq - 1]
+            for schedule in schedule_list_done:
+                if schedule.has_cast_table:
+                    for show in schedule.shows:
+                        del show.cast_table[role.seq - 1]
+    role_list = [role for role in role_list if role.flag]
     tour.chupiao = Chupiao.objects.filter(show__schedule__tour=tour, show__time__gte=now)[:1]
     context = {
         'tour': tour,
@@ -183,6 +198,8 @@ def schedule_detail(request, pk):
     schedule = Schedule.objects.get(pk=pk)
     tour = schedule.tour
     role_list = Role.objects.filter(musical=tour.musical).order_by('seq')
+    for role in role_list:
+        role.flag = False
     now = datetime.datetime.now()
     search_cast = request.GET.get('artist', None)
     if search_cast:
@@ -202,6 +219,13 @@ def schedule_detail(request, pk):
                 show.cast_table[show_cast.role.seq - 1].append(show_cast)
             else:
                 show.cast_table[show_cast.role.seq - 1] = [show_cast]
+                role_list[show_cast.role.seq - 1].flag = True
+    if schedule.has_cast_table:
+        for role in reversed(role_list):
+            if not role.flag:
+                for show in schedule.shows:
+                    del show.cast_table[role.seq - 1]
+        role_list = [role for role in role_list if role.flag]
     search_chupiao = request.GET.get('chupiao', None)
     if search_chupiao == '1':
         search_chupiao = True
