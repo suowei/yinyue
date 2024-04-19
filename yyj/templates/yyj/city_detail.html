@@ -152,7 +152,7 @@
     <h3 class="ui pink header">驻场演出<i class="map marker alternate icon"></i></h3>
 </div>
 <table class="ui pink unstackable compact table">
-    <thead><tr><th>音乐剧</th><th>剧院</th></tr></thead>
+    <thead><tr><th>音乐剧</th><th>剧院</th><th>最新排期</th></tr></thead>
     <tbody>
     {% for schedule in long_term_schedule_list %}
     <tr>
@@ -166,6 +166,7 @@
                 {{ schedule.stage.theatre.name }}{{ schedule.stage.name|default_if_none:"" }}
             </a>
         </td>
+        <td>{{ schedule.end_date|date:"n月j日" }}</td>
     </tr>
     {% endfor %}
     </tbody>
