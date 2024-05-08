@@ -158,6 +158,7 @@ def tour_detail(request, pk):
         'stage', 'stage__theatre', 'stage__theatre__city').order_by('begin_date')
     for schedule in schedule_list_done:
         schedule.shows = schedule.show_set.filter(time__lt=now).order_by('time')[:30]
+        schedule.has_cast_table = False
         if schedule.show_set.filter(time__lt=now).count() > 30:
             schedule.show_list_more = True
         for show in schedule.shows:
