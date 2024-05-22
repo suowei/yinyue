@@ -84,5 +84,5 @@ class Command(BaseCommand):
                             show_count = Show.objects.filter(cast__artist=musical_cast.artist_id,
                                                              time=show.time).distinct().count()
                             if show_count > 1:
-                                Conflict.objects.get_or_create(artist=musical_cast.artist_id, time=show.time)
+                                Conflict.objects.get_or_create(artist=musical_cast.artist, time=show.time)
                             break
