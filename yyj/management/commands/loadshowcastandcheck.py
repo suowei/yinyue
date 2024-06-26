@@ -11,12 +11,16 @@ class Command(BaseCommand):
         parser.add_argument('schedule_id', nargs='?')
 
     def handle(self, *args, **options):
-        pk = int(options['schedule_id'])
-        schedule = Schedule.objects.get(pk=pk)
+        if not options['schedule_id']:
+            print('请输入schedule_id:')
+            schedule_id = input()
+        else:
+            schedule_id = options['schedule_id']
+        schedule = Schedule.objects.get(pk=int(schedule_id))
         role_list = Role.objects.filter(musical=schedule.tour.musical).order_by('seq')
         musical_cast_list = MusicalCast.objects.filter(
             role__musical=schedule.tour.musical).select_related('role', 'artist')
-        filename = options['schedule_id'] + '.txt'
+        filename = schedule_id + '.txt'
         with open(filename, encoding="utf-8") as f:
             # 读取角色列表
             line = f.readline()
