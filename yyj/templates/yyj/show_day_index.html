@@ -16,6 +16,11 @@
     <h3 class="ui pink header">
         {{ form.cleaned_data.date|date:"Y年n月j日 l" }}
         {{ form.cleaned_data.city|default_if_none:"" }}
+        {% if show_list %}
+        <a href="{% url 'yyj:yyj.show_day_map' %}?date={{form.cleaned_data.date|date:'Y-m-d'}}&city={{ form.cleaned_data.city.id|default_if_none:'' }}" class="circular ui icon basic right floated button" target="_blank">
+            <i class="globe icon"></i>
+        </a>
+        {% endif %}
     </h3>
 </div>
 {% if show_list %}

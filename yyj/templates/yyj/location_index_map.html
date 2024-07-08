@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="renderer" content="webkit">
+    <title>剧院地图</title>
+    <link rel="stylesheet" type="text/css" href="https://lib.baomitu.com/semantic-ui/2.4.1/semantic.min.css">
+    <script crossorigin="anonymous" integrity="sha384-tsQFqpEReu7ZLhBV2VZlAu7zcOV+rXbYlF2cqB8txI/8aZajjp4Bqd+V6D5IgvKT" src="https://lib.baomitu.com/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://lib.baomitu.com/semantic-ui/2.4.1/semantic.min.js"></script>
+    <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?5a23a22a8b0592235a20280da39e127b";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+    </script>
+    <script type="text/javascript" src="http://api.tianditu.gov.cn/api?v=4.0&tk=8d1a33b8e3c82d468e7399fe50a6a1db"></script>
+    <script src="http://lbs.tianditu.gov.cn/js/lib/d3/d3.min.js" charset="utf-8"></script>
+    <script src="http://lbs.tianditu.gov.cn/api/js4.0/opensource/openlibrary/D3SvgOverlay.min.js"></script>
+    <style type="text/css">
+        html, body {
+            height: 100%;
+        }
+        #map-canvas {
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+<div id="map-canvas"></div>
+<script>
+    var min_lng = 135.04167;
+    var max_lng = 73.66667;
+    var min_lat = 53.56167;
+    var max_lat = 22.21443;
+    var center_lng = (max_lng + min_lng) / 2;
+    var center_lat = (max_lat + min_lat) / 2;
+    var zoom = 5;
+    var map = new T.Map("map-canvas");
+    map.centerAndZoom(new T.LngLat(center_lng, center_lat), zoom);
+    {% for location in location_list %}
+        var marker = new T.Marker(new T.LngLat({{ location.longitude }}, {{ location.latitude }}));
+        map.addOverLay(marker);
+        var content ="{{ location.name }}";
+        addClickHandler(content,marker);
+    {% endfor %}
+    function addClickHandler(content,marker){
+        marker.addEventListener("click",function(e){
+            openInfo(content,e)
+        });
+    }
+    function openInfo(content,e){
+        var point = e.lnglat;
+        var markerInfoWin = new T.InfoWindow(content,{offset:new T.Point(0,-30)});
+        map.openInfoWindow(markerInfoWin,point);
+    }
+</script>
+</body>
+</html>

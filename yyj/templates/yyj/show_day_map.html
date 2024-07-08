@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="renderer" content="webkit">
+    <title>{{ date }}{{ city.name|default_if_none:"" }}演出地图</title>
+    <link rel="stylesheet" type="text/css" href="https://lib.baomitu.com/semantic-ui/2.4.1/semantic.min.css">
+    <script crossorigin="anonymous" integrity="sha384-tsQFqpEReu7ZLhBV2VZlAu7zcOV+rXbYlF2cqB8txI/8aZajjp4Bqd+V6D5IgvKT" src="https://lib.baomitu.com/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://lib.baomitu.com/semantic-ui/2.4.1/semantic.min.js"></script>
+    <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?5a23a22a8b0592235a20280da39e127b";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+    </script>
+    <script type="text/javascript" src="http://api.tianditu.gov.cn/api?v=4.0&tk=8d1a33b8e3c82d468e7399fe50a6a1db"></script>
+    <script src="http://lbs.tianditu.gov.cn/js/lib/d3/d3.min.js" charset="utf-8"></script>
+    <script src="http://lbs.tianditu.gov.cn/api/js4.0/opensource/openlibrary/D3SvgOverlay.min.js"></script>
+    <style type="text/css">
+        html, body, #map-grid, #map-canvas {
+            height: 100%;
+        }
+        #map-column {
+            min-height: 400px;
+        }
+    </style>
+</head>
+<body>
+    <div class="ui stackable grid" id="map-grid">
+        <div class="eleven wide column" id="map-column">
+            <div id="map-canvas"></div>
+        </div>
+        <div class="five wide column">
+            <div class="ui basic segment">
+            <h3 class="ui pink header">{{ date|date:"Y年n月j日 l" }} {{ city|default_if_none:"" }}</h3>
+            <div class="ui accordion">
+                {% for location in location_list %}
+                <div class="title">
+                    <h4 class="ui pink header">
+                        {{ forloop.counter0|add:1 }}&nbsp;&nbsp;&nbsp;&nbsp;
+                        {% if not city %}{{ location.show_list.0.schedule.stage.theatre.city.name }} ·{% endif %}
+                        {{ location.name }}
+                    </h4>
+                </div>
+                <div class="content">
+                    <table class="ui unstackable compact table">
+                        <tbody>
+                        {% for show in location.show_list %}
+                        <tr>
+                            <td class="center aligned">
+                                {% ifchanged show.schedule.stage.theatre.city show.time %}{{ show.time|time }}{% endifchanged %}
+                            </td>
+                            <td class="center aligned">
+                                <h4 class="ui header"><a href="{{ show.schedule.get_absolute_url }}" target="_blank">{{ show.schedule.tour.musical.name }}</a></h4>
+                            </td>
+                            <td>
+                                {% for show_cast in show.cast_list %}
+                                <a href="{{ show_cast.artist.get_absolute_url }}" target="_blank">{{ show_cast.artist.name }}</a>{% if show_cast.warning %}*{% endif %}
+                                {% endfor %}
+                            </td>
+                            <td class="center aligned">
+                                <a href="{{ show.schedule.stage.get_absolute_url }}" target="_blank">
+                                    {{ show.schedule.stage.theatre.name }}{{ show.schedule.stage.name|default_if_none:"" }}
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endfor %}
+            </div>
+            </div>
+        </div>
+    </div>
+<script>
+    $('.ui.accordion').accordion();
+    var min_lng = 135.04167;
+    var max_lng = 73.66667;
+    var min_lat = 53.56167;
+    var max_lat = 22.21443;
+    {% for location in location_list %}
+        var lng = {{ location.longitude }};
+        if (max_lng < lng) {
+            max_lng = lng;
+        }
+        if (min_lng > lng) {
+            min_lng = lng;
+        }
+        var lat = {{ location.latitude }};
+        if (min_lat > lat) {
+            min_lat = lat;
+        }
+        if (max_lat < lat) {
+            max_lat = lat;
+        }
+    {% endfor %}
+    var center_lng = (max_lng + min_lng) / 2;
+    var center_lat = (max_lat + min_lat) / 2;
+    {% if city %}
+    var zoom = 10;
+    {% else %}
+    var zoom = 5;
+    {% endif %}
+    var map = new T.Map("map-canvas");
+    map.centerAndZoom(new T.LngLat(center_lng, center_lat), zoom);
+    var i = 1;
+    {% for location in location_list %}
+        var icon = new T.Icon({
+            iconUrl: "http://y.saoju.net/static/yyj/map/marker" + i + ".png",
+            iconSize: new T.Point(38, 38),
+            iconAnchor: new T.Point(19, 38)
+        });
+        i++;
+        var marker = new T.Marker(new T.LngLat({{ location.longitude }}, {{ location.latitude }}), {icon: icon});
+        var content = "{{ location.name }}";
+        map.addOverLay(marker);
+        addClickHandler(content,marker);
+        var infoWin = new T.InfoWindow({offset:new T.Point(0,-30)});
+        marker.addEventListener("click", function () {
+            $('.ui.accordion').accordion('open', {{ forloop.counter0 }});
+        });
+    {% endfor %}
+    function addClickHandler(content,marker){
+        marker.addEventListener("click",function(e){
+            openInfo(content,e)}
+        );
+    }
+    function openInfo(content,e){
+        var point = e.lnglat;
+        var markerInfoWin = new T.InfoWindow(content,{offset:new T.Point(0,-30)});
+        map.openInfoWindow(markerInfoWin,point);
+    }
+    $('.title').click(function() {
+        var content = $(event.target).text();
+        {% if city %}
+        content = content.substring(content.indexOf(' ') + 4);
+        {% else %}
+        content = content.substring(content.indexOf('·') + 1);
+        {% endif %}
+        var index = $(event.target).parents('.title').index('.title');
+        var marker = map.getOverlays()[index];
+        marker.openInfoWindow(new T.InfoWindow(content));
+    });
+</script>
+</body>
+</html>
