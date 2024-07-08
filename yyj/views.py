@@ -5,7 +5,7 @@ import datetime
 import csv
 import codecs
 from .models import Role, Tour, Schedule, Musical, Produce, Artist, Show, City, Theatre, Stage, Chupiao, Conflict
-from .models import MusicalProduces, MusicalStaff, MusicalCast
+from .models import MusicalProduces, MusicalStaff, MusicalCast, Location
 from .forms import ShowForm, ApiShowDayForm, ChupiaoSearchForm, ChupiaoFilterForm, ChupiaoForm
 from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
@@ -748,6 +748,64 @@ def show_day_index(request):
         else:
             form = ShowForm()
         return render(request, 'yyj/show_day_index.html', {'form': form})
+
+
+def show_day_map(request):
+    date = request.GET.get('date')
+    date = datetime.datetime.strptime(date, '%Y-%m-%d').date()
+    city = request.GET.get('city')
+    if city:
+        show_list = Show.objects.filter(
+            schedule__stage__theatre__city=city, time__range=(date, date + datetime.timedelta(1))
+        ).select_related(
+            'schedule', 'schedule__tour', 'schedule__tour__musical', 'schedule__stage',
+            'schedule__stage__theatre', 'schedule__stage__theatre__city', 'schedule__stage__theatre__location'
+        ).order_by('time')
+        city = City.objects.get(id=city)
+    else:
+        show_list = Show.objects.filter(
+            time__range=(date, date + datetime.timedelta(1))
+        ).select_related(
+            'schedule', 'schedule__tour', 'schedule__tour__musical', 'schedule__stage',
+            'schedule__stage__theatre', 'schedule__stage__theatre__city', 'schedule__stage__theatre__location'
+        ).order_by('time')
+    for show in show_list:
+        show.cast_list = show.cast.select_related('role', 'artist').order_by('role__seq')
+    conflicts = Conflict.objects.all()
+    for conflict in conflicts:
+        for show in show_list:
+            if show.time == conflict.time:
+                for cast in show.cast_list:
+                    if cast.artist == conflict.artist:
+                        cast.warning = True
+    location_list = []
+    for show in show_list:
+        location = show.schedule.stage.theatre.location
+        location.city_seq = show.schedule.stage.theatre.city.seq
+        for location_item in location_list:
+            if location.id == location_item.id:
+                location_item.show_list.append(show)
+                location_item.show_count += 1
+                break
+        else:
+            location.show_list = [show]
+            location.show_count = 1
+            location_list.append(location)
+    location_list.sort(key=lambda x: (x.city_seq, -x.show_count))
+    context = {
+        'date': date,
+        'city': city,
+        'location_list': location_list,
+    }
+    return render(request, 'yyj/show_day_map.html', context)
+
+
+def location_index_map(request):
+    location_list = Location.objects.all()
+    context = {
+        'location_list': location_list,
+    }
+    return render(request, 'yyj/location_index_map.html', context)
 
 
 def download(request):

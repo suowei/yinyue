@@ -13,9 +13,20 @@ class City(models.Model):
         return self.name
 
 
+class Location(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    longitude = models.FloatField()  # 经度
+    latitude = models.FloatField()  # 纬度
+    seq = models.PositiveSmallIntegerField(default=999)
+
+    def __str__(self):
+        return self.name
+
+
 class Theatre(models.Model):
     city = models.ForeignKey(City, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
+    location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True, blank=True)
 
     def get_absolute_url(self):
         return "/yyj/theatre/%i/" % self.id

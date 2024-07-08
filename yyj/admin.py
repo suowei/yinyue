@@ -1,15 +1,19 @@
 from django.contrib import admin
 
-from .models import City, Theatre, Stage, Produce, Musical, MusicalProduces, MusicalStaff, MusicalCast, Tour, Schedule, Role, Artist, Show, Conflict, Chupiao
+from .models import City, Theatre, Stage, Produce, Musical, MusicalProduces, MusicalStaff, MusicalCast, Tour, Schedule, Role, Artist, Show, Conflict, Chupiao, Location
 
 
 class CityAdmin(admin.ModelAdmin):
     search_fields = ['name']
 
 
+class LocationAdmin(admin.ModelAdmin):
+    search_fields = ['name']
+
+
 class TheatreAdmin(admin.ModelAdmin):
     search_fields = ['name']
-    autocomplete_fields = ['city']
+    autocomplete_fields = ['city', 'location']
 
 
 class StageAdmin(admin.ModelAdmin):
@@ -164,3 +168,4 @@ admin.site.register(MusicalStaff, MusicalStaffAdmin)
 admin.site.register(MusicalCast, MusicalCastAdmin)
 admin.site.register(Conflict, ConflictAdmin)
 admin.site.register(Chupiao, ChupiaoAdmin)
+admin.site.register(Location, LocationAdmin)
