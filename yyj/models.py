@@ -17,7 +17,6 @@ class Location(models.Model):
     name = models.CharField(max_length=50, unique=True)
     longitude = models.FloatField()  # 经度
     latitude = models.FloatField()  # 纬度
-    seq = models.PositiveSmallIntegerField(default=999)
 
     def __str__(self):
         return self.name
