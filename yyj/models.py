@@ -18,6 +18,9 @@ class Location(models.Model):
     longitude = models.FloatField()  # 经度
     latitude = models.FloatField()  # 纬度
 
+    def get_absolute_url(self):
+        return "/yyj/location/%i/" % self.id
+
     def __str__(self):
         return self.name
 

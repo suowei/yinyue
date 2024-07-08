@@ -808,6 +808,28 @@ def location_index_map(request):
     return render(request, 'yyj/location_index_map.html', context)
 
 
+def location_detail(request, pk):
+    location = Location.objects.get(id=pk)
+    theatre_list = Theatre.objects.filter(location=location)
+    today = datetime.datetime.now().date()
+    schedule_list = Schedule.objects.filter(end_date__gte=today, stage__theatre__location=location).select_related(
+        'tour', 'tour__musical').order_by('begin_date')
+    context = {
+        'location': location,
+        'theatre_list': theatre_list,
+        'schedule_list': schedule_list,
+    }
+    return render(request, 'yyj/location_detail.html', context)
+
+
+def location_map(request, pk):
+    location = Location.objects.get(id=pk)
+    context = {
+        'location': location,
+    }
+    return render(request, 'yyj/location_map.html', context)
+
+
 def download(request):
     file_list = []
     with open('download/filename.csv', newline='') as f:
@@ -954,6 +976,11 @@ def api_stage_index(request):
 
 def api_theatre_index(request):
     data = serializers.serialize("json", Theatre.objects.all())
+    return HttpResponse(data)
+
+
+def api_location_index(request):
+    data = serializers.serialize("json", Location.objects.all())
     return HttpResponse(data)
 
 

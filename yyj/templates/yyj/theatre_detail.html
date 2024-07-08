@@ -7,7 +7,8 @@
     <h2 class="ui header">
         {{ theatre.name }}
         <div class="sub header">
-            <a href="{{ theatre.city.get_absolute_url }}">{{ theatre.city.name }}</a>
+            <a href="{{ theatre.city.get_absolute_url }}" target="_blank">{{ theatre.city.name }}</a>
+            &nbsp;&nbsp;<a href="{% url 'yyj:yyj.location_map' theatre.location.id %}" target="_blank"><i class="map pin icon"></i></a>
         </div>
     </h2>
     {% for stage in stage_list %}

@@ -3,6 +3,10 @@
 {% block title %}剧场列表{% endblock %}
 
 {% block content %}
+    <a class="ui tiny basic right floated button" href="{% url 'yyj:yyj.location_index_map' %}" target="_blank"><i class="map icon"></i>地图</a>
+<p>
+    &nbsp;&nbsp;&nbsp;&nbsp;总计：{{ stage_list|length }}
+</p>
 <table class="ui pink unstackable table">
     <thead>
     <th>城市</th>

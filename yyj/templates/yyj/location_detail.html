@@ -1,0 +1,24 @@
+{% extends "yyj/base.html" %}
+
+{% block title %}{{ location.name }}{% endblock %}
+
+{% block content %}
+<div class="ui basic segment">
+    <h2 class="ui header">
+        {{ location.name }}
+        <div class="sub header">
+            {{ location.longitude }}, {{ location.latitude }}
+        </div>
+    </h2>
+    {% if schedule_list %}
+    <h3 class="ui pink header">近期剧目</h3>
+    {% for schedule in schedule_list %}
+    <a href="{{ schedule.get_absolute_url }}">{{ schedule.tour.musical.name }}</a><br>
+    {% endfor %}
+    {% endif %}
+    <h3 class="ui pink header">全部剧院</h3>
+    {% for theatre in theatre_list %}
+    <a href="{{ theatre.get_absolute_url }}">{{ theatre.name }}</a><br>
+    {% endfor %}
+</div>
+{% endblock %}

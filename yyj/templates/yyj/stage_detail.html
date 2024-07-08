@@ -9,6 +9,7 @@
         <div class="sub header">
             <a href="{{ stage.theatre.city.get_absolute_url }}">{{ stage.theatre.city.name }}</a>
             {{ stage.seats }}座
+            &nbsp;&nbsp;<a href="{% url 'yyj:yyj.location_map' stage.theatre.location.id %}" target="_blank"><i class="map pin icon"></i></a>
         </div>
     </h2>
 </div>
