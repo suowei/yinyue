@@ -8,6 +8,7 @@
         {{ location.name }}
         <div class="sub header">
             {{ location.longitude }}, {{ location.latitude }}
+            <a href="{% url 'yyj:yyj.location_map' location.id %}" target="_blank"><i class="map pin icon"></i></a>
         </div>
     </h2>
     {% if schedule_list %}
