@@ -12,7 +12,7 @@
         </div>
     </h2>
     {% for stage in stage_list %}
-    <a href="{{ stage.get_absolute_url }}">{{ stage.name|default_if_none:"" }}</a> {{ stage.seats }}座<br>
+    <a href="{{ stage.get_absolute_url }}">{{ stage.name|default_if_none:"主剧场" }}</a> {{ stage.seats }}座<br>
     {% endfor %}
 </div>
 {% if schedule_list %}
