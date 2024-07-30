@@ -56,6 +56,7 @@ class RoleInline(admin.TabularInline):
 
 class MusicalAdmin(admin.ModelAdmin):
     save_as = True
+    ordering = ['-id']
     search_fields = ['name']
     inlines = [
         MusicalStaffInline,
@@ -71,6 +72,7 @@ class ScheduleInline(admin.TabularInline):
 
 class TourAdmin(admin.ModelAdmin):
     save_as = True
+    ordering = ['-id']
     search_fields = ['musical__name']
     autocomplete_fields = ['musical']
     inlines = [
