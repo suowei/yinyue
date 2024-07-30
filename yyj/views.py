@@ -33,9 +33,7 @@ def index(request):
         if schedule_list:
             month_list.append({'month': begin, 'schedule_list': schedule_list})
         begin = end
-    long_term_schedule_list = Schedule.objects.filter(
-        is_long_term=True, begin_date__lte=today
-    ).select_related(
+    long_term_schedule_list = Schedule.objects.filter(is_long_term=True).select_related(
         'tour', 'tour__musical', 'stage', 'stage__theatre', 'stage__theatre__city'
     ).order_by('stage__theatre__city__seq', 'begin_date')
     end = today + datetime.timedelta(7)
