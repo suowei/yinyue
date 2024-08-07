@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-import re
+import re, glob
 import datetime
 from yyj.models import Schedule, Role, MusicalCast, Show, Conflict
 
@@ -10,12 +10,23 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('schedule_id', nargs='?')
 
+        parser.add_argument('--first',
+                            action='store_true',
+                            help='Load all txt.',
+                            )
+
     def handle(self, *args, **options):
-        if not options['schedule_id']:
-            print('请输入schedule_id:')
-            schedule_id = input()
+        if options['first']:
+            txt_files = glob.glob('*.txt')
+            txt_file = txt_files[0]
+            schedule_id = txt_file.split('.')[0]
+            print(schedule_id)
         else:
-            schedule_id = options['schedule_id']
+            if not options['schedule_id']:
+                print('请输入schedule_id:')
+                schedule_id = input()
+            else:
+                schedule_id = options['schedule_id']
         schedule = Schedule.objects.get(pk=int(schedule_id))
         role_list = Role.objects.filter(musical=schedule.tour.musical).order_by('seq')
         musical_cast_list = MusicalCast.objects.filter(
