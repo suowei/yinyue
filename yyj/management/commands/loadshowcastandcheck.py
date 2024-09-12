@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
-import re, glob
+import re
+import glob
 import datetime
 from yyj.models import Schedule, Role, MusicalCast, Show, Conflict
 
@@ -13,6 +14,11 @@ class Command(BaseCommand):
         parser.add_argument('--first',
                             action='store_true',
                             help='Load all txt.',
+                            )
+
+        parser.add_argument('--updateenddate',
+                            action='store_true',
+                            help='Update end date.',
                             )
 
     def handle(self, *args, **options):
@@ -101,3 +107,6 @@ class Command(BaseCommand):
                             if show_count > 1:
                                 Conflict.objects.get_or_create(artist=musical_cast.artist, time=show.time)
                             break
+                end_date = str(year) + '-' + str(month) + '-' + str(day)
+                schedule.end_date = datetime.datetime.strptime(end_date, '%Y-%m-%d').date()
+                schedule.save()
