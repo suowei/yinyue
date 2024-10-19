@@ -110,6 +110,9 @@ class MusicalProduces(models.Model):
     title = models.CharField(max_length=20, default="出品制作")
     produce = models.ForeignKey(Produce, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return self.musical.name + self.title + self.produce.name
+
 
 class MusicalStaff(models.Model):
     musical = models.ForeignKey(Musical, on_delete=models.CASCADE)
