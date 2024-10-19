@@ -29,6 +29,11 @@ class ArtistAdmin(admin.ModelAdmin):
     search_fields = ['name']
 
 
+class MusicalProducesAdmin(admin.ModelAdmin):
+    search_fields = ['musical__name', 'produce__name']
+    autocomplete_fields = ['musical', 'produce']
+
+
 class MusicalStaffAdmin(admin.ModelAdmin):
     search_fields = ['musical__name', 'artist__name']
     autocomplete_fields = ['musical', 'artist']
@@ -166,6 +171,7 @@ admin.site.register(Schedule, ScheduleAdmin)
 admin.site.register(Role, RoleAdmin)
 admin.site.register(Artist, ArtistAdmin)
 admin.site.register(Show, ShowAdmin)
+admin.site.register(MusicalProduces, MusicalProducesAdmin)
 admin.site.register(MusicalStaff, MusicalStaffAdmin)
 admin.site.register(MusicalCast, MusicalCastAdmin)
 admin.site.register(Conflict, ConflictAdmin)
