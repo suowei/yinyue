@@ -742,9 +742,9 @@ def show_day_index(request):
                             cast.warning = True
                             show_list.warning = True
         if city:
-            chupiao = Chupiao.objects.filter(show__time__date=date, show__schedule__stage__theatre__city=city)[:1]
+            chupiao = Chupiao.objects.filter(show__time__range=(date, date + datetime.timedelta(1)), show__schedule__stage__theatre__city=city)[:1]
         else:
-            chupiao = Chupiao.objects.filter(show__time__date=date)[:1]
+            chupiao = Chupiao.objects.filter(show__time__range=(date, date + datetime.timedelta(1)))[:1]
         context = {
             'form': form,
             'city': city,
