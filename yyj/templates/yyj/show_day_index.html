@@ -11,6 +11,11 @@
         <label>选择城市：</label>
         <div class="field">{{ form.city }}</div>
         <input class="ui pink button" type="submit" value="搜索演出">
+        {% if search_chupiao %}
+            &nbsp;&nbsp;<a href="?date={{ form.cleaned_data.date|date:'Y-m-d' }}&city={{ form.cleaned_data.city.id }}&chupiao=0" class="ui teal label"><i class="ticket alternate icon"></i>隐藏出票信息</a>
+        {% elif chupiao and not search_chupiao %}
+            &nbsp;&nbsp;<a href="?date={{ form.cleaned_data.date|date:'Y-m-d' }}&city={{ form.cleaned_data.city.id }}&chupiao=1" class="ui teal label"><i class="ticket alternate icon"></i>查看出票信息</a>
+        {% endif %}
     </div>
 </form>
     <h3 class="ui pink header">
@@ -30,6 +35,9 @@
             {% if not city %}<th class="center aligned">城市</th>{% endif %}
             <th class="center aligned">时间</th>
             <th class="center aligned">音乐剧</th>
+            {% if search_chupiao %}
+                <th class="center aligned">出票信息</th>
+            {% endif %}
             <th class="center aligned">卡司</th>
             <th class="center aligned">剧院</th>
         </tr>
@@ -50,6 +58,17 @@
             <td class="center aligned">
                 <h4 class="ui header"><a href="{{ show.schedule.get_absolute_url }}" target="_blank">{{ show.schedule.tour.musical.name }}</a></h4>
             </td>
+            {% if search_chupiao %}
+                <td>
+                    {% if show.chupiao_list %}
+                        {% for chupiao in show.chupiao_list %}
+                            <a href="{{ chupiao.get_absolute_url }}" target="_blank">
+                                {{ chupiao.price|floatformat }}/{{ chupiao.par_value|floatformat }} {{ chupiao.seat }}
+                            </a><br>
+                        {% endfor %}
+                    {% endif %}
+                </td>
+            {% endif %}
             <td>
                 {% for show_cast in show.cast_list %}
                 <a href="{{ show_cast.artist.get_absolute_url }}" target="_blank">{{ show_cast.artist.name }}</a>{% if show_cast.warning %}*{% endif %}

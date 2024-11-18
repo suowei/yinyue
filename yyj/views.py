@@ -725,6 +725,14 @@ def show_day_index(request):
             ).order_by('schedule__stage__theatre__city__seq', 'time')
         for show in show_list:
             show.cast_list = show.cast.select_related('role', 'artist').order_by('role__seq')
+        search_chupiao = request.GET.get('chupiao', None)
+        if search_chupiao == '1':
+            search_chupiao = True
+        else:
+            search_chupiao = False
+        if search_chupiao:
+            for show in show_list:
+                show.chupiao_list = Chupiao.objects.filter(show=show).order_by('price', 'id')
         conflicts = Conflict.objects.all()
         for conflict in conflicts:
             for show in show_list:
@@ -733,9 +741,15 @@ def show_day_index(request):
                         if cast.artist == conflict.artist:
                             cast.warning = True
                             show_list.warning = True
+        if city:
+            chupiao = Chupiao.objects.filter(show__time__date=date, show__schedule__stage__theatre__city=city)[:1]
+        else:
+            chupiao = Chupiao.objects.filter(show__time__date=date)[:1]
         context = {
             'form': form,
             'city': city,
+            'chupiao': chupiao,
+            'search_chupiao': search_chupiao,
             'show_list': show_list,
         }
         return render(request, 'yyj/show_day_index.html', context)
