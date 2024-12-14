@@ -11,9 +11,9 @@
     <h3 class="ui pink header">
         过往演出
         {% if other %}
-        <a href="?other=0" class="ui pink right floated basic button">不显示同场演员</a>
+        <a href="?page={{ show_list.number }}&other=0" class="ui pink right floated basic button">不显示同场演员</a>
         {% else %}
-        <a href="?other=1" class="ui pink right floated basic button">显示同场演员</a>
+        <a href="?page={{ show_list.number }}&other=1" class="ui pink right floated basic button">显示同场演员</a>
         {% endif %}
     </h3>
 </div>
