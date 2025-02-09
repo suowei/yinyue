@@ -43,12 +43,11 @@ class Command(BaseCommand):
             line = f.readline()
             row = line.split('\t')
             role_id_list = []
-            if row[0] == '角色':
-                for s_role in row[1:]:
-                    for role in role_list:
-                        if s_role.strip() == role.name:
-                            role_id_list.append(role)
-                            break
+            for s_role in row:
+                for role in role_list:
+                    if s_role.strip() == role.name:
+                        role_id_list.append(role)
+                        break
             # 读取每一场演出的卡司排期并检查演员行程是否冲突
             today = datetime.date.today()
             while line:
