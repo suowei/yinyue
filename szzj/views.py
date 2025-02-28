@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.views import generic
 from django.db.models import Count, Q
 from django.http import HttpResponse
+from django.http import FileResponse
 from django.core.paginator import Paginator
 from django.core.cache import cache
 import datetime
@@ -277,3 +278,10 @@ def search(request):
     album_list = Album.objects.filter(title__icontains=q).select_related('artist')
     context = {'artist_list': artist_list, 'album_list': album_list}
     return render(request, 'szzj/search.html', context)
+
+
+def download_file(request, file):
+    filename = 'download/' + file
+    response = FileResponse(open(filename, 'rb'))
+    response['Content-Disposition'] = 'attachment;filename=' + file
+    return response

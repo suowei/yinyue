@@ -1,0 +1,38 @@
+{% extends "szzj/base.html" %}
+
+{% block title %}数据下载{% endblock %}
+
+{% block content %}
+<div class="ui blue inverted four item menu">
+  <a class="active item" href="/" target="_blank">最新</a>
+  <a class="item" href="/szzj" target="_blank">数字专辑</a>
+  <a class="item" href="/yanchanghui" target="_blank">演唱会</a>
+  <a class="item" href="/yyj" target="_blank">音乐剧</a>
+</div>
+<div class="ui basic segment">
+    <h2 class="ui header">数据下载</h2>
+    <p>
+        要求：
+        <br>1. 引用本站数据需注明来源http://y.saoju.net。
+        <br>2. 数据仅供学习参考，不允许用于盈利。
+        <br>3. 本站不负责数据的准确性和全面性，因使用数据出现任何问题，后果自负。
+    </p>
+    <p>
+        数据为UTC时间，转换为北京时间需加8小时。<br>
+        <a href="{% url 'szzj:szzj.download_file' 'szzj_album.csv' %}">szzj_album.csv</a>
+        <br><a href="{% url 'szzj:szzj.download_file' 'szzj_albumdata_2019.5-2020.1.zip' %}">szzj_albumdata_2019.5-2020.1.zip</a>
+        <br><a href="{% url 'szzj:szzj.download_file' 'szzj_albumdata_2020.1-2020.8.zip' %}">szzj_albumdata_2020.1-2020.8.zip</a>
+        <br><a href="{% url 'szzj:szzj.download_file' 'szzj_albumdata_2020.8-2021.2.zip' %}">szzj_albumdata_2020.8-2021.2.zip</a>
+        <br><a href="{% url 'szzj:szzj.download_file' 'szzj_albumdata_2021.2-2021.10.zip' %}">szzj_albumdata_2021.2-2021.10.zip</a>
+        <br><a href="{% url 'szzj:szzj.download_file' 'szzj_albumdata_2021.10-2022.7.zip' %}">szzj_albumdata_2021.10-2022.7.zip</a>
+        <br><a href="{% url 'szzj:szzj.download_file' 'szzj_albumdata_2022.7-2023.6.zip' %}">szzj_albumdata_2022.7-2023.6.zip</a>
+        <br><a href="{% url 'szzj:szzj.download_file' 'szzj_albumdata_2023.6-2024.5.zip' %}">szzj_albumdata_2023.6-2024.5.zip</a>
+        <br><a href="{% url 'szzj:szzj.download_file' 'szzj_albumdatadaily.zip' %}">szzj_albumdatadaily.zip</a>
+        <br><a href="{% url 'szzj:szzj.download_file' 'szzj_artist.csv' %}">szzj_artist.csv</a>
+        <br><a href="{% url 'szzj:szzj.download_file' 'szzj_city.csv' %}">szzj_city.csv</a>
+        <br><a href="{% url 'szzj:szzj.download_file' 'szzj_concert.csv' %}">szzj_concert.csv</a>
+        <br><a href="{% url 'szzj:szzj.download_file' 'szzj_site.csv' %}">szzj_site.csv</a>
+        <br><a href="{% url 'szzj:szzj.download_file' 'szzj_tour.csv' %}">szzj_tour.csv</a>
+    </p>
+</div>
+{% endblock %}

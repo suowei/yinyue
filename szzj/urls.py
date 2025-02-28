@@ -27,4 +27,6 @@ urlpatterns = [
     path('yanchanghui/site/', views.SiteIndexView.as_view(), name='yanchanghui.site_index'),
     path('yanchanghui/site/<int:pk>/', views.SiteDetailView.as_view(), name='yanchanghui.site_detail'),
     # path('search/', views.search),
+    path('download/', TemplateView.as_view(template_name="szzj/download.html"), name='szzj.download'),
+    path('download/<str:file>', views.download_file, name='szzj.download_file'),
 ]
