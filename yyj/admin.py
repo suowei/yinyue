@@ -144,7 +144,7 @@ class ShowCastInline(admin.TabularInline):
 
 class ShowAdmin(admin.ModelAdmin):
     save_as = True
-    search_fields = ['schedule__tour__musical__name', 'schedule__tour__name', 'time__date']
+    search_fields = ['schedule__tour__musical__name', 'schedule__tour__name']
     autocomplete_fields = ['schedule']
     exclude = ('cast',)
     inlines = [
