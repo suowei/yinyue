@@ -60,4 +60,5 @@ urlpatterns = [
     path('chupiao/add/', views.chupiao_create, name='yyj.chupiao_add'),
     path('chupiao/<int:pk>/edit/', views.chupiao_edit, name='yyj.chupiao_edit'),
     path('chupiao/<int:pk>/delete/', views.chupiao_delete, name='yyj.chupiao_delete'),
+    path('donation/', TemplateView.as_view(template_name="yyj/donation.html"), name='yyj.donation')
 ]
