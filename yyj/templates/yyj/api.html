@@ -6,8 +6,8 @@
 <div class="ui basic segment">
     <h2 class="ui pink header">查询接口<div class="sub header">以下接口全部返回json数据</div></h2>
     1. 查询某日演出<br>
-    接口格式：http://y.saoju.net/yyj/api/search_day/?date={}<br>
-    例：http://y.saoju.net/yyj/api/search_day/?date=2023-07-25<br>
+    接口格式：https://y.saoju.net/yyj/api/search_day/?date={}<br>
+    例：https://y.saoju.net/yyj/api/search_day/?date=2023-07-25<br>
     <div class="ui bulleted list">
         <div class="item">"date": "2023-07-25"</div>
         <div class="item">
@@ -28,8 +28,8 @@
         </div>
     </div>
     2. 查询某日某城市演出<br>
-    接口格式：http://y.saoju.net/yyj/api/search_day/?date={}&city={}<br>
-    例：http://y.saoju.net/yyj/api/search_day/?date=2023-07-25&city=上海<br>
+    接口格式：https://y.saoju.net/yyj/api/search_day/?date={}&city={}<br>
+    例：https://y.saoju.net/yyj/api/search_day/?date=2023-07-25&city=上海<br>
     <div class="ui bulleted list">
         <div class="item">"date": "2023-07-25"</div>
         <div class="item">"city": "上海"</div>
@@ -51,7 +51,7 @@
     </div>
     <h2 class="ui pink header">数据接口<div class="sub header">以下接口全部返回json数据</div></h2>
     1. 获取全部演员/主创<br>
-    http://y.saoju.net/yyj/api/artist/<br>
+    https://y.saoju.net/yyj/api/artist/<br>
     <div class="ui bulleted list">
         <div class="item">pk: 2591（代表数据库中的主键，即该条数据的id）</div>
         <div class="item">model: "yyj.artist"（代码里的模型名称）</div>
@@ -64,7 +64,7 @@
         </div>
     </div>
     2. 获取全部制作出品方<br>
-    http://y.saoju.net/yyj/api/produce/<br>
+    https://y.saoju.net/yyj/api/produce/<br>
     <div class="ui bulleted list">
         <div class="item">pk: 368</div>
         <div class="item">model: "yyj.produce"</div>
@@ -76,7 +76,7 @@
         </div>
     </div>
     3. 获取全部音乐剧<br>
-    http://y.saoju.net/yyj/api/musical/<br>
+    https://y.saoju.net/yyj/api/musical/<br>
     <div class="ui bulleted list">
         <div class="item">pk: 267</div>
         <div class="item">model: "yyj.musical"</div>
@@ -93,7 +93,7 @@
         </div>
     </div>
     4. 获取全部音乐剧出品制作信息<br>
-    http://y.saoju.net/yyj/api/musicalproduces/<br>
+    https://y.saoju.net/yyj/api/musicalproduces/<br>
     <div class="ui bulleted list">
         <div class="item">pk: 667</div>
         <div class="item">model: "yyj.musicalproduces"</div>
@@ -108,7 +108,7 @@
         </div>
     </div>
     5. 获取全部音乐剧主创信息<br>
-    http://y.saoju.net/yyj/api/musicalstaff/<br>
+    https://y.saoju.net/yyj/api/musicalstaff/<br>
     <div class="ui bulleted list">
         <div class="item">pk: 2587</div>
         <div class="item">model: "yyj.musicalstaff"</div>
@@ -123,7 +123,7 @@
         </div>
     </div>
     6. 获取全部角色<br>
-    http://y.saoju.net/yyj/api/role/<br>
+    https://y.saoju.net/yyj/api/role/<br>
     <div class="ui bulleted list">
         <div class="item">pk: 933</div>
         <div class="item">model: "yyj.role"</div>
@@ -137,7 +137,7 @@
         </div>
     </div>
     7. 获取全部音乐剧卡司信息<br>
-    http://y.saoju.net/yyj/api/musicalcast/<br>
+    https://y.saoju.net/yyj/api/musicalcast/<br>
     <div class="ui bulleted list">
         <div class="item">pk: 2721</div>
         <div class="item">model: "yyj.musicalcast"</div>
@@ -151,7 +151,7 @@
         </div>
     </div>
     8. 获取全部城市<br>
-    http://y.saoju.net/yyj/api/city/<br>
+    https://y.saoju.net/yyj/api/city/<br>
     <div class="ui bulleted list">
         <div class="item">pk: 74</div>
         <div class="item">model: "yyj.city"</div>
@@ -164,7 +164,7 @@
         </div>
     </div>
     9. 获取全部地点<br>
-    http://y.saoju.net/yyj/api/location/<br>
+    https://y.saoju.net/yyj/api/location/<br>
     <div class="ui bulleted list">
         <div class="item">pk: 1</div>
         <div class="item">model: "yyj.location"（此模型仅表示剧院所在的地点区域，主要用于地图位置标记）</div>
@@ -178,7 +178,7 @@
         </div>
     </div>
     10. 获取全部剧院<br>
-    http://y.saoju.net/yyj/api/theatre/<br>
+    https://y.saoju.net/yyj/api/theatre/<br>
     <div class="ui bulleted list">
         <div class="item">pk: 242</div>
         <div class="item">model: "yyj.theatre"（此模型仅代表整个剧院，不指代具体的剧场舞台，因为一个剧院中可能包含多个剧场。但诸如亚洲大厦内的小剧场，因为是独立运营的空间，所以暂时作为不同的theatre处理。）</div>
@@ -192,7 +192,7 @@
         </div>
     </div>
     11. 获取全部剧场舞台<br>
-    http://y.saoju.net/yyj/api/stage/<br>
+    https://y.saoju.net/yyj/api/stage/<br>
     <div class="ui bulleted list">
         <div class="item">pk: 258</div>
         <div class="item">model: "yyj.stage"</div>
@@ -206,7 +206,7 @@
         </div>
     </div>
     12. 获取全部巡演计划<br>
-    http://y.saoju.net/yyj/api/tour/<br>
+    https://y.saoju.net/yyj/api/tour/<br>
     <div class="ui bulleted list">
         <div class="item">pk: 227</div>
         <div class="item">model: "yyj.tour"</div>
@@ -222,7 +222,7 @@
         </div>
     </div>
     13. 获取全部日程排期<br>
-    http://y.saoju.net/yyj/api/schedule/<br>
+    https://y.saoju.net/yyj/api/schedule/<br>
     <div class="ui bulleted list">
         <div class="item">pk: 701</div>
         <div class="item">model: "yyj.schedule"</div>
@@ -238,8 +238,8 @@
         </div>
     </div>
     14. 获取某一日程排期下的全部演出<br>
-    http://y.saoju.net/yyj/api/schedule/{}/show/<br>
-    其中{}代表该日程排期的id，即yyj.schedule的pk值。例：http://y.saoju.net/yyj/api/schedule/701/show/<br>
+    https://y.saoju.net/yyj/api/schedule/{}/show/<br>
+    其中{}代表该日程排期的id，即yyj.schedule的pk值。例：https://y.saoju.net/yyj/api/schedule/701/show/<br>
     <div class="ui bulleted list">
         <div class="item">pk: 8115</div>
         <div class="item">model: "yyj.show"</div>
@@ -251,8 +251,8 @@
         </div>
     </div>
     15. 获取某一场演出的全部卡司<br>
-    http://y.saoju.net/yyj/api/show/{}/cast/<br>
-    其中{}代表该演出的id，即yyj.show的pk值。例：http://y.saoju.net/yyj/api/show/8618/cast/<br>
+    https://y.saoju.net/yyj/api/show/{}/cast/<br>
+    其中{}代表该演出的id，即yyj.show的pk值。例：https://y.saoju.net/yyj/api/show/8618/cast/<br>
     <div class="ui bulleted list">
         <div class="item">pk: 2114（卡司信息id，即yyj.musicalcast的pk）</div>
         <div class="item">model: "yyj.musicalcast"</div>
