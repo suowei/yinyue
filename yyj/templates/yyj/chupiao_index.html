@@ -65,12 +65,31 @@
         | <a href="?keyword={{ keyword }}&order=2">最新发布</a>
         {% endif %}
     </h5>
-    {% for chupiao in chupiao_list %}
+    {% if order != 2 %}
+        {% for schedule in chupiao_list %}
+            <h5 class="ui pink header">
+                {{ schedule.tour.musical.name }} {{ schedule.stage.theatre.city.name }}
+                <div class="sub header">
+            {% for chupiao in schedule.chupiao_list %}
+                <a href="{{ chupiao.get_absolute_url }}" target="_blank">
+                    {{ chupiao.show.time|date:"n.j D H:i" }}
+                    {% for show_cast in chupiao.show.cast_list %}
+                        {{ show_cast.artist.name }}
+                    {% endfor %}
+                    {{ chupiao.seat }}
+                    {{ chupiao.note|default_if_none:"" }}
+                    {{ chupiao.price|floatformat }}
+                </a><br>
+            {% endfor %}</div>
+            </h5>
+        {% endfor %}
+    {% else %}
+        {% for chupiao in chupiao_list %}
         <h5 class="ui header">
             <a href="{{ chupiao.get_absolute_url }}" target="_blank">
-                {{ chupiao.show.time|date:"n.j D H:i" }}
                 {{ chupiao.show.schedule.stage.theatre.city.name }}
                 {{ chupiao.show.schedule.tour.musical.name }}
+                {{ chupiao.show.time|date:"n.j D H:i" }}
                 票面{{ chupiao.par_value|floatformat }}
                 售价{{ chupiao.price|floatformat }}
                 {{ chupiao.seat }}
@@ -82,7 +101,8 @@
                 {% endfor %}
             </div>
         </h5>
-    {% endfor %}
+        {% endfor %}
+    {% endif %}
 </div>
 <script>
 $("[data-label='chupiao']").attr("class","active item");

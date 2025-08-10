@@ -1131,7 +1131,7 @@ def chupiao_index(request):
             ).select_related(
                 'show__schedule', 'show__schedule__tour', 'show__schedule__tour__musical',
                 'show__schedule__stage', 'show__schedule__stage__theatre', 'show__schedule__stage__theatre__city'
-            ).order_by('show__time')
+            ).order_by('show__time', 'price')
     else:
         keyword = None
         if order == 2:
@@ -1143,9 +1143,21 @@ def chupiao_index(request):
             chupiao_list = Chupiao.objects.filter(show__time__gte=now).select_related(
                 'show__schedule', 'show__schedule__tour', 'show__schedule__tour__musical',
                 'show__schedule__stage', 'show__schedule__stage__theatre', 'show__schedule__stage__theatre__city'
-            ).order_by('show__time')
+            ).order_by('show__time', 'price')
     for chupiao in chupiao_list:
         chupiao.show.cast_list = chupiao.show.cast.select_related('role', 'artist').order_by('role__seq')
+    if order != 2:
+        schedule_list = []
+        for chupiao in chupiao_list:
+            for schedule in schedule_list:
+                if schedule.id == chupiao.show.schedule_id:
+                    break
+            else:
+                schedule = chupiao.show.schedule
+                schedule.chupiao_list = []
+                schedule_list.append(schedule)
+            schedule.chupiao_list.append(chupiao)
+        chupiao_list = schedule_list
     context = {
         'my_chupiao_list': my_chupiao_list,
         'form': form,
