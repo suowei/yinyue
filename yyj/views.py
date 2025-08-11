@@ -1116,22 +1116,39 @@ def chupiao_index(request):
         order = 2
     else:
         order = None
+    city = request.GET.get('city', False)
     if form.is_valid():
         keyword = form.cleaned_data['keyword']
         if order == 2:
-            chupiao_list = Chupiao.objects.filter(
-                show__schedule__tour__musical__name__icontains=keyword, show__time__gte=now
-            ).select_related(
-                'show__schedule', 'show__schedule__tour', 'show__schedule__tour__musical',
-                'show__schedule__stage', 'show__schedule__stage__theatre', 'show__schedule__stage__theatre__city'
-            ).order_by('-id')
+            if city:
+                chupiao_list = Chupiao.objects.filter(
+                    show__schedule__tour__musical__name__icontains=keyword, show__time__gte=now, show__schedule__stage__theatre__city=city
+                ).select_related(
+                    'show__schedule', 'show__schedule__tour', 'show__schedule__tour__musical',
+                    'show__schedule__stage', 'show__schedule__stage__theatre', 'show__schedule__stage__theatre__city'
+                ).order_by('-id')
+            else:
+                chupiao_list = Chupiao.objects.filter(
+                    show__schedule__tour__musical__name__icontains=keyword, show__time__gte=now
+                ).select_related(
+                    'show__schedule', 'show__schedule__tour', 'show__schedule__tour__musical',
+                    'show__schedule__stage', 'show__schedule__stage__theatre', 'show__schedule__stage__theatre__city'
+                ).order_by('-id')
         else:
-            chupiao_list = Chupiao.objects.filter(
-                show__schedule__tour__musical__name__icontains=keyword, show__time__gte=now
-            ).select_related(
-                'show__schedule', 'show__schedule__tour', 'show__schedule__tour__musical',
-                'show__schedule__stage', 'show__schedule__stage__theatre', 'show__schedule__stage__theatre__city'
-            ).order_by('show__time', 'price')
+            if city:
+                chupiao_list = Chupiao.objects.filter(
+                    show__schedule__tour__musical__name__icontains=keyword, show__time__gte=now, show__schedule__stage__theatre__city=city
+                ).select_related(
+                    'show__schedule', 'show__schedule__tour', 'show__schedule__tour__musical',
+                    'show__schedule__stage', 'show__schedule__stage__theatre', 'show__schedule__stage__theatre__city'
+                ).order_by('show__time', 'price')
+            else:
+                chupiao_list = Chupiao.objects.filter(
+                    show__schedule__tour__musical__name__icontains=keyword, show__time__gte=now
+                ).select_related(
+                    'show__schedule', 'show__schedule__tour', 'show__schedule__tour__musical',
+                    'show__schedule__stage', 'show__schedule__stage__theatre', 'show__schedule__stage__theatre__city'
+                ).order_by('show__time', 'price')
     else:
         keyword = None
         if order == 2:
@@ -1140,13 +1157,38 @@ def chupiao_index(request):
                 'show__schedule__stage', 'show__schedule__stage__theatre', 'show__schedule__stage__theatre__city'
             ).order_by('-id')
         else:
-            chupiao_list = Chupiao.objects.filter(show__time__gte=now).select_related(
-                'show__schedule', 'show__schedule__tour', 'show__schedule__tour__musical',
-                'show__schedule__stage', 'show__schedule__stage__theatre', 'show__schedule__stage__theatre__city'
-            ).order_by('show__time', 'price')
+            if city:
+                chupiao_list = Chupiao.objects.filter(
+                    show__time__gte=now, show__schedule__stage__theatre__city=city
+                ).select_related(
+                    'show__schedule', 'show__schedule__tour', 'show__schedule__tour__musical',
+                    'show__schedule__stage', 'show__schedule__stage__theatre', 'show__schedule__stage__theatre__city'
+                ).order_by('show__time', 'price')
+            else:
+                chupiao_list = Chupiao.objects.filter(show__time__gte=now).select_related(
+                    'show__schedule', 'show__schedule__tour', 'show__schedule__tour__musical',
+                    'show__schedule__stage', 'show__schedule__stage__theatre', 'show__schedule__stage__theatre__city'
+                ).order_by('show__time', 'price')
     for chupiao in chupiao_list:
         chupiao.show.cast_list = chupiao.show.cast.select_related('role', 'artist').order_by('role__seq')
-    if order != 2:
+    city_list = []
+    if city:
+        city = City.objects.get(pk=city)
+        city_list.append(city)
+        city.count = len(chupiao_list)
+    else:
+        for chupiao in chupiao_list:
+            for city in city_list:
+                if city.id == chupiao.show.schedule.stage.theatre.city_id:
+                    city.count += 1
+                    break
+            else:
+                city = chupiao.show.schedule.stage.theatre.city
+                city_list.append(city)
+                city.count = 1
+        city_list.sort(key=lambda x: x.count, reverse=True)
+        city = None
+    if order != 2 and not city:
         schedule_list = []
         for chupiao in chupiao_list:
             for schedule in schedule_list:
@@ -1164,6 +1206,8 @@ def chupiao_index(request):
         'keyword': keyword,
         'order': order,
         'chupiao_list': chupiao_list,
+        'city': city,
+        'city_list': city_list,
     }
     return render(request, 'yyj/chupiao_index.html', context)
 
