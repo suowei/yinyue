@@ -49,6 +49,26 @@
             </div>
         </div>
     </div>
+    3. 查询某剧给定时间范围内的演出信息<br>
+    接口格式：https://y.saoju.net/yyj/api/search_musical_show/?musical={}&begin_date={}&end_date={}<br>
+    例：https://y.saoju.net/yyj/api/search_musical_show/?musical=阿波罗尼亚&begin_date=2025-08-20&end_date=2025-08-21<br>
+    <div class="ui bulleted list">
+        <div class="item">
+            <div>"show_list":</div>
+            <div class="list">
+                <div class="item">"city": "X城市"</div>
+                <div class="item">"theatre": "XX剧院"</div>
+                <div class="item">"time": "2025-08-20 19:30"</div>
+                <div class="item">
+                    <div>"cast":</div>
+                    <div class="list">
+                        <div class="item">{"role": "A角色", "artist": "X演员"}</div>
+                        <div class="item">{"role": "B角色", "artist": "Y演员"}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <h2 class="ui pink header">数据接口<div class="sub header">以下接口全部返回json数据</div></h2>
     1. 获取全部演员/主创<br>
     https://y.saoju.net/yyj/api/artist/<br>

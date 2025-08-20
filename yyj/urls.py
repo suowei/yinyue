@@ -36,6 +36,7 @@ urlpatterns = [
     path('data/', TemplateView.as_view(template_name="yyj/data.html"), name='yyj.data'),
     path('api/', TemplateView.as_view(template_name="yyj/api.html"), name='yyj.api'),
     path('api/search_day/', views.api_show_day_index, name='yyj.api_show_day_index'),
+    path('api/search_musical_show/', views.api_musical_show_index, name='yyj.api_musical_show_index'),
     path('api/artist/', views.api_artist_index, name='api_artist_index'),
     path('api/city/', views.api_city_index, name='api_city_index'),
     path('api/musical/', views.api_musical_index, name='api_musical_index'),

@@ -12,6 +12,12 @@ class ApiShowDayForm(forms.Form):
     city = forms.CharField(required=False, max_length=100)
 
 
+class ApiMusicalShowForm(forms.Form):
+    musical = forms.CharField(max_length=100)
+    begin_date = forms.DateField()
+    end_date = forms.DateField()
+
+
 class ChupiaoSearchForm(forms.Form):
     keyword = forms.CharField(label='音乐剧', max_length=100)
     date = forms.DateField(label='日期')

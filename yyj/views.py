@@ -6,7 +6,7 @@ import csv
 import codecs
 from .models import Role, Tour, Schedule, Musical, Produce, Artist, Show, City, Theatre, Stage, Chupiao, Conflict
 from .models import MusicalProduces, MusicalStaff, MusicalCast, Location
-from .forms import ShowForm, ApiShowDayForm, ChupiaoSearchForm, ChupiaoFilterForm, ChupiaoForm
+from .forms import ShowForm, ApiShowDayForm, ApiMusicalShowForm, ChupiaoSearchForm, ChupiaoFilterForm, ChupiaoForm
 from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
 from django.utils.encoding import escape_uri_path
@@ -920,6 +920,38 @@ def api_show_day_index(request):
                 }
                 show_list_info.append(item)
             data = {'date': date, 'show_list': show_list_info}
+    else:
+        data = {'error': '请检查输入'}
+    response = JsonResponse(data)
+    return response
+
+
+def api_musical_show_index(request):
+    form = ApiMusicalShowForm(request.GET)
+    if form.is_valid():
+        keyword = form.cleaned_data['musical']
+        begin_date = form.cleaned_data['begin_date']
+        end_date = form.cleaned_data['end_date']
+        show_list = Show.objects.filter(
+            schedule__tour__musical__name__icontains=keyword, time__range=(begin_date, end_date + datetime.timedelta(1))
+        ).select_related(
+            'schedule', 'schedule__tour', 'schedule__tour__musical', 'schedule__stage',
+            'schedule__stage__theatre', 'schedule__stage__theatre__city'
+        ).order_by('time')
+        show_list_info = []
+        for show in show_list:
+            show.cast_list = show.cast.select_related('role', 'artist').order_by('role__seq')
+            cast_list = []
+            for cast in show.cast_list:
+                cast_list.append({'role': cast.role.name, 'artist': cast.artist.name})
+            item = {
+                'city': show.schedule.stage.theatre.city.name,
+                'theatre': show.schedule.stage.__str__(),
+                'time': timezone.localtime(show.time).strftime("%Y-%m-%d %H:%M"),
+                'cast': cast_list,
+            }
+            show_list_info.append(item)
+        data = {'show_list': show_list_info}
     else:
         data = {'error': '请检查输入'}
     response = JsonResponse(data)
