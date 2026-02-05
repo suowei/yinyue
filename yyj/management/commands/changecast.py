@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 import datetime
-from yyj.models import Schedule, Artist, MusicalCast, Show
+from yyj.models import Schedule, MusicalCast, Show
 
 
 class Command(BaseCommand):
@@ -41,14 +41,8 @@ class Command(BaseCommand):
 
         # 替换卡司
         show.cast_list = show.cast.select_related('role', 'artist')
-        try:
-            original_cast = Artist.objects.get(name=original_cast_name)
-        except Artist.DoesNotExist:
-            print("Original artist not found.")
-            return
-
         for cast in show.cast_list:
-            if cast.artist == original_cast:
+            if cast.artist.name == original_cast_name:
                 try:
                     new_cast = MusicalCast.objects.get(role=cast.role, artist__name=new_cast_name)
                 except MusicalCast.DoesNotExist:
