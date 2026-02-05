@@ -1,58 +1,62 @@
 from django.core.management.base import BaseCommand
-import re, sys
 import datetime
 from yyj.models import Schedule, Artist, MusicalCast, Show
 
 
 class Command(BaseCommand):
-    help = 'Change show cast data.'
+    help = 'Replace cast in a specific show at a given schedule_id and show_time'
 
     def add_arguments(self, parser):
-        parser.add_argument('info', nargs='?', type=str)
+        parser.add_argument('schedule_id', type=int, help='The schedule ID')
+        parser.add_argument('show_time', type=str, help="The show time in 'YYYY-MM-DD HH:MM' format")
+        parser.add_argument('original_cast', type=str, help='The name of the original cast member')
+        parser.add_argument('new_cast', type=str, help='The name of the new cast member')
 
     def handle(self, *args, **options):
-        if not options['info']:
-            print("请输入schedule_id:")
-            schedule_id = input()
-            print("请输入时间:")
-            time = input()
-            print("请输入原演员:")
-            artist_a = input()
-            print("请输入现演员:")
-            artist_b = input()
-        else:
-            s = options['info']
-            parts = s.split(",")
-            schedule_id = parts[0]
-            time = parts[1]
-            artist_a = parts[2]
-            artist_b = parts[3]
-        schedule = Schedule.objects.get(id=int(schedule_id))
-        numbers = [int(num) for num in re.findall(r'\d+', time)]
-        l_numbers = len(numbers)
-        if l_numbers == 4:
-            month = numbers[0]
-            today = datetime.date.today()
-            if month < today.month:
-                year = today.year + 1
-            else:
-                year = today.year
-            day = numbers[1]
-            hour = numbers[2]
-            minute = numbers[3]
-        elif l_numbers == 5:
-            year = numbers[0]
-            month = numbers[1]
-            day = numbers[2]
-            hour = numbers[3]
-            minute = numbers[4]
-        time = str(year) + '-' + str(month) + '-' + str(day) + ' ' + str(hour) + ':' + str(minute)
-        show = Show.objects.get(schedule=schedule, time=time)
+        schedule_id = options['schedule_id']
+        show_time_str = options['show_time']
+        original_cast_name = options['original_cast']
+        new_cast_name = options['new_cast']
+
+        # 将 show_time 字符串转为 datetime 对象
+        try:
+            show_time = datetime.datetime.strptime(show_time_str, "%Y-%m-%d %H:%M")
+        except ValueError:
+            print("Invalid show time format. Please use 'YYYY-MM-DD HH:MM'.")
+            return
+
+        # 获取 Schedule 对象
+        try:
+            schedule = Schedule.objects.get(pk=schedule_id)
+        except Schedule.DoesNotExist:
+            print("Schedule does not exist.")
+            return
+
+        # 获取 Show 对象
+        try:
+            show = Show.objects.get(schedule=schedule, time=show_time)
+        except Show.DoesNotExist:
+            print("Show does not exist.")
+            return
+
+        # 替换卡司
         show.cast_list = show.cast.select_related('role', 'artist')
-        artist_a = Artist.objects.get(name=artist_a)
+        try:
+            original_cast = Artist.objects.get(name=original_cast_name)
+        except Artist.DoesNotExist:
+            print("Original artist not found.")
+            return
+
         for cast in show.cast_list:
-            if cast.artist == artist_a:
-                cast_b = MusicalCast.objects.get(role=cast.role, artist__name=artist_b)
+            if cast.artist == original_cast:
+                try:
+                    new_cast = MusicalCast.objects.get(role=cast.role, artist__name=new_cast_name)
+                except MusicalCast.DoesNotExist:
+                    print("New cast {new_cast_name} not found.")
+                    return
                 show.cast.remove(cast)
-                show.cast.add(cast_b)
+                show.cast.add(new_cast)
+                print("Successfully replaced.")
                 break
+        else:
+            print("Original cast is not in the show.")

@@ -10,15 +10,14 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('schedule_id', nargs='?')
-
         parser.add_argument('--first',
                             action='store_true',
                             help='Load all txt.',
                             )
 
-        parser.add_argument('--updateenddate',
+        parser.add_argument('--keependdate',
                             action='store_true',
-                            help='Update end date.',
+                            help='Keep end date.',
                             )
 
     def handle(self, *args, **options):
@@ -106,6 +105,7 @@ class Command(BaseCommand):
                             if show_count > 1:
                                 Conflict.objects.get_or_create(artist=musical_cast.artist, time=show.time)
                             break
-                end_date = str(year) + '-' + str(month) + '-' + str(day)
-                schedule.end_date = datetime.datetime.strptime(end_date, '%Y-%m-%d').date()
+                if not options['keependdate']:
+                    end_date = str(year) + '-' + str(month) + '-' + str(day)
+                    schedule.end_date = datetime.datetime.strptime(end_date, '%Y-%m-%d').date()
                 schedule.save()
