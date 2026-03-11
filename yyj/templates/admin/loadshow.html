@@ -1,0 +1,18 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<form method="post">
+    {% csrf_token %}
+    <p>Schedule ID <input type="text" name="schedule_id" required></p>
+    <p>卡司排期</p>
+    <textarea name="showcast" rows="15" style="width:100%;" required></textarea>
+    <p><label><input type="checkbox" name="keependdate"> Keep End Date</label></p>
+    <button type="submit">执行</button>
+</form>
+{% if result %}
+<h2>执行结果</h2>
+<pre>
+{{ result }}
+</pre>
+{% endif %}
+{% endblock %}

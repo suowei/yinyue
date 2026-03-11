@@ -1,0 +1,20 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<form method="post">
+    {% csrf_token %}
+    <p>
+        Schedule ID<br>
+        <input type="text" name="schedule_id" required>
+    </p>
+    <p>
+        演出时间 (X月X日 星期几 HH:MM)<br>
+        <input type="text" name="show_time_str" required>
+    </p>
+    <button type="submit">执行</button>
+</form>
+{% if result %}
+<h2>Result</h2>
+<pre>{{ result }}</pre>
+{% endif %}
+{% endblock %}

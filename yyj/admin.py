@@ -1,4 +1,8 @@
 from django.contrib import admin
+from django.urls import path
+from django.template.response import TemplateResponse
+import datetime
+import re
 
 from .models import City, Theatre, Stage, Produce, Musical, MusicalProduces, MusicalStaff, MusicalCast, Tour, Schedule, Role, Artist, Show, Conflict, Chupiao, Location
 
@@ -177,3 +181,240 @@ admin.site.register(MusicalCast, MusicalCastAdmin)
 admin.site.register(Conflict, ConflictAdmin)
 admin.site.register(Chupiao, ChupiaoAdmin)
 admin.site.register(Location, LocationAdmin)
+
+
+class CustomAdminSite(admin.AdminSite):
+    site_header = "管理后台"
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path("", self.admin_view(self.tools_view)),
+            path("loadshow/", self.admin_view(self.loadshow_view)),
+            path("replacecast/", self.admin_view(self.replace_cast_view)),
+            path("cancelshow/", self.admin_view(self.cancel_show_view)),
+        ]
+        return custom_urls + urls
+
+    def tools_view(self, request):
+        context = dict(
+            self.each_context(request),
+            title="后台工具"
+        )
+        return TemplateResponse(request, "admin/tools.html", context)
+
+    def loadshow_view(self, request):
+        result = []
+        if request.method == "POST":
+            schedule_id = request.POST.get("schedule_id")
+            showcast_text = request.POST.get("showcast")
+            keependdate = bool(request.POST.get("keependdate"))
+            schedule = Schedule.objects.get(pk=int(schedule_id))
+            role_list = Role.objects.filter(musical=schedule.tour.musical).order_by('seq')
+            musical_cast_list = MusicalCast.objects.filter(
+                role__musical=schedule.tour.musical).select_related('role', 'artist')
+            lines = showcast_text.strip().split("\n")
+            # 读取角色列表
+            header = lines[0].split('\t')
+            role_id_list = []
+            for s_role in header:
+                for role in role_list:
+                    if s_role.strip() == role.name:
+                        role_id_list.append(role)
+                        result.append("OK -> " + s_role)
+                        break
+            # 读取每一场演出的卡司排期并检查演员行程是否冲突
+            today = datetime.date.today()
+            for line in lines[1:]:
+                try:
+                    row = line.split('\t')
+                    # 去除空格和空字段
+                    row = [s.strip() for s in row]
+                    row = [s for s in row if s]
+                    # 读取日期和时间并添加演出信息
+                    for i, s in enumerate(row):
+                        numbers = [int(num) for num in re.findall(r'\d+', row[i])]
+                        l_numbers = len(numbers)
+                        # 如果有冒号代表读取结束
+                        if ':' in row[i]:
+                            if l_numbers == 2:
+                                hour = numbers[0]
+                                minute = numbers[1]
+                            elif l_numbers == 4:
+                                month = numbers[0]
+                                if month < today.month:
+                                    year = today.year + 1
+                                else:
+                                    year = today.year
+                                day = numbers[1]
+                                hour = numbers[2]
+                                minute = numbers[3]
+                            elif l_numbers == 5:
+                                year = numbers[0]
+                                month = numbers[1]
+                                day = numbers[2]
+                                hour = numbers[3]
+                                minute = numbers[4]
+                            break
+                        # 如果没有冒号只读取日期
+                        if l_numbers == 2:
+                            month = numbers[0]
+                            if month < today.month:
+                                year = today.year + 1
+                            else:
+                                year = today.year
+                            day = numbers[1]
+                        elif l_numbers == 3:
+                            year = numbers[0]
+                            month = numbers[1]
+                            day = numbers[2]
+                    time = str(year) + '-' + str(month) + '-' + str(day) + ' ' + str(hour) + ':' + str(minute)
+                    show, created = Show.objects.get_or_create(schedule=schedule, time=time)
+                    # 读取并添加卡司信息
+                    index = i + 1
+                    for i, s_artist in enumerate(row[index:]):
+                        for musical_cast in musical_cast_list:
+                            if musical_cast.role == role_id_list[i] and musical_cast.artist.name == s_artist:
+                                show.cast.add(musical_cast)
+                                show_count = Show.objects.filter(cast__artist=musical_cast.artist_id,
+                                                                 time=show.time).distinct().count()
+                                if show_count > 1:
+                                    Conflict.objects.get_or_create(artist=musical_cast.artist, time=show.time)
+                                break
+                    result.append("OK -> " + line)
+                except Exception as e:
+                    result.append("ERROR " + line)
+            if not keependdate and year and month and day:
+                end_date = str(year) + '-' + str(month) + '-' + str(day)
+                schedule.end_date = datetime.datetime.strptime(end_date, '%Y-%m-%d').date()
+                schedule.save()
+        context = dict(
+            self.each_context(request),
+            title="导入演出信息",
+            result="\n".join(result)
+        )
+
+        return TemplateResponse(request, "admin/loadshow.html", context)
+
+    def replace_cast_view(self, request):
+        result = ""
+        if request.method == "POST":
+            schedule_id = request.POST.get("schedule_id")
+            show_time_str = request.POST.get("show_time_str")
+            original_cast_name = request.POST.get("original_cast_name")
+            new_cast_name = request.POST.get("new_cast_name")
+            # 解析时间
+            today = datetime.date.today()
+            try:
+                m = re.search(r"(\d+)月(\d+)日.*?(\d{2}:\d{2})", show_time_str)
+                month = int(m.group(1))
+                day = int(m.group(2))
+                time_str = m.group(3)
+                hour, minute = map(int, time_str.split(":"))
+                if month < today.month:
+                    year = today.year + 1
+                else:
+                    year = today.year
+                show_time = datetime.datetime(year, month, day, hour, minute)
+            except Exception:
+                result = "Invalid show time format. Example: 4月15日 星期三 19:30"
+            # 获取Schedule
+            try:
+                schedule = Schedule.objects.get(pk=schedule_id)
+            except Schedule.DoesNotExist:
+                result = "Schedule does not exist."
+                return TemplateResponse(
+                    request,
+                    "admin/replace_cast.html",
+                    dict(self.each_context(request), result=result),
+                )
+            # 获取Show
+            try:
+                show = Show.objects.get(schedule=schedule, time=show_time)
+            except Show.DoesNotExist:
+                result = "Show does not exist."
+                return TemplateResponse(
+                    request,
+                    "admin/replace_cast.html",
+                    dict(self.each_context(request), result=result),
+                )
+            # 替换卡司
+            show.cast_list = show.cast.select_related("role", "artist")
+            for cast in show.cast_list:
+                if cast.artist.name == original_cast_name:
+                    try:
+                        new_cast = MusicalCast.objects.get(role=cast.role, artist__name=new_cast_name)
+                    except MusicalCast.DoesNotExist:
+                        result = "New cast not found."
+                        break
+                    show.cast.remove(cast)
+                    show.cast.add(new_cast)
+                    result = "Successfully replaced."
+                    break
+            else:
+                result = "Original cast is not in the show."
+        context = dict(
+            self.each_context(request),
+            title="更换卡司",
+            result=result,
+        )
+        return TemplateResponse(request, "admin/replace_cast.html", context)
+
+    def cancel_show_view(self, request):
+        result = ""
+        if request.method == "POST":
+            schedule_id = request.POST.get("schedule_id")
+            show_time_str = request.POST.get("show_time_str")
+            # 解析时间
+            today = datetime.date.today()
+            try:
+                m = re.search(r"(\d+)月(\d+)日.*?(\d{2}:\d{2})", show_time_str)
+                if not m:
+                    raise ValueError()
+                month = int(m.group(1))
+                day = int(m.group(2))
+                hour, minute = map(int, m.group(3).split(":"))
+                if month < today.month:
+                    year = today.year + 1
+                else:
+                    year = today.year
+                show_time = datetime.datetime(year, month, day, hour, minute)
+            except Exception:
+                result = "Invalid show time format. Example: 4月15日 星期三 19:30"
+                return TemplateResponse(
+                    request,
+                    "admin/cancel_show.html",
+                    dict(self.each_context(request), result=result),
+                )
+            # 获取Schedule
+            try:
+                schedule = Schedule.objects.get(pk=schedule_id)
+            except Schedule.DoesNotExist:
+                result = "Schedule does not exist."
+                return TemplateResponse(
+                    request,
+                    "admin/cancel_show.html",
+                    dict(self.each_context(request), result=result),
+                )
+            # 获取Show
+            try:
+                show = Show.objects.get(schedule=schedule, time=show_time)
+            except Show.DoesNotExist:
+                result = "Show does not exist."
+                return TemplateResponse(
+                    request,
+                    "admin/cancel_show.html",
+                    dict(self.each_context(request), result=result),
+                )
+            # 删除show
+            show.delete()
+            result = "Show cancelled successfully."
+        context = dict(
+            self.each_context(request),
+            title="演出取消",
+            result=result,
+        )
+        return TemplateResponse(request, "admin/cancel_show.html", context)
+
+
+admin_site = CustomAdminSite(name="custom_admin")
