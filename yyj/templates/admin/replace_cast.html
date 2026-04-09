@@ -8,16 +8,8 @@
         <input type="text" name="schedule_id" required>
     </p>
     <p>
-        演出时间(X月X日 星期几 HH:MM)<br>
-        <input type="text" name="show_time_str" required>
-    </p>
-    <p>
-        原卡司<br>
-        <input type="text" name="original_cast_name" required>
-    </p>
-    <p>
-        现卡司<br>
-        <input type="text" name="new_cast_name" required>
+        批量替换（每行一条，格式：2025年4月15日 19:30 新卡司表）<br>
+        <textarea name="replace_lines" rows="15" style="width:100%;" required></textarea>
     </p>
     <button type="submit">执行</button>
 </form>

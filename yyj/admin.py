@@ -297,66 +297,83 @@ class CustomAdminSite(admin.AdminSite):
         return TemplateResponse(request, "admin/loadshow.html", context)
 
     def replace_cast_view(self, request):
-        result = ""
+        result = []
         if request.method == "POST":
             schedule_id = request.POST.get("schedule_id")
-            show_time_str = request.POST.get("show_time_str")
-            original_cast_name = request.POST.get("original_cast_name")
-            new_cast_name = request.POST.get("new_cast_name")
-            # 解析时间
-            today = datetime.date.today()
-            try:
-                m = re.search(r"(\d+)月(\d+)日.*?(\d{2}:\d{2})", show_time_str)
-                month = int(m.group(1))
-                day = int(m.group(2))
-                time_str = m.group(3)
-                hour, minute = map(int, time_str.split(":"))
-                if month < today.month:
-                    year = today.year + 1
-                else:
-                    year = today.year
-                show_time = datetime.datetime(year, month, day, hour, minute)
-            except Exception:
-                result = "Invalid show time format. Example: 4月15日 星期三 19:30"
+            replace_lines = request.POST.get("replace_lines", "").strip()
             # 获取Schedule
             try:
                 schedule = Schedule.objects.get(pk=schedule_id)
             except Schedule.DoesNotExist:
-                result = "Schedule does not exist."
+                result.append("Schedule does not exist.")
                 return TemplateResponse(
                     request,
                     "admin/replace_cast.html",
                     dict(self.each_context(request), result=result),
                 )
-            # 获取Show
-            try:
-                show = Show.objects.get(schedule=schedule, time=show_time)
-            except Show.DoesNotExist:
-                result = "Show does not exist."
-                return TemplateResponse(
-                    request,
-                    "admin/replace_cast.html",
-                    dict(self.each_context(request), result=result),
+            today = datetime.date.today()
+            for i, line in enumerate(replace_lines.splitlines(), 1):
+                line = line.strip()
+                if not line:
+                    continue
+                # 解析格式：日期时间 + 制表符分隔的卡司名单
+                m = re.match(
+                    r"(?:(\d{4})年)?(\d{1,2})月(\d{1,2})日\s.*?(\d{2}:\d{2})\t(.+)",
+                    line,
                 )
-            # 替换卡司
-            show.cast_list = show.cast.select_related("role", "artist")
-            for cast in show.cast_list:
-                if cast.artist.name == original_cast_name:
-                    try:
-                        new_cast = MusicalCast.objects.get(role=cast.role, artist__name=new_cast_name)
-                    except MusicalCast.DoesNotExist:
-                        result = "New cast not found."
-                        break
-                    show.cast.remove(cast)
-                    show.cast.add(new_cast)
-                    result = "Successfully replaced."
-                    break
-            else:
-                result = "Original cast is not in the show."
+                if not m:
+                    result.append("格式错误：" + line)
+                    continue
+                year = int(m.group(1)) if m.group(1) else None
+                month = int(m.group(2))
+                day = int(m.group(3))
+                if year is None:
+                    if month < today.month:
+                        year = today.year + 1
+                    else:
+                        year = today.year
+                hour, minute = map(int, m.group(4).split(":"))
+                new_names = [name.strip() for name in m.group(5).split("\t") if name.strip()]
+                try:
+                    show_time = datetime.datetime(year, month, day, hour, minute)
+                except ValueError:
+                    result.append("日期无效：" + line)
+                    continue
+                # 获取 Show
+                try:
+                    show = Show.objects.get(schedule=schedule, time=show_time)
+                except Show.DoesNotExist:
+                    result.append("演出不存在：" + line)
+                    continue
+                # 获取当前卡司，按角色建立映射
+                current_casts = show.cast.select_related('role', 'artist').order_by('role__seq')
+                print(current_casts)
+                if len(new_names) != len(current_casts):
+                    result.append("卡司数量不匹配：" + line)
+                    continue
+                # 逐位对比，不同的就替换
+                replaced = []
+                for cast, new_name in zip(current_casts, new_names):
+                    if cast.artist.name != new_name:
+                        try:
+                            new_cast = MusicalCast.objects.get(
+                                role=cast.role, artist__name=new_name
+                            )
+                        except MusicalCast.DoesNotExist:
+                            result.append("新卡司不存在：" + new_name)
+                            break
+                        show.cast.remove(cast)
+                        show.cast.add(new_cast)
+                        replaced.append(cast.artist.name + " → " + new_name)
+                else:
+                    if replaced:
+                        result.append(line + "替换了：" + '，'.join(replaced))
+                    else:
+                        result.append(line + " 无变化")
         context = dict(
             self.each_context(request),
             title="更换卡司",
-            result=result,
+            result="\n".join(result),
         )
         return TemplateResponse(request, "admin/replace_cast.html", context)
 
