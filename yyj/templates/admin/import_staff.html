@@ -1,0 +1,63 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+{% if step == 'input' %}
+<form method="post">
+    {% csrf_token %}
+    <p>
+        Musical ID<br>
+        <input type="text" name="musical_id" required>
+    </p>
+    <p>
+        Staff 文本（每行：职位：人名）<br>
+        <textarea name="raw_text" rows="15" cols="60" required></textarea>
+    </p>
+    <button type="submit">解析</button>
+</form>
+{% endif %}
+{% if step == 'confirm' %}
+<h2>导入到：{{ musical }} (ID#{{ musical.id }})</h2>
+<form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="confirm" value="1">
+    <input type="hidden" name="musical_id" value="{{ musical.id }}">
+    <input type="hidden" name="item_count" value="{{ items|length }}">
+    <table border="1" cellpadding="6" cellspacing="0">
+        <tr><th>职位</th><th>姓名</th><th>状态</th><th>操作</th></tr>
+        {% for item in items %}
+        <tr>
+            <td>
+                {{ item.job }}
+                <input type="hidden" name="job_{{ item.index }}" value="{{ item.job }}">
+                <input type="hidden" name="name_{{ item.index }}" value="{{ item.name }}">
+            </td>
+            <td>{{ item.name }}</td>
+            <td>
+                {% if item.status == 'matched' %}✅
+                {% elif item.status == 'similar' %}⚠️
+                {% else %}🆕{% endif %}
+            </td>
+            <td>
+                <select name="action_{{ item.index }}">
+                    {% if item.status == 'matched' %}
+                    <option value="match_{{ item.artist.id }}" selected>{{ item.artist }} (ID#{{ item.artist.id }})</option>
+                    {% endif %}
+                    {% for c in item.candidates %}
+                    <option value="match_{{ c.id }}" {% if item.status == 'similar' and forloop.first %}selected{% endif %}>{{ c }} (ID#{{ c.id }})</option>
+                    {% endfor %}
+                    <option value="new" {% if item.status == 'new' %}selected{% endif %}>➕ 新建「{{ item.name }}」</option>
+                    <option value="skip">跳过</option>
+                </select>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br>
+    <button type="submit">确认导入</button>
+</form>
+{% endif %}
+{% if result %}
+<h2>Result</h2>
+<pre>{{ result }}</pre>
+{% endif %}
+{% endblock %}

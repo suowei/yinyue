@@ -193,6 +193,7 @@ class CustomAdminSite(admin.AdminSite):
             path("loadshow/", self.admin_view(self.loadshow_view)),
             path("replacecast/", self.admin_view(self.replace_cast_view)),
             path("cancelshow/", self.admin_view(self.cancel_show_view)),
+            path("importstaff/", self.admin_view(self.import_staff_view)),
         ]
         return custom_urls + urls
 
@@ -432,6 +433,124 @@ class CustomAdminSite(admin.AdminSite):
             result=result,
         )
         return TemplateResponse(request, "admin/cancel_show.html", context)
+
+    def import_staff_view(self, request):
+        import re
+        from django.db.models import Q
+
+        result = ""
+        step = "input"
+        musical = None
+        items = []
+        created = 0
+
+        if request.method == "POST":
+            musical_id = request.POST.get("musical_id")
+
+            # 获取 Musical
+            try:
+                musical = Musical.objects.get(pk=musical_id)
+            except Musical.DoesNotExist:
+                result = "Musical does not exist."
+                return TemplateResponse(
+                    request,
+                    "admin/import_staff.html",
+                    dict(self.each_context(request), step="input", result=result),
+                )
+
+            if "confirm" in request.POST:
+                count = int(request.POST.get("item_count", 0))
+                max_seq = MusicalStaff.objects.filter(
+                    musical=musical
+                ).order_by("-seq").values_list("seq", flat=True).first() or 0
+
+                for i in range(count):
+                    job = request.POST.get("job_" + str(i))
+                    action = request.POST.get("action_" + str(i))
+                    name = request.POST.get("name_" + str(i))
+
+                    if not action or action == "skip":
+                        continue
+
+                    if action.startswith("match_"):
+                        artist = Artist.objects.get(pk=int(action.replace("match_", "")))
+                    elif action == "new":
+                        artist = Artist.objects.create(name=name)
+                    else:
+                        continue
+
+                    max_seq += 1
+                    MusicalStaff.objects.create(
+                        musical=musical, job=job, artist=artist, seq=max_seq,
+                    )
+                    created += 1
+
+                result = "✅ 成功导入 " + str(created) + " 条 staff 到「" + str(musical) + "」"
+                return TemplateResponse(
+                    request,
+                    "admin/import_staff.html",
+                    dict(self.each_context(request), step="done", result=result),
+                )
+
+            # Step 1: 解析文本
+            raw_text = request.POST.get("raw_text", "")
+            if not raw_text.strip():
+                result = "请输入 staff 文本。"
+                return TemplateResponse(
+                    request,
+                    "admin/import_staff.html",
+                    dict(self.each_context(request), step="input", result=result),
+                )
+
+            for line in raw_text.strip().split("\n"):
+                line = line.strip()
+                if not line:
+                    continue
+                # 优先冒号分隔，否则第一个空白符分隔
+                m = re.match(r"^(.+?)[：:]\s*(.+)$", line)
+                if not m:
+                    m = re.match(r"^(\S+)\s+(.+)$", line)
+                if not m:
+                    continue
+                job = m.group(1).strip()
+                names = re.split(r"[、，,/\s]+", m.group(2).strip())
+                for name in names:
+                    name = name.strip()
+                    if not name:
+                        continue
+
+                    exact = Artist.objects.filter(name=name).first()
+                    if exact:
+                        status, artist, candidates = "matched", exact, []
+                    else:
+                        similar = list(Artist.objects.filter(
+                            Q(name__icontains=name) | Q(name__icontains=name[:2])
+                        ).distinct()[:10])
+                        if similar:
+                            status, artist, candidates = "similar", None, similar
+                        else:
+                            status, artist, candidates = "new", None, []
+
+                    items.append({
+                        "index": len(items),
+                        "job": job,
+                        "name": name,
+                        "status": status,
+                        "artist": artist,
+                        "candidates": candidates,
+                    })
+
+            step = "confirm"
+
+        context = dict(
+            self.each_context(request),
+            title="导入 Staff",
+            step=step,
+            musical=musical,
+            items=items,
+            result=result,
+        )
+        return TemplateResponse(request, "admin/import_staff.html", context)
 
 
 admin_site = CustomAdminSite(name="custom_admin")
