@@ -78,7 +78,7 @@ class Artist(models.Model):
 
 class Musical(models.Model):
     produces = models.ManyToManyField(Produce, through='MusicalProduces')
-    name = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=50)
     is_original = models.BooleanField(default=True)
     SETUP = 'ZZ'
     PROMOTE = 'DD'
