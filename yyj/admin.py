@@ -3,6 +3,7 @@ from django.urls import path
 from django.template.response import TemplateResponse
 import datetime
 import re
+from django.db.models import Q
 
 from .models import City, Theatre, Stage, Produce, Musical, MusicalProduces, MusicalStaff, MusicalCast, Tour, Schedule, Role, Artist, Show, Conflict, Chupiao, Location
 
@@ -194,6 +195,7 @@ class CustomAdminSite(admin.AdminSite):
             path("replacecast/", self.admin_view(self.replace_cast_view)),
             path("cancelshow/", self.admin_view(self.cancel_show_view)),
             path("importstaff/", self.admin_view(self.import_staff_view)),
+            path("addrolelist/", self.admin_view(self.addrolelist_view)),
         ]
         return custom_urls + urls
 
@@ -551,6 +553,132 @@ class CustomAdminSite(admin.AdminSite):
             result=result,
         )
         return TemplateResponse(request, "admin/import_staff.html", context)
+
+    def addrolelist_view(self, request):
+        result = ""
+        step = "input"
+        musical = None
+        items = []
+        created_roles = 0
+        created_casts = 0
+        if request.method == "POST":
+            musical_id = request.POST.get("musical_id")
+            try:
+                musical = Musical.objects.get(pk=musical_id)
+            except Musical.DoesNotExist:
+                result = "Musical does not exist."
+                return TemplateResponse(
+                    request,
+                    "admin/addrolelist.html",
+                    dict(self.each_context(request), step="input", result=result),
+                )
+            if "confirm" in request.POST:
+                count = int(request.POST.get("item_count", 0))
+                max_role_seq = Role.objects.filter(
+                    musical=musical
+                ).order_by("-seq").values_list("seq", flat=True).first() or 0
+                current_role = None
+                current_role_name = None
+                actor_seq = 0
+                for i in range(count):
+                    role_name = request.POST.get("role_name_" + str(i))
+                    action = request.POST.get("action_" + str(i))
+                    name = request.POST.get("name_" + str(i))
+                    if not action or action == "skip":
+                        continue
+                    if role_name != current_role_name:
+                        current_role_name = role_name
+                        current_role = Role.objects.filter(
+                            musical=musical, name=role_name
+                        ).first()
+                        if not current_role:
+                            max_role_seq += 1
+                            current_role = Role.objects.create(
+                                musical=musical, name=role_name, seq=max_role_seq
+                            )
+                            created_roles += 1
+                        actor_seq = MusicalCast.objects.filter(
+                            role=current_role
+                        ).order_by("-seq").values_list("seq", flat=True).first() or 0
+                    if action.startswith("match_"):
+                        artist = Artist.objects.get(pk=int(action.replace("match_", "")))
+                    elif action == "new":
+                        artist = Artist.objects.create(name=name)
+                    else:
+                        continue
+                    if MusicalCast.objects.filter(role=current_role, artist=artist).exists():
+                        continue
+                    actor_seq += 1
+                    MusicalCast.objects.create(
+                        role=current_role, artist=artist, seq=actor_seq
+                    )
+                    created_casts += 1
+                result = (
+                        "✅ 成功为「" + str(musical) + "」添加了 "
+                        + str(created_roles) + " 个角色、"
+                        + str(created_casts) + " 位演员"
+                )
+                return TemplateResponse(
+                    request,
+                    "admin/addrolelist.html",
+                    dict(self.each_context(request), step="done", result=result),
+                )
+            raw_text = request.POST.get("raw_text", "")
+            if not raw_text.strip():
+                result = "请输入角色列表文本。"
+                return TemplateResponse(
+                    request,
+                    "admin/addrolelist.html",
+                    dict(self.each_context(request), step="input", result=result),
+                )
+            blocks = []
+            current_block = []
+            for line in raw_text.strip().split("\n"):
+                line = line.strip()
+                if not line:
+                    if current_block:
+                        blocks.append(current_block)
+                        current_block = []
+                else:
+                    current_block.append(line)
+            if current_block:
+                blocks.append(current_block)
+            for block in blocks:
+                role_name = block[0]
+                actors = block[1:] if len(block) > 1 else []
+                for name in actors:
+                    name = name.strip()
+                    if not name:
+                        continue
+                    exact = Artist.objects.filter(name=name).first()
+                    if exact:
+                        status, artist, candidates = "matched", exact, []
+                    else:
+                        similar = list(Artist.objects.filter(
+                            Q(name__icontains=name) | Q(name__icontains=name[1:])
+                        ).distinct()[:10])
+                        if similar:
+                            status, artist, candidates = "similar", None, similar
+                        else:
+                            status, artist, candidates = "new", None, []
+                    items.append({
+                        "index": len(items),
+                        "role_name": role_name,
+                        "name": name,
+                        "status": status,
+                        "artist": artist,
+                        "candidates": candidates,
+                    })
+            step = "confirm"
+        context = dict(
+            self.each_context(request),
+            title="添加角色列表",
+            step=step,
+            musical=musical,
+            items=items,
+            result=result,
+        )
+        return TemplateResponse(request, "admin/addrolelist.html", context)
 
 
 admin_site = CustomAdminSite(name="custom_admin")
