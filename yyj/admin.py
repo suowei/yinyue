@@ -196,6 +196,7 @@ class CustomAdminSite(admin.AdminSite):
             path("cancelshow/", self.admin_view(self.cancel_show_view)),
             path("importstaff/", self.admin_view(self.import_staff_view)),
             path("addrolelist/", self.admin_view(self.addrolelist_view)),
+            path("stoplongterm/", self.admin_view(self.stop_longterm_view)),
         ]
         return custom_urls + urls
 
@@ -679,6 +680,51 @@ class CustomAdminSite(admin.AdminSite):
             result=result,
         )
         return TemplateResponse(request, "admin/addrolelist.html", context)
+
+    def stop_longterm_view(self, request):
+        result = ""
+        if request.method == "POST":
+            schedule_id = request.POST.get("schedule_id")
+            # 获取 Schedule
+            try:
+                schedule = Schedule.objects.get(pk=schedule_id)
+            except Schedule.DoesNotExist:
+                result = "Schedule does not exist."
+                return TemplateResponse(
+                    request,
+                    "admin/stoplongterm.html",
+                    dict(self.each_context(request), result=result),
+                )
+            # 获取该 Schedule 最后一场 Show 的日期
+            last_show = Show.objects.filter(schedule=schedule).order_by("-time").first()
+            if not last_show:
+                result = "该 Schedule 没有任何 Show，无法确定 end_date。"
+                return TemplateResponse(
+                    request,
+                    "admin/stoplongterm.html",
+                    dict(self.each_context(request), result=result),
+                )
+            last_date = last_show.time.date()
+            # 更新 Schedule
+            schedule.end_date = last_date
+            schedule.is_long_term = False
+            schedule.save()
+            # 更新对应的 Tour
+            tour = schedule.tour
+            tour.end_date = last_date
+            tour.is_long_term = False
+            tour.save()
+            result = (
+                "✅ 已停止驻演。\n"
+                "Schedule #{pk}：end_date = {date}，is_long_term = False\n"
+                "Tour #{tour_pk}：end_date = {date}，is_long_term = False"
+            ).format(pk=schedule.pk, tour_pk=tour.pk, date=last_date)
+        context = dict(
+            self.each_context(request),
+            title="停止驻演",
+            result=result,
+        )
+        return TemplateResponse(request, "admin/stoplongterm.html", context)
 
 
 admin_site = CustomAdminSite(name="custom_admin")

@@ -1,0 +1,19 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<form method="post">
+    {% csrf_token %}
+    <p>
+        Schedule ID<br>
+        <input type="text" name="schedule_id" required>
+    </p>
+    <p>
+        该工具会把 Schedule 及其对应 Tour 的 end_date 置为该 Schedule 最后一场 Show 的日期，并把 is_long_term 置为 False。
+    </p>
+    <button type="submit">执行</button>
+</form>
+{% if result %}
+<h2>执行结果</h2>
+<pre>{{ result }}</pre>
+{% endif %}
+{% endblock %}
