@@ -320,9 +320,9 @@ class CustomAdminSite(admin.AdminSite):
                 line = line.strip()
                 if not line:
                     continue
-                # 解析格式：日期时间 + 制表符分隔的卡司名单
+                # 解析格式：日期时间 + 制表符、顿号分隔的卡司名单
                 m = re.match(
-                    r"(?:(\d{4})年)?(\d{1,2})月(\d{1,2})日\s.*?(\d{2}:\d{2})\t(.+)",
+                    r"(?:(\d{4})年)?(\d{1,2})月(\d{1,2})日\s?.*?(\d{2}:\d{2})[\t、 ](.+)",
                     line,
                 )
                 if not m:
@@ -337,7 +337,7 @@ class CustomAdminSite(admin.AdminSite):
                     else:
                         year = today.year
                 hour, minute = map(int, m.group(4).split(":"))
-                new_names = [name.strip() for name in m.group(5).split("\t") if name.strip()]
+                new_names = [name.strip() for name in re.split(r"[\t、]", m.group(5)) if name.strip()]
                 try:
                     show_time = datetime.datetime(year, month, day, hour, minute)
                 except ValueError:
