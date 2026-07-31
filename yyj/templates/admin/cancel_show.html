@@ -8,13 +8,13 @@
         <input type="text" name="schedule_id" required>
     </p>
     <p>
-        演出时间 (X月X日 星期几 HH:MM)<br>
-        <input type="text" name="show_time_str" required>
+        演出时间（每行一条，格式：X月X日 星期几 HH:MM 或 X月X日HH:MM）<br>
+        <textarea name="show_time_text" rows="15" style="width:100%;" required></textarea>
     </p>
     <button type="submit">执行</button>
 </form>
 {% if result %}
-<h2>Result</h2>
+<h2>执行结果</h2>
 <pre>{{ result }}</pre>
 {% endif %}
 {% endblock %}
