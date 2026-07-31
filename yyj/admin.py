@@ -285,6 +285,10 @@ class CustomAdminSite(admin.AdminSite):
                                 if show_count > 1:
                                     Conflict.objects.get_or_create(artist=musical_cast.artist, time=show.time)
                                 break
+                        else:
+                            # 未找到匹配的卡司
+                            role_name = role_id_list[i].name if i < len(role_id_list) else "未知角色"
+                            result.append("  ⚠ 未找到卡司：" + role_name + " = " + s_artist)
                     result.append("OK -> " + line)
                 except Exception as e:
                     result.append("ERROR " + line)
