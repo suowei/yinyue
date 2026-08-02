@@ -197,6 +197,7 @@ class CustomAdminSite(admin.AdminSite):
             path("importstaff/", self.admin_view(self.import_staff_view)),
             path("addrolelist/", self.admin_view(self.addrolelist_view)),
             path("stoplongterm/", self.admin_view(self.stop_longterm_view)),
+            path("editshowtime/", self.admin_view(self.edit_showtime_view)),
         ]
         return custom_urls + urls
 
@@ -440,6 +441,87 @@ class CustomAdminSite(admin.AdminSite):
             result="\n".join(result),
         )
         return TemplateResponse(request, "admin/cancel_show.html", context)
+
+    def edit_showtime_view(self, request):
+        result = ""
+        if request.method == "POST":
+            schedule_id = request.POST.get("schedule_id")
+            old_time_str = request.POST.get("old_time_str")
+            new_time_str = request.POST.get("new_time_str")
+            today = datetime.date.today()
+
+            def _parse_time(s):
+                m = re.search(r"(?:(\d{4})年)?(\d{1,2})月(\d{1,2})日.*?(\d{1,2}):(\d{2})", s)
+                if not m:
+                    raise ValueError("时间格式无法解析")
+                year = int(m.group(1)) if m.group(1) else None
+                month = int(m.group(2))
+                day = int(m.group(3))
+                hour = int(m.group(4))
+                minute = int(m.group(5))
+                if year is None:
+                    if month < today.month:
+                        year = today.year + 1
+                    else:
+                        year = today.year
+                return datetime.datetime(year, month, day, hour, minute)
+
+            try:
+                old_show_time = _parse_time(old_time_str)
+            except Exception:
+                result = "原时间格式错误。示例：4月15日 19:30 或 2026年4月15日 周四 19:30"
+                return TemplateResponse(
+                    request,
+                    "admin/edit_showtime.html",
+                    dict(self.each_context(request), result=result),
+                )
+            try:
+                new_show_time = _parse_time(new_time_str)
+            except Exception:
+                result = "新时间格式错误。示例：4月15日 19:30 或 2026年4月15日 周四 19:30"
+                return TemplateResponse(
+                    request,
+                    "admin/edit_showtime.html",
+                    dict(self.each_context(request), result=result),
+                )
+            # 获取Schedule
+            try:
+                schedule = Schedule.objects.get(pk=schedule_id)
+            except Schedule.DoesNotExist:
+                result = "Schedule does not exist."
+                return TemplateResponse(
+                    request,
+                    "admin/edit_showtime.html",
+                    dict(self.each_context(request), result=result),
+                )
+            # 获取原时间对应的Show
+            try:
+                show = Show.objects.get(schedule=schedule, time=old_show_time)
+            except Show.DoesNotExist:
+                result = "原时间的演出不存在。"
+                return TemplateResponse(
+                    request,
+                    "admin/edit_showtime.html",
+                    dict(self.each_context(request), result=result),
+                )
+            # 检查新时间是否冲突
+            if Show.objects.filter(schedule=schedule, time=new_show_time).exclude(pk=show.pk).exists():
+                result = "新时间下该 Schedule 已有演出，无法修改（会重复）。"
+                return TemplateResponse(
+                    request,
+                    "admin/edit_showtime.html",
+                    dict(self.each_context(request), result=result),
+                )
+            # 更新时间
+            show.time = new_show_time
+            show.save()
+            result = "✅ 修改成功：{} → {}".format(old_show_time, new_show_time)
+        context = dict(
+            self.each_context(request),
+            title="修改演出时间",
+            result=result,
+        )
+        return TemplateResponse(request, "admin/edit_showtime.html", context)
 
     def import_staff_view(self, request):
         import re
