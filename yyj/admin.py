@@ -210,9 +210,11 @@ class CustomAdminSite(admin.AdminSite):
 
     def loadshow_view(self, request):
         result = []
+        schedule_id = ""
+        showcast_text = ""
         if request.method == "POST":
-            schedule_id = request.POST.get("schedule_id")
-            showcast_text = request.POST.get("showcast")
+            schedule_id = request.POST.get("schedule_id", "")
+            showcast_text = request.POST.get("showcast", "")
             keependdate = bool(request.POST.get("keependdate"))
             schedule = Schedule.objects.get(pk=int(schedule_id))
             role_list = Role.objects.filter(musical=schedule.tour.musical).order_by('seq')
@@ -302,7 +304,9 @@ class CustomAdminSite(admin.AdminSite):
         context = dict(
             self.each_context(request),
             title="导入演出信息",
-            result="\n".join(result)
+            result="\n".join(result),
+            schedule_id=schedule_id,
+            showcast_text=showcast_text,
         )
 
         return TemplateResponse(request, "admin/loadshow.html", context)
