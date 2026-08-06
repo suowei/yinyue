@@ -415,7 +415,7 @@ class CustomAdminSite(admin.AdminSite):
                     continue
                 # 解析时间
                 try:
-                    m = re.search(r"(?:(\d{4})年)?(\d{1,2})月(\d{1,2})日.*?(\d{1,2}):(\d{2})", line)
+                    m = re.search(r"(?:(\d{4})[年./-])?(\d{1,2})[月./-](\d{1,2})日?.*?(\d{1,2}):(\d{2})", line)
                     if not m:
                         raise ValueError()
                     year = int(m.group(1)) if m.group(1) else None
