@@ -258,6 +258,8 @@ class CustomAdminSite(admin.AdminSite):
                                 minute = numbers[3]
                             elif l_numbers == 5:
                                 year = numbers[0]
+                                if year < 100:
+                                    year += 2000
                                 month = numbers[1]
                                 day = numbers[2]
                                 hour = numbers[3]
@@ -273,6 +275,8 @@ class CustomAdminSite(admin.AdminSite):
                             day = numbers[1]
                         elif l_numbers == 3:
                             year = numbers[0]
+                            if year < 100:
+                                year += 2000
                             month = numbers[1]
                             day = numbers[2]
                     time = str(year) + '-' + str(month) + '-' + str(day) + ' ' + str(hour) + ':' + str(minute)

@@ -16,3 +16,4 @@ yinyue/asgi.py
 docker-compose.yml
 Dockerfile
 requirements.txt
+/locale/zh_Hans
