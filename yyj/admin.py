@@ -198,6 +198,7 @@ class CustomAdminSite(admin.AdminSite):
             path("addrolelist/", self.admin_view(self.addrolelist_view)),
             path("stoplongterm/", self.admin_view(self.stop_longterm_view)),
             path("editshowtime/", self.admin_view(self.edit_showtime_view)),
+            path("removecast/", self.admin_view(self.remove_cast_view)),
         ]
         return custom_urls + urls
 
@@ -451,6 +452,73 @@ class CustomAdminSite(admin.AdminSite):
             result="\n".join(result),
         )
         return TemplateResponse(request, "admin/cancel_show.html", context)
+
+    def remove_cast_view(self, request):
+        result = []
+        if request.method == "POST":
+            schedule_id = request.POST.get("schedule_id")
+            show_cast_text = request.POST.get("show_cast_text", "")
+            try:
+                schedule = Schedule.objects.get(pk=schedule_id)
+            except Schedule.DoesNotExist:
+                result.append("Schedule does not exist.")
+                context = dict(
+                    self.each_context(request),
+                    title="去除多余卡司",
+                    result="\n".join(result),
+                )
+                return TemplateResponse(request, "admin/remove_cast.html", context)
+            today = datetime.date.today()
+            for line in show_cast_text.splitlines():
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    m = re.search(r"(?:(\d{4})[年./-])?(\d{1,2})[月./-](\d{1,2})日?.*?(\d{1,2}):(\d{2})", line)
+                    if not m:
+                        raise ValueError("时间格式无法解析")
+                    year = int(m.group(1)) if m.group(1) else None
+                    month = int(m.group(2))
+                    day = int(m.group(3))
+                    hour = int(m.group(4))
+                    minute = int(m.group(5))
+                    if year is None:
+                        if month < today.month:
+                            year = today.year + 1
+                        else:
+                            year = today.year
+                    show_time = datetime.datetime(year, month, day, hour, minute)
+                    artist_name = line[m.end():].strip().lstrip('\t').lstrip('、').strip()
+                    if not artist_name:
+                        raise ValueError("缺少演员名")
+                except Exception as e:
+                    result.append(line + " → " + str(e))
+                    continue
+                try:
+                    show = Show.objects.get(schedule=schedule, time=show_time)
+                except Show.DoesNotExist:
+                    result.append(line + " → 演出不存在")
+                    continue
+                try:
+                    artist = Artist.objects.get(name=artist_name)
+                except Artist.DoesNotExist:
+                    result.append(line + " → 演员不存在：" + artist_name)
+                    continue
+                removed = []
+                for musical_cast in show.cast.select_related('artist', 'role').all():
+                    if musical_cast.artist == artist:
+                        show.cast.remove(musical_cast)
+                        removed.append(musical_cast.role.name + "/" + musical_cast.artist.name)
+                if removed:
+                    result.append("已移除：" + line + " → " + '，'.join(removed))
+                else:
+                    result.append(line + " → 该演员不在该场卡司中")
+        context = dict(
+            self.each_context(request),
+            title="去除多余卡司",
+            result="\n".join(result),
+        )
+        return TemplateResponse(request, "admin/remove_cast.html", context)
 
     def edit_showtime_view(self, request):
         result = ""

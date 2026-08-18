@@ -1,0 +1,17 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<form method="post">
+    {% csrf_token %}
+    <p>Schedule ID <input type="text" name="schedule_id" required></p>
+    <p>演出信息（每行一条：时间\t演员名，支持制表符、顿号、空格分隔）</p>
+    <textarea name="show_cast_text" rows="12" style="width:100%;" required placeholder="例如：&#10;2026.08.06 19:30&#9;张三&#10;2026/8/7 周五 14:30&#9;李四"></textarea>
+    <button type="submit">执行</button>
+</form>
+{% if result %}
+<h2>执行结果</h2>
+<pre>
+{{ result }}
+</pre>
+{% endif %}
+{% endblock %}
