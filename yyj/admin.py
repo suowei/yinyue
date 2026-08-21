@@ -686,9 +686,12 @@ class CustomAdminSite(admin.AdminSite):
                     if not name:
                         continue
 
-                    exact = Artist.objects.filter(name=name).first()
-                    if exact:
-                        status, artist, candidates = "matched", exact, []
+                    exact_matches = list(Artist.objects.filter(name=name))
+                    if len(exact_matches) == 1:
+                        status, artist, candidates = "matched", exact_matches[0], []
+                    elif len(exact_matches) > 1:
+                        # 同名 artist 多个，全部放入下拉列表供选择
+                        status, artist, candidates = "similar", None, exact_matches
                     else:
                         similar = list(Artist.objects.filter(
                             Q(name__icontains=name) | Q(name__icontains=name[:2])
