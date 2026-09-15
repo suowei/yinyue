@@ -209,6 +209,91 @@ class CustomAdminSite(admin.AdminSite):
         )
         return TemplateResponse(request, "admin/tools.html", context)
 
+    def _run_import_shows(self, schedule, showcast_text, keependdate, role_id_list, musical_cast_list):
+        """解析卡司排期文本，创建 Show 并关联卡司。返回日志列表。"""
+        result = []
+        lines = showcast_text.strip().split("\n") if showcast_text.strip() else []
+        if not lines:
+            return ["请输入卡司排期文本。"]
+        today = datetime.date.today()
+        year = month = day = hour = minute = None
+        for line in lines[1:]:
+            try:
+                row = line.split('\t')
+                row = [s.strip() for s in row]
+                row = [s for s in row if s]
+                for i, s in enumerate(row):
+                    numbers = [int(num) for num in re.findall(r'\d+', row[i])]
+                    l_numbers = len(numbers)
+                    if ':' in row[i]:
+                        if l_numbers == 2:
+                            hour = numbers[0]
+                            minute = numbers[1]
+                        elif l_numbers == 4:
+                            month = numbers[0]
+                            if month < today.month:
+                                year = today.year + 1
+                            else:
+                                year = today.year
+                            day = numbers[1]
+                            hour = numbers[2]
+                            minute = numbers[3]
+                        elif l_numbers == 5:
+                            year = numbers[0]
+                            if year < 100:
+                                year += 2000
+                            month = numbers[1]
+                            day = numbers[2]
+                            hour = numbers[3]
+                            minute = numbers[4]
+                        break
+                    if l_numbers == 2:
+                        month = numbers[0]
+                        if month < today.month:
+                            year = today.year + 1
+                        else:
+                            year = today.year
+                        day = numbers[1]
+                    elif l_numbers == 3:
+                        year = numbers[0]
+                        if year < 100:
+                            year += 2000
+                        month = numbers[1]
+                        day = numbers[2]
+                time = str(year) + '-' + str(month) + '-' + str(day) + ' ' + str(hour) + ':' + str(minute)
+                show, created = Show.objects.get_or_create(schedule=schedule, time=time)
+                index = i + 1
+                for ci, s_artist in enumerate(row[index:]):
+                    if s_artist == "敬请期待":
+                        continue
+                    found = False
+                    if ci < len(role_id_list) and role_id_list[ci] is not None:
+                        for musical_cast in musical_cast_list:
+                            if (musical_cast.role == role_id_list[ci]
+                                    and musical_cast.artist.name == s_artist):
+                                show.cast.add(musical_cast)
+                                show_count = Show.objects.filter(
+                                    cast__artist=musical_cast.artist_id,
+                                    time=show.time
+                                ).distinct().count()
+                                if show_count > 1:
+                                    Conflict.objects.get_or_create(artist=musical_cast.artist, time=show.time)
+                                found = True
+                                break
+                    if not found:
+                        role_name = role_id_list[ci].name if ci < len(role_id_list) and role_id_list[ci] else "未知角色"
+                        result.append("  ⚠ 未找到卡司：" + role_name + " = " + s_artist)
+                result.append("OK -> " + line)
+            except Exception:
+                result.append("ERROR " + line)
+
+        if not keependdate and year and month and day:
+            end_date = str(year) + '-' + str(month) + '-' + str(day)
+            schedule.end_date = datetime.datetime.strptime(end_date, '%Y-%m-%d').date()
+            schedule.save()
+
+        return result
+
     def loadshow_view(self, request):
         result = []
         step = "input"
@@ -325,83 +410,8 @@ class CustomAdminSite(admin.AdminSite):
                 musical_cast_list = list(MusicalCast.objects.filter(
                     role__musical=musical).select_related('role', 'artist'))
 
-                # 5. 走原 loadshow 后半段逻辑：解析日期 + 创建 Show + add cast + 冲突检查
-                today = datetime.date.today()
-                year = month = day = hour = minute = None
-                for line in lines[1:]:
-                    try:
-                        row = line.split('\t')
-                        row = [s.strip() for s in row]
-                        row = [s for s in row if s]
-                        for i, s in enumerate(row):
-                            numbers = [int(num) for num in re.findall(r'\d+', row[i])]
-                            l_numbers = len(numbers)
-                            if ':' in row[i]:
-                                if l_numbers == 2:
-                                    hour = numbers[0]
-                                    minute = numbers[1]
-                                elif l_numbers == 4:
-                                    month = numbers[0]
-                                    if month < today.month:
-                                        year = today.year + 1
-                                    else:
-                                        year = today.year
-                                    day = numbers[1]
-                                    hour = numbers[2]
-                                    minute = numbers[3]
-                                elif l_numbers == 5:
-                                    year = numbers[0]
-                                    if year < 100:
-                                        year += 2000
-                                    month = numbers[1]
-                                    day = numbers[2]
-                                    hour = numbers[3]
-                                    minute = numbers[4]
-                                break
-                            if l_numbers == 2:
-                                month = numbers[0]
-                                if month < today.month:
-                                    year = today.year + 1
-                                else:
-                                    year = today.year
-                                day = numbers[1]
-                            elif l_numbers == 3:
-                                year = numbers[0]
-                                if year < 100:
-                                    year += 2000
-                                month = numbers[1]
-                                day = numbers[2]
-                        time = str(year) + '-' + str(month) + '-' + str(day) + ' ' + str(hour) + ':' + str(minute)
-                        show, created = Show.objects.get_or_create(schedule=schedule, time=time)
-                        index = i + 1
-                        for ci, s_artist in enumerate(row[index:]):
-                            if s_artist == "敬请期待":
-                                continue
-                            found = False
-                            if ci < len(role_id_list) and role_id_list[ci] is not None:
-                                for musical_cast in musical_cast_list:
-                                    if (musical_cast.role == role_id_list[ci]
-                                            and musical_cast.artist.name == s_artist):
-                                        show.cast.add(musical_cast)
-                                        show_count = Show.objects.filter(
-                                            cast__artist=musical_cast.artist_id,
-                                            time=show.time
-                                        ).distinct().count()
-                                        if show_count > 1:
-                                            Conflict.objects.get_or_create(artist=musical_cast.artist, time=show.time)
-                                        found = True
-                                        break
-                            if not found:
-                                role_name = role_id_list[ci].name if ci < len(role_id_list) and role_id_list[ci] else "未知角色"
-                                result.append("  ⚠ 未找到卡司：" + role_name + " = " + s_artist)
-                        result.append("OK -> " + line)
-                    except Exception:
-                        result.append("ERROR " + line)
-
-                if not keependdate and year and month and day:
-                    end_date = str(year) + '-' + str(month) + '-' + str(day)
-                    schedule.end_date = datetime.datetime.strptime(end_date, '%Y-%m-%d').date()
-                    schedule.save()
+                # 5. 创建 Show + add cast + 冲突检查
+                result.extend(self._run_import_shows(schedule, showcast_text, keependdate, role_id_list, musical_cast_list))
 
                 stats = "✅ 新增 {} 角色 / {} 演员 / {} 卡司".format(
                     len(new_role_by_col), created_artists_count, created_casts_count)
@@ -510,6 +520,21 @@ class CustomAdminSite(admin.AdminSite):
                         })
                 except Exception:
                     continue
+
+            # 所有角色和卡司都已存在时，跳过确认直接导入
+            if not pending_roles and not pending_casts:
+                result.extend(self._run_import_shows(schedule, showcast_text, keependdate, role_id_list, musical_cast_list))
+                result.insert(0, "✅ 新增 0 角色 / 0 演员 / 0 卡司")
+                context = dict(
+                    self.each_context(request),
+                    title="导入演出信息",
+                    step="input",
+                    result="\n".join(result),
+                    schedule_id=schedule_id,
+                    showcast_text=showcast_text,
+                    keependdate=keependdate,
+                )
+                return TemplateResponse(request, "admin/loadshow.html", context)
 
             step = "confirm"
 
