@@ -211,109 +211,321 @@ class CustomAdminSite(admin.AdminSite):
 
     def loadshow_view(self, request):
         result = []
+        step = "input"
         schedule_id = ""
         showcast_text = ""
+        keependdate = False
+        pending_roles = []
+        pending_casts = []
+        musical = None
+        schedule = None
+
         if request.method == "POST":
             schedule_id = request.POST.get("schedule_id", "")
             showcast_text = request.POST.get("showcast", "")
             keependdate = bool(request.POST.get("keependdate"))
-            schedule = Schedule.objects.get(pk=int(schedule_id))
-            role_list = Role.objects.filter(musical=schedule.tour.musical).order_by('seq')
-            musical_cast_list = MusicalCast.objects.filter(
-                role__musical=schedule.tour.musical).select_related('role', 'artist')
-            lines = showcast_text.strip().split("\n")
-            # 读取角色列表
-            header = lines[0].split('\t')
-            role_id_list = []
-            for s_role in header:
-                for role in role_list:
-                    if s_role.strip() == role.name:
-                        role_id_list.append(role)
-                        result.append("OK -> " + s_role)
-                        break
-            # 读取每一场演出的卡司排期并检查演员行程是否冲突
-            today = datetime.date.today()
-            for line in lines[1:]:
-                try:
-                    row = line.split('\t')
-                    # 去除空格和空字段
-                    row = [s.strip() for s in row]
-                    row = [s for s in row if s]
-                    # 读取日期和时间并添加演出信息
-                    for i, s in enumerate(row):
-                        numbers = [int(num) for num in re.findall(r'\d+', row[i])]
-                        l_numbers = len(numbers)
-                        # 如果有冒号代表读取结束
-                        if ':' in row[i]:
+            # 获取 Schedule
+            try:
+                schedule = Schedule.objects.get(pk=int(schedule_id))
+            except (Schedule.DoesNotExist, ValueError):
+                return TemplateResponse(
+                    request,
+                    "admin/loadshow.html",
+                    dict(self.each_context(request), step="input", result="Schedule does not exist.",
+                         schedule_id=schedule_id, showcast_text=showcast_text, keependdate=keependdate),
+                )
+            musical = schedule.tour.musical
+            role_list = list(Role.objects.filter(musical=musical).order_by('seq'))
+            musical_cast_list = list(MusicalCast.objects.filter(
+                role__musical=musical).select_related('role', 'artist'))
+
+            # === Step 3: 执行（用户已确认）===
+            if "confirm" in request.POST:
+                pending_roles_count = int(request.POST.get("pending_roles_count", 0))
+                pending_casts_count = int(request.POST.get("pending_casts_count", 0))
+
+                lines = showcast_text.strip().split("\n") if showcast_text.strip() else []
+                if not lines:
+                    return TemplateResponse(
+                        request,
+                        "admin/loadshow.html",
+                        dict(self.each_context(request), step="input", result="请输入卡司排期文本。",
+                             schedule_id=schedule_id, showcast_text=showcast_text, keependdate=keependdate),
+                    )
+                header = [s.strip() for s in lines[0].split('\t')]
+
+                # 1. 创建 Role（按 pending_roles 顺序）
+                max_role_seq = Role.objects.filter(musical=musical).order_by("-seq").values_list("seq", flat=True).first() or 0
+                new_role_by_col = {}
+                for k in range(pending_roles_count):
+                    try:
+                        col_index = int(request.POST.get("pending_role_col_" + str(k)))
+                    except (TypeError, ValueError):
+                        continue
+                    role_name = request.POST.get("pending_role_name_" + str(k))
+                    action = request.POST.get("pending_role_action_" + str(k))
+                    if action == "new" and role_name:
+                        role, created = Role.objects.get_or_create(
+                            musical=musical, name=role_name,
+                            defaults={'seq': max_role_seq + 1}
+                        )
+                        if created:
+                            max_role_seq += 1
+                        new_role_by_col[col_index] = role
+
+                # 2. 构建 role_id_list（一一对应 header，None 表示该列未匹配且未新增）
+                all_roles = list(Role.objects.filter(musical=musical).order_by('seq'))
+                role_id_list = []
+                for i, s_role in enumerate(header):
+                    role = None
+                    if i in new_role_by_col:
+                        role = new_role_by_col[i]
+                    else:
+                        for r in all_roles:
+                            if s_role == r.name:
+                                role = r
+                                break
+                    role_id_list.append(role)
+
+                # 3. 创建 Artist + MusicalCast
+                created_artists_count = 0
+                created_casts_count = 0
+                for k in range(pending_casts_count):
+                    try:
+                        col_index = int(request.POST.get("pending_cast_col_" + str(k)))
+                    except (TypeError, ValueError):
+                        continue
+                    name = request.POST.get("pending_cast_name_" + str(k))
+                    action = request.POST.get("pending_cast_action_" + str(k))
+
+                    if not action or action == "skip" or not name:
+                        continue
+                    if col_index >= len(role_id_list) or role_id_list[col_index] is None:
+                        continue
+                    role = role_id_list[col_index]
+
+                    if action.startswith("match_"):
+                        try:
+                            artist = Artist.objects.get(pk=int(action.replace("match_", "")))
+                        except (Artist.DoesNotExist, ValueError):
+                            continue
+                    elif action == "new":
+                        artist = Artist.objects.create(name=name)
+                        created_artists_count += 1
+                    else:
+                        continue
+
+                    # 创建 MusicalCast（如果不存在）
+                    if not MusicalCast.objects.filter(role=role, artist=artist).exists():
+                        actor_seq = MusicalCast.objects.filter(role=role).order_by("-seq").values_list("seq", flat=True).first() or 0
+                        MusicalCast.objects.create(role=role, artist=artist, seq=actor_seq + 1)
+                        created_casts_count += 1
+
+                # 4. 重新查 musical_cast_list（含新建的）
+                musical_cast_list = list(MusicalCast.objects.filter(
+                    role__musical=musical).select_related('role', 'artist'))
+
+                # 5. 走原 loadshow 后半段逻辑：解析日期 + 创建 Show + add cast + 冲突检查
+                today = datetime.date.today()
+                year = month = day = hour = minute = None
+                for line in lines[1:]:
+                    try:
+                        row = line.split('\t')
+                        row = [s.strip() for s in row]
+                        row = [s for s in row if s]
+                        for i, s in enumerate(row):
+                            numbers = [int(num) for num in re.findall(r'\d+', row[i])]
+                            l_numbers = len(numbers)
+                            if ':' in row[i]:
+                                if l_numbers == 2:
+                                    hour = numbers[0]
+                                    minute = numbers[1]
+                                elif l_numbers == 4:
+                                    month = numbers[0]
+                                    if month < today.month:
+                                        year = today.year + 1
+                                    else:
+                                        year = today.year
+                                    day = numbers[1]
+                                    hour = numbers[2]
+                                    minute = numbers[3]
+                                elif l_numbers == 5:
+                                    year = numbers[0]
+                                    if year < 100:
+                                        year += 2000
+                                    month = numbers[1]
+                                    day = numbers[2]
+                                    hour = numbers[3]
+                                    minute = numbers[4]
+                                break
                             if l_numbers == 2:
-                                hour = numbers[0]
-                                minute = numbers[1]
-                            elif l_numbers == 4:
                                 month = numbers[0]
                                 if month < today.month:
                                     year = today.year + 1
                                 else:
                                     year = today.year
                                 day = numbers[1]
-                                hour = numbers[2]
-                                minute = numbers[3]
-                            elif l_numbers == 5:
+                            elif l_numbers == 3:
                                 year = numbers[0]
                                 if year < 100:
                                     year += 2000
                                 month = numbers[1]
                                 day = numbers[2]
-                                hour = numbers[3]
-                                minute = numbers[4]
-                            break
-                        # 如果没有冒号只读取日期
-                        if l_numbers == 2:
-                            month = numbers[0]
-                            if month < today.month:
-                                year = today.year + 1
-                            else:
-                                year = today.year
-                            day = numbers[1]
-                        elif l_numbers == 3:
-                            year = numbers[0]
-                            if year < 100:
-                                year += 2000
-                            month = numbers[1]
-                            day = numbers[2]
-                    time = str(year) + '-' + str(month) + '-' + str(day) + ' ' + str(hour) + ':' + str(minute)
-                    show, created = Show.objects.get_or_create(schedule=schedule, time=time)
-                    # 读取并添加卡司信息
-                    index = i + 1
-                    for i, s_artist in enumerate(row[index:]):
-                        for musical_cast in musical_cast_list:
-                            if musical_cast.role == role_id_list[i] and musical_cast.artist.name == s_artist:
-                                show.cast.add(musical_cast)
-                                show_count = Show.objects.filter(cast__artist=musical_cast.artist_id,
-                                                                 time=show.time).distinct().count()
-                                if show_count > 1:
-                                    Conflict.objects.get_or_create(artist=musical_cast.artist, time=show.time)
-                                break
-                        else:
-                            # 未找到匹配的卡司
+                        time = str(year) + '-' + str(month) + '-' + str(day) + ' ' + str(hour) + ':' + str(minute)
+                        show, created = Show.objects.get_or_create(schedule=schedule, time=time)
+                        index = i + 1
+                        for ci, s_artist in enumerate(row[index:]):
                             if s_artist == "敬请期待":
                                 continue
-                            role_name = role_id_list[i].name if i < len(role_id_list) else "未知角色"
-                            result.append("  ⚠ 未找到卡司：" + role_name + " = " + s_artist)
-                    result.append("OK -> " + line)
-                except Exception as e:
-                    result.append("ERROR " + line)
-            if not keependdate and year and month and day:
-                end_date = str(year) + '-' + str(month) + '-' + str(day)
-                schedule.end_date = datetime.datetime.strptime(end_date, '%Y-%m-%d').date()
-                schedule.save()
+                            found = False
+                            if ci < len(role_id_list) and role_id_list[ci] is not None:
+                                for musical_cast in musical_cast_list:
+                                    if (musical_cast.role == role_id_list[ci]
+                                            and musical_cast.artist.name == s_artist):
+                                        show.cast.add(musical_cast)
+                                        show_count = Show.objects.filter(
+                                            cast__artist=musical_cast.artist_id,
+                                            time=show.time
+                                        ).distinct().count()
+                                        if show_count > 1:
+                                            Conflict.objects.get_or_create(artist=musical_cast.artist, time=show.time)
+                                        found = True
+                                        break
+                            if not found:
+                                role_name = role_id_list[ci].name if ci < len(role_id_list) and role_id_list[ci] else "未知角色"
+                                result.append("  ⚠ 未找到卡司：" + role_name + " = " + s_artist)
+                        result.append("OK -> " + line)
+                    except Exception:
+                        result.append("ERROR " + line)
+
+                if not keependdate and year and month and day:
+                    end_date = str(year) + '-' + str(month) + '-' + str(day)
+                    schedule.end_date = datetime.datetime.strptime(end_date, '%Y-%m-%d').date()
+                    schedule.save()
+
+                stats = "✅ 新增 {} 角色 / {} 演员 / {} 卡司".format(
+                    len(new_role_by_col), created_artists_count, created_casts_count)
+                result.insert(0, stats)
+
+                context = dict(
+                    self.each_context(request),
+                    title="导入演出信息",
+                    step="input",
+                    result="\n".join(result),
+                    schedule_id=schedule_id,
+                    showcast_text=showcast_text,
+                    keependdate=keependdate,
+                )
+                return TemplateResponse(request, "admin/loadshow.html", context)
+
+            # === Step 2: 解析（产出 pending_roles / pending_casts）===
+            lines = showcast_text.strip().split("\n") if showcast_text.strip() else []
+            if not lines:
+                return TemplateResponse(
+                    request,
+                    "admin/loadshow.html",
+                    dict(self.each_context(request), step="input", result="请输入卡司排期文本。",
+                         schedule_id=schedule_id, showcast_text=showcast_text, keependdate=keependdate),
+                )
+            header = [s.strip() for s in lines[0].split('\t')]
+
+            # 解析 header 角色，一一对应 role_id_list
+            role_id_list = []
+            for s_role in header:
+                found = None
+                for role in role_list:
+                    if s_role == role.name:
+                        found = role
+                        break
+                role_id_list.append(found)
+                if found is None and s_role:
+                    # 去重：同一角色名只入一次 pending_roles
+                    if not any(pr['role_name'] == s_role for pr in pending_roles):
+                        pending_roles.append({
+                            'index': len(pending_roles),
+                            'col_index': len(role_id_list) - 1,
+                            'role_name': s_role,
+                        })
+
+            # 解析后续每行：定位时间列，扫描演员列，收集未匹配的 MusicalCast
+            for line in lines[1:]:
+                try:
+                    row = line.split('\t')
+                    row = [s.strip() for s in row]
+                    row = [s for s in row if s]
+                    # 找时间列（含 ':'）
+                    time_col = None
+                    for i, s in enumerate(row):
+                        if ':' in s:
+                            time_col = i
+                            break
+                    if time_col is None:
+                        continue
+                    # 演员从 time_col + 1 开始，索引 ci 对应 role_id_list[ci]
+                    for ci, s_artist in enumerate(row[time_col + 1:]):
+                        if s_artist == "敬请期待":
+                            continue
+                        # 去重：同一 (col_index, artist_name) 只入一次
+                        if any(pc['col_index'] == ci and pc['name'] == s_artist for pc in pending_casts):
+                            continue
+                        role = role_id_list[ci] if ci < len(role_id_list) else None
+                        # 检查是否已有 MusicalCast（仅当 role 已存在时）
+                        exists = False
+                        if role is not None:
+                            for mc in musical_cast_list:
+                                if mc.role == role and mc.artist.name == s_artist:
+                                    exists = True
+                                    break
+                        if exists:
+                            continue
+                        # Artist 模糊匹配
+                        exact_matches = list(Artist.objects.filter(name=s_artist))
+                        if len(exact_matches) == 1:
+                            status, artist, candidates = "matched", exact_matches[0], []
+                        elif len(exact_matches) > 1:
+                            status, artist, candidates = "similar", None, exact_matches
+                        else:
+                            similar = list(Artist.objects.filter(
+                                Q(name__icontains=s_artist) | Q(name__icontains=s_artist[:2])
+                            ).distinct()[:10])
+                            if similar:
+                                status, artist, candidates = "similar", None, similar
+                            else:
+                                status, artist, candidates = "new", None, []
+                        # 显示用的角色名
+                        if role is not None:
+                            role_name = role.name
+                        elif ci < len(header) and header[ci]:
+                            role_name = "(待新增: " + header[ci] + ")"
+                        else:
+                            role_name = "(未知角色)"
+                        pending_casts.append({
+                            'index': len(pending_casts),
+                            'col_index': ci,
+                            'role_name': role_name,
+                            'name': s_artist,
+                            'status': status,
+                            'artist': artist,
+                            'candidates': candidates,
+                        })
+                except Exception:
+                    continue
+
+            step = "confirm"
+
         context = dict(
             self.each_context(request),
             title="导入演出信息",
-            result="\n".join(result),
+            step=step,
+            result="\n".join(result) if result else "",
             schedule_id=schedule_id,
             showcast_text=showcast_text,
+            keependdate=keependdate,
+            musical=musical,
+            schedule=schedule,
+            pending_roles=pending_roles,
+            pending_casts=pending_casts,
         )
-
         return TemplateResponse(request, "admin/loadshow.html", context)
 
     def replace_cast_view(self, request):

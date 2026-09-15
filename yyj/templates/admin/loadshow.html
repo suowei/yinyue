@@ -1,28 +1,99 @@
 {% extends "admin/base_site.html" %}
 
 {% block content %}
+{% if step == 'confirm' %}
+<h2>确认导入到：{{ schedule }}（{{ musical }}）</h2>
 <form method="post" id="loadshowForm">
     {% csrf_token %}
-    <p>Schedule ID <input type="text" name="schedule_id" required></p>
-    <p>卡司排期</p>
-    <textarea name="showcast" rows="15" style="width:100%;" required></textarea>
-    <p><label><input type="checkbox" name="keependdate"> Keep End Date</label></p>
-    <button type="submit">执行</button>
-    {% if result %}
-    <button type="button" id="reloadBtn">重新导入</button>
+    <input type="hidden" name="confirm" value="1">
+    <input type="hidden" name="schedule_id" value="{{ schedule_id }}">
+    <input type="hidden" name="showcast" value="{{ showcast_text }}">
+    {% if keependdate %}<input type="hidden" name="keependdate" value="1">{% endif %}
+    <input type="hidden" name="pending_roles_count" value="{{ pending_roles|length }}">
+    <input type="hidden" name="pending_casts_count" value="{{ pending_casts|length }}">
+
+    {% if pending_roles %}
+    <h3>待新增角色（{{ pending_roles|length }}）</h3>
+    <table border="1" cellpadding="6" cellspacing="0">
+        <tr><th>列号</th><th>角色名</th><th>操作</th></tr>
+        {% for pr in pending_roles %}
+        <tr>
+            <td>{{ pr.col_index }}</td>
+            <td>{{ pr.role_name }}
+                <input type="hidden" name="pending_role_col_{{ pr.index }}" value="{{ pr.col_index }}">
+                <input type="hidden" name="pending_role_name_{{ pr.index }}" value="{{ pr.role_name }}">
+            </td>
+            <td>
+                <select name="pending_role_action_{{ pr.index }}">
+                    <option value="new" selected>➕ 新增角色</option>
+                    <option value="skip">跳过</option>
+                </select>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br>
     {% endif %}
+
+    {% if pending_casts %}
+    <h3>待新增卡司（{{ pending_casts|length }}）</h3>
+    <table border="1" cellpadding="6" cellspacing="0">
+        <tr><th>列号</th><th>角色</th><th>演员</th><th>状态</th><th>操作</th></tr>
+        {% for pc in pending_casts %}
+        <tr>
+            <td>{{ pc.col_index }}</td>
+            <td>{{ pc.role_name }}
+                <input type="hidden" name="pending_cast_col_{{ pc.index }}" value="{{ pc.col_index }}">
+                <input type="hidden" name="pending_cast_name_{{ pc.index }}" value="{{ pc.name }}">
+            </td>
+            <td>{{ pc.name }}</td>
+            <td>
+                {% if pc.status == 'matched' %}✅
+                {% elif pc.status == 'similar' %}⚠️
+                {% else %}🆕{% endif %}
+            </td>
+            <td>
+                <select name="pending_cast_action_{{ pc.index }}">
+                    {% if pc.status == 'matched' %}
+                    <option value="match_{{ pc.artist.id }}" selected>{{ pc.artist }} (ID#{{ pc.artist.id }}) + 新增卡司</option>
+                    {% endif %}
+                    {% for c in pc.candidates %}
+                    <option value="match_{{ c.id }}" {% if pc.status == 'similar' and forloop.first %}selected{% endif %}>{{ c }} (ID#{{ c.id }}) + 新增卡司</option>
+                    {% endfor %}
+                    <option value="new" {% if pc.status == 'new' %}selected{% endif %}>➕ 新建「{{ pc.name }}」+ 新增卡司</option>
+                    <option value="skip">跳过</option>
+                </select>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br>
+    {% endif %}
+
+    {% if not pending_roles and not pending_casts %}
+    <p>所有角色和卡司均已存在，可直接导入。</p>
+    {% endif %}
+
+    <button type="submit">确认导入</button>
 </form>
+<br>
+{% endif %}
+
+{% if step != 'confirm' %}
+<form method="post" id="loadshowForm">
+    {% csrf_token %}
+    <p>Schedule ID <input type="text" name="schedule_id" value="{{ schedule_id }}" required></p>
+    <p>卡司排期</p>
+    <textarea name="showcast" rows="15" style="width:100%;" required>{{ showcast_text }}</textarea>
+    <p><label><input type="checkbox" name="keependdate" {% if keependdate %}checked{% endif %}> Keep End Date</label></p>
+    <button type="submit">执行</button>
+</form>
+{% endif %}
+
 {% if result %}
 <h2>执行结果</h2>
 <pre>
 {{ result }}
 </pre>
-<script>
-document.getElementById('reloadBtn').addEventListener('click', function() {
-    var form = document.getElementById('loadshowForm');
-    form.querySelector('input[name="schedule_id"]').value = "{{ schedule_id|escapejs }}";
-    form.querySelector('textarea[name="showcast"]').value = "{{ showcast_text|escapejs }}";
-});
-</script>
 {% endif %}
 {% endblock %}
