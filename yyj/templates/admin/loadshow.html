@@ -75,6 +75,14 @@
     {% endif %}
 
     <button type="submit">确认导入</button>
+    <button type="submit" form="backForm" style="margin-left:12px;">返回修改</button>
+</form>
+<form method="post" id="backForm" style="display:none;">
+    {% csrf_token %}
+    <input type="hidden" name="back" value="1">
+    <input type="hidden" name="schedule_id" value="{{ schedule_id }}">
+    <input type="hidden" name="showcast" value="{{ showcast_text }}">
+    {% if keependdate %}<input type="hidden" name="keependdate" value="1">{% endif %}
 </form>
 <br>
 {% endif %}

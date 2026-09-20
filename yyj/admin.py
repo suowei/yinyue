@@ -324,6 +324,18 @@ class CustomAdminSite(admin.AdminSite):
             musical_cast_list = list(MusicalCast.objects.filter(
                 role__musical=musical).select_related('role', 'artist'))
 
+            # 返回修改：用户在确认页点"返回修改"按钮，回填文本到输入页
+            if "back" in request.POST:
+                context = dict(
+                    self.each_context(request),
+                    title="导入演出信息",
+                    step="input",
+                    schedule_id=schedule_id,
+                    showcast_text=showcast_text,
+                    keependdate=keependdate,
+                )
+                return TemplateResponse(request, "admin/loadshow.html", context)
+
             # === Step 3: 执行（用户已确认）===
             if "confirm" in request.POST:
                 pending_roles_count = int(request.POST.get("pending_roles_count", 0))
@@ -422,9 +434,6 @@ class CustomAdminSite(admin.AdminSite):
                     title="导入演出信息",
                     step="input",
                     result="\n".join(result),
-                    schedule_id=schedule_id,
-                    showcast_text=showcast_text,
-                    keependdate=keependdate,
                 )
                 return TemplateResponse(request, "admin/loadshow.html", context)
 
@@ -530,9 +539,6 @@ class CustomAdminSite(admin.AdminSite):
                     title="导入演出信息",
                     step="input",
                     result="\n".join(result),
-                    schedule_id=schedule_id,
-                    showcast_text=showcast_text,
-                    keependdate=keependdate,
                 )
                 return TemplateResponse(request, "admin/loadshow.html", context)
 
